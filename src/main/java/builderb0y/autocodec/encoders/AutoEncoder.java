@@ -1,0 +1,147 @@
+package builderb0y.autocodec.encoders;
+
+import org.jetbrains.annotations.ApiStatus.OverrideOnly;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import builderb0y.autocodec.common.AutoHandler;
+import builderb0y.autocodec.common.FactoryContext;
+import builderb0y.autocodec.common.FactoryException;
+import builderb0y.autocodec.reflection.reification.ReifiedType;
+import builderb0y.autocodec.util.ObjectArrayFactory;
+
+public interface AutoEncoder<T_Decoded> extends AutoHandler {
+
+	public static final @NotNull ObjectArrayFactory<AutoEncoder<?>> ARRAY_FACTORY = new ObjectArrayFactory<>(AutoEncoder.class).generic();
+
+	/**
+	takes an instance of {@link T_Decoded} stored on {@link EncodeContext#input},
+	and encodes it into data. throws {@link EncodeException} if some
+	abnormal conditions prevent the object from being serialized.
+
+	there is no verification when encoding objects,
+	as we assume that the object being encoded came from a trusted source.
+	if it was decoded from data, it would've been verified on decode.
+
+	this method is annotated with {@link OverrideOnly}
+	because it performs no logging on its own.
+	use {@link EncodeContext#encodeWith(AutoEncoder)}
+	to encode and log what is being encoded.
+	*/
+	@OverrideOnly
+	public abstract <T_Encoded> @NotNull T_Encoded encode(@NotNull EncodeContext<T_Encoded, T_Decoded> context) throws EncodeException;
+
+	/**
+	adapts this AutoEncoder to work on a different type. specifically type T_To.
+	the mapper's purpose is to convert instances of T_To
+	into T_Decoded so that this AutoEncoder can handle them.
+	at the time of writing this, the newType parameter is unused by the default implementation.
+	it is provided for subclasses to use if they choose to override this method.
+	*/
+	public default <T_To> @NotNull AutoEncoder<T_To> mapEncoder(
+		@NotNull ReifiedType<T_To> newType,
+		@NotNull HandlerMapper<@Nullable T_To, @Nullable T_Decoded> mapper
+	) {
+		return new AutoEncoder<>() {
+
+			@Override
+			public <T_Encoded> @NotNull T_Encoded encode(@NotNull EncodeContext<T_Encoded, T_To> context) throws EncodeException {
+				try {
+					return context.input(mapper.apply(context.input)).encodeWith(AutoEncoder.this);
+				}
+				catch (EncodeException | Error exception) {
+					throw exception;
+				}
+				catch (Throwable throwable) {
+					throw new EncodeException(throwable);
+				}
+			}
+
+			@Override
+			public String toString() {
+				return AutoEncoder.this + " <- " + mapper;
+			}
+		};
+	}
+
+	/**
+	same as {@link #mapEncoder(ReifiedType, HandlerMapper)},
+	but allows you to provide a name for the mapper function.
+	this can be particularly useful for logging when the mapper
+	function is a lambda expression, since lambda expressions
+	don't override {@link Object#toString()}. the provided name
+	is only used by the returned AutoEncoder's toString() method,
+	and has no effect on how the returned AutoEncoder encodes things.
+	at the time of writing this, the newType parameter is unused by the default implementation.
+	it is provided for subclasses to use if they choose to override this method.
+	*/
+	public default <T_To> @NotNull AutoEncoder<T_To> mapEncoder(
+		@NotNull ReifiedType<T_To> newType,
+		@NotNull String mapperName,
+		@NotNull HandlerMapper<@Nullable T_To, @Nullable T_Decoded> mapper
+	) {
+		return new AutoEncoder<>() {
+
+			@Override
+			public <T_Encoded> @NotNull T_Encoded encode(@NotNull EncodeContext<T_Encoded, T_To> context) throws EncodeException {
+				try {
+					return context.input(mapper.apply(context.input)).encodeWith(AutoEncoder.this);
+				}
+				catch (EncodeException | Error exception) {
+					throw exception;
+				}
+				catch (Throwable throwable) {
+					throw new EncodeException(throwable);
+				}
+			}
+
+			@Override
+			public String toString() {
+				return AutoEncoder.this + " <- " + mapperName;
+			}
+		};
+	}
+
+	public static abstract class NamedEncoder<T_Decoded> extends NamedHandler<T_Decoded> implements AutoEncoder<T_Decoded> {
+
+		public NamedEncoder(@NotNull ReifiedType<T_Decoded> type) {
+			super(type);
+		}
+
+		public NamedEncoder(@NotNull String toString) {
+			super(toString);
+		}
+	}
+
+	public static interface EncoderFactory extends AutoFactory<AutoEncoder<?>> {
+
+		/**
+		returns an AutoEncoder which can encode instances of T_HandledType,
+		or null if this factory does not know how to encode instances of T_HandledType.
+		throws {@link FactoryException} if this factory knows how to encode instances
+		of T_HandledType, but some other problem occurs which prevents it from doing so.
+
+		this method used to enforce that it returns AutoEncoder<T_HandledType>,
+		but the problem with that is it usually just resulted
+		in a lot of unchecked casts for implementors.
+		java's generics system just wasn't designed for these kinds of things.
+
+		this method is annotated with {@link OverrideOnly}
+		because it performs no logging on its own.
+		use {@link FactoryContext#tryCreateEncoder(EncoderFactory)}
+		to create an encoder using this factory and log it at the same time.
+		*/
+		@Override
+		@OverrideOnly
+		public abstract <T_HandledType> @Nullable AutoEncoder<?> tryCreate(@NotNull FactoryContext<T_HandledType> context) throws FactoryException;
+	}
+
+	public static abstract class NamedEncoderFactory extends NamedFactory<AutoEncoder<?>> implements EncoderFactory {
+
+		public NamedEncoderFactory() {}
+
+		public NamedEncoderFactory(@NotNull String toString) {
+			super(toString);
+		}
+	}
+}
