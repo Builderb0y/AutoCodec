@@ -1,11 +1,13 @@
 package builderb0y.autocodec.annotations;
 
 import java.lang.annotation.*;
+import java.util.Collection;
 
 import builderb0y.autocodec.reflection.reification.ReifiedType;
 
 /**
-applicable to arrays, indicates that the array can be
+applicable to arrays and {@link Collection}s,
+indicates that the array or Collection can be
 serialized and deserialized from its singleton element.
 for example, the array [ "foo" ] will be serialized as "foo",
 and the string "foo" can be deserialized into [ "foo" ].

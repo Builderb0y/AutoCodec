@@ -3,7 +3,6 @@ package builderb0y.autocodec;
 import java.lang.invoke.MethodHandles;
 import java.util.concurrent.locks.ReentrantLock;
 
-import com.google.gson.Gson;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.Decoder;
 import com.mojang.serialization.DynamicOps;
@@ -18,7 +17,6 @@ import builderb0y.autocodec.coders.AutoCoder;
 import builderb0y.autocodec.common.AutoHandler.AutoFactory;
 import builderb0y.autocodec.common.FactoryContext;
 import builderb0y.autocodec.common.FactoryException;
-import builderb0y.autocodec.common.FactoryList;
 import builderb0y.autocodec.common.ReflectContextProvider;
 import builderb0y.autocodec.constructors.AutoConstructor;
 import builderb0y.autocodec.constructors.ConstructException;
@@ -47,109 +45,12 @@ import builderb0y.autocodec.verifiers.VerifierFactoryList;
 import builderb0y.autocodec.verifiers.VerifyException;
 
 /**
-introduction:
-	in the beginning...
-
-	there was {@link Gson}.
-	Gson was nice because you could tell it
-	what you wanted to serialize or deserialize,
-	and it would figure out how to do that for you.
-
-	and then minecraft made world settings use NBT data instead of JSON data.
-	so I wrote my own version of Gson which could handle NBT data.
-
-	and then mojang invented {@link DynamicOps}.
-	so I re-wrote my version of Gson to work with that.
-	now I could handle JSON data AND NBT data with the same library.
-
-	and then mojang invented {@link Codec}'s,
-	and didn't document how they work or to use them.
-	to this day I still don't know how to use Codec's the intended way.
-	but my serialization library lives on.
-
-	only time will tell how many more iterations of
-	this library I'll need to make in the future.
-
-brief description:
-	welcome to AutoCodec! the Gson of Codec's.
-	here you can provide a {@link Class} or {@link ReifiedType},
-	and you will get a {@link Codec} back from it which
-	can serialize and deserialize instances of that type.
-	see {@link #createDFUCodec(Class)} and {@link #createDFUCodec(ReifiedType)}.
-
-quick start:
-	step 1: create an {@link AutoCodec#AutoCodec()}.
-	step 2: call {@link #createDFUCodec(Class)} or
-		{@link #createDFUCodec(ReifiedType)} with the type you want.
-	step 3: you now have a {@link Codec} for that type.
-
-customization:
-	any method in this class, subclasses of {@link FactoryList},
-	and {@link ReflectionManager} which are annotated with {@link OverrideOnly}
-	are intended to be overridden by an anonymous subclass.
-	for example: {@code
-		public static final AutoCodec AUTO_CODEC = new AutoCodec() {
-
-			@Override
-			public @NotNull TaskLogger createDecodeLogger(@NotNull ReentrantLock lock) {
-				return new IndentedTaskLogger(lock, Printer.SYSTEM, true);
-			}
-
-			@Override
-			public @NotNull DecoderFactoryList createDecoders() {
-				return new DecoderFactoryList() {
-
-					@Override
-					public void setup() {
-						super.setup();
-						this.addFactoryAfter(LookupDecoderFactory.class, new MySpecialDecoderFactory());
-						this.addFactoryBefore(RecordDecoder.Factory.INSTANCE, new MyOtherDecoderFactory());
-					}
-				}
-			}
-		};
-	}
-
-advantages over traditional Codec's:
-	1: automation.
-		users of AutoCodec do not need to specify how to handle
-		every type they intend to serialize or deserialize.
-		instead, users provide "rules" (AKA "factories")
-		which specify how to handle a wide range of types.
-		many factories are built-in, and many
-		types can be handled out-of-the-box.
-		therefore, users only need to specify how to
-		handle "non-trivial" types, with special rules
-		for how they should be encoded and decoded.
-
-	2: logging.
-		AutoCodec provides built-in logging which divides work into "tasks".
-		see {@link TaskLogger} for more information on how this works,
-		and {@link #createDefaultLogger(ReentrantLock)} for information on how to customize logging.
-		the bottom line is that AutoCodec can log what it's doing,
-		and how tasks are structured, which makes it very easy to see at a glance
-		what's going on, and what broke *this* time. cause we all know *that* feeling.
-
-	3: debugging.
-		AutoCodec aims to use vastly less lambda soup than the rest of DFU.
-		it also aims to use less delegation (not none, just less).
-		this makes it easier to use a debugger on it,
-		and also easier to step through it.
-
-re-organization of tasks:
-	regular DFU has 2 types of handlers:
-	{@link Encoder} and {@link Decoder},
-	with {@link Codec} performing the tasks of both.
-
-	by contrast, AutoCodec has 5 types of handlers:
-	{@link AutoEncoder}, {@link AutoConstructor}, {@link AutoImprinter},
-	{@link AutoDecoder}, and {@link AutoVerifier}.
-	AutoEncoder and AutoDecoder are still the main ones,
-	but the process of decoding will *sometimes* be
-	broken down into constructing and imprinting,
-	and *sometimes* a verifier will be stuck on the end.
-	basically, this system is a bit more modular than default DFU.
-	see the documentation on each of these classes to see how they fit together.
+the main class responsible for creating Codec's.
+simply construct an instance of this class
+(and preferably store it in a static final field),
+then call {@link #createDFUCodec(Class)}
+or {@link #createDFUCodec(ReifiedType)}
+on it to create a Codec for that type.
 */
 public class AutoCodec implements ReflectContextProvider {
 
@@ -164,7 +65,7 @@ public class AutoCodec implements ReflectContextProvider {
 	public final @NotNull    VerifierFactoryList verifiers;
 
 	public AutoCodec() {
-		ReentrantLock lock = new ReentrantLock();
+		ReentrantLock lock     = new ReentrantLock();
 		this.factoryLogger     = this.createFactoryLogger(lock);
 		this.encodeLogger      = this.createEncodeLogger(lock);
 		this.decodeLogger      = this.createDecodeLogger(lock);

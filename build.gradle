@@ -33,6 +33,8 @@ java() {
 	withSourcesJar()
 }
 
+//if you're reading this and trying to compile AutoCodec yourself,
+//you'll probably want to remove this part.
 publishing() {
 	publications() {
 		mavenJava(MavenPublication) {
@@ -47,4 +49,5 @@ publishing() {
 	}
 }
 
+//and this part too.
 build.dependsOn(publish)
