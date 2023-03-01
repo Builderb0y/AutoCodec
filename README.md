@@ -109,4 +109,4 @@ One other nice thing about loggers is that they only perform String concatenatio
 
 # A word on Minecraft
 
-Yes, this library was designed to interact with Minecraft. However, Minecraft's obfuscation and unstable code base makes this impractical, even if I were to make it a mod for Minecraft. So instead, this library simply provides the boilerplate work, and it is up to the user to make it interact with Minecraft. For an example on how to do this, check out what Big Globe does with it.
+Yes, this library was designed to interact with Minecraft. However, Minecraft's obfuscation and unstable code base makes this impractical, even if I were to make it a mod for Minecraft. So instead, this library simply provides the boilerplate work, and it is up to the user to make it interact with Minecraft. For an example on how to do this, check out [what Big Globe does with it](https://github.com/Builderb0y/BigGlobe/blob/master/src/main/java/builderb0y/bigglobe/codecs/BigGlobeAutoCodec.java).
