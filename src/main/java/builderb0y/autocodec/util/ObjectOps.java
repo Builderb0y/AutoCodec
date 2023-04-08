@@ -31,6 +31,10 @@ public class ObjectOps implements DynamicOps<Object> {
 		this.compressed = compressed;
 	}
 
+	public static <R> DataResult<R> notA(String type, Object object) {
+		return DataResult.error(() -> "Not a " + type + ": " + object);
+	}
+
 	@Override
 	public boolean compressMaps() {
 		return this.compressed;
@@ -57,7 +61,7 @@ public class ObjectOps implements DynamicOps<Object> {
 
 	@Override
 	public DataResult<Number> getNumberValue(Object input) {
-		return input instanceof Number number ? DataResult.success(number) : DataResult.error("Not a Number: " + input);
+		return input instanceof Number number ? DataResult.success(number) : notA("Number", input);
 	}
 
 	@Override
@@ -67,7 +71,7 @@ public class ObjectOps implements DynamicOps<Object> {
 
 	@Override
 	public DataResult<String> getStringValue(Object input) {
-		return input instanceof String string ? DataResult.success(string) : DataResult.error("Not a String: " + input);
+		return input instanceof String string ? DataResult.success(string) : notA("String", input);
 	}
 
 	@Override
@@ -89,7 +93,7 @@ public class ObjectOps implements DynamicOps<Object> {
 			newList.add(value);
 			return DataResult.success(newList);
 		}
-		return DataResult.error("Not a List: " + list);
+		return notA("List", list);
 	}
 
 	@Override
@@ -100,7 +104,7 @@ public class ObjectOps implements DynamicOps<Object> {
 			newMap.put(key, value);
 			return DataResult.success(newMap);
 		}
-		return DataResult.error("Not a Map: " + map);
+		return notA("Map", map);
 	}
 
 	@Override
@@ -108,7 +112,7 @@ public class ObjectOps implements DynamicOps<Object> {
 		if (input instanceof Map<?, ?> actualMap) {
 			return DataResult.success(actualMap.entrySet().stream().map(entry -> Pair.of(entry.getKey(), entry.getValue())));
 		}
-		return DataResult.error("Not a Map: " + input);
+		return notA("Map", input);
 	}
 
 	@Override
@@ -124,7 +128,7 @@ public class ObjectOps implements DynamicOps<Object> {
 		if (input.getClass().isArray()) {
 			return DataResult.success(IntStream.range(0, Array.getLength(input)).mapToObj((int index) -> Array.get(input, index)));
 		}
-		return DataResult.error("Not a List: " + input);
+		return notA("List", input);
 	}
 
 	@Override
@@ -189,7 +193,7 @@ public class ObjectOps implements DynamicOps<Object> {
 
 	@Override
 	public DataResult<Boolean> getBooleanValue(Object input) {
-		return input instanceof Boolean bool ? DataResult.success(bool) : DataResult.error("Not a Boolean: " + input);
+		return input instanceof Boolean bool ? DataResult.success(bool) : notA("Boolean", input);
 	}
 
 	@Override
@@ -205,7 +209,7 @@ public class ObjectOps implements DynamicOps<Object> {
 			newList.addAll(values);
 			return DataResult.success(newList);
 		}
-		return DataResult.error("Not a List: " + list);
+		return notA("List", list);
 	}
 
 	@Override
@@ -216,7 +220,7 @@ public class ObjectOps implements DynamicOps<Object> {
 			newMap.putAll(values);
 			return DataResult.success(newMap);
 		}
-		return DataResult.error("Not a Map: " + map);
+		return notA("Map", map);
 	}
 
 	@Override
@@ -226,7 +230,7 @@ public class ObjectOps implements DynamicOps<Object> {
 			values.entries().forEach((Pair pair) -> newMap.put(pair.getFirst(), pair.getSecond()));
 			return DataResult.success(newMap);
 		}
-		return DataResult.error("Not a Map: " + map);
+		return notA("Map", map);
 	}
 
 	@Override
@@ -234,7 +238,7 @@ public class ObjectOps implements DynamicOps<Object> {
 		if (input instanceof Map actualMap) {
 			return DataResult.success(MapLike.forMap(actualMap, this));
 		}
-		return DataResult.error("Not a Map: " + input);
+		return notA("Map", input);
 	}
 
 	@Override
@@ -247,7 +251,7 @@ public class ObjectOps implements DynamicOps<Object> {
 		if (input instanceof byte[] bytes) {
 			return DataResult.success(ByteBuffer.wrap(bytes));
 		}
-		return DataResult.error("Not a byte[]: " + input);
+		return notA("byte[]", input);
 	}
 
 	@Override
@@ -262,7 +266,7 @@ public class ObjectOps implements DynamicOps<Object> {
 		if (input instanceof int[] ints) {
 			return DataResult.success(Arrays.stream(ints));
 		}
-		return DataResult.error("Not an int[]: " + input);
+		return notA("int[]", input);
 	}
 
 	@Override
@@ -275,7 +279,7 @@ public class ObjectOps implements DynamicOps<Object> {
 		if (input instanceof long[] longs) {
 			return DataResult.success(Arrays.stream(longs));
 		}
-		return DataResult.error("Not a long[]: " + input);
+		return notA("long[]", input);
 	}
 
 	@Override
@@ -295,9 +299,9 @@ public class ObjectOps implements DynamicOps<Object> {
 			if (value != null) {
 				return DataResult.success(value);
 			}
-			return DataResult.error("No element " + key + " in the map " + actualMap);
+			return DataResult.error(() -> "No element " + key + " in the map " + actualMap);
 		}
-		return DataResult.error("Not a Map: " + input);
+		return notA("Map", input);
 	}
 
 	@Override

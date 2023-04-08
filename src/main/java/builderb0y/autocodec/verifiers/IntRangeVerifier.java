@@ -38,26 +38,27 @@ public class IntRangeVerifier implements AutoVerifier<Number> {
 			return;
 		}
 		else {
-			StringBuilder message = new StringBuilder(128);
-			context.appendPathTo(message);
-			boolean haveMin = this.min != Long.MIN_VALUE || !this.minInclusive;
-			boolean haveMax = this.max != Long.MAX_VALUE || !this.maxInclusive;
-			assert haveMin || haveMax : "No bounds, but still failed?";
-			message.append(" must be ");
-			if (haveMin) {
-				message.append("greater than ");
-				if (this.minInclusive) message.append("or equal to ");
-				message.append(this.min);
-			}
-			if (haveMin && haveMax) {
-				message.append(" and ");
-			}
-			if (haveMax) {
-				message.append("less than ");
-				if (this.maxInclusive) message.append("or equal to ");
-				message.append(this.max);
-			}
-			throw new VerifyException(message.toString());
+			throw new VerifyException(() -> {
+				StringBuilder message = context.pathToStringBuilder();
+				boolean haveMin = this.min != Long.MIN_VALUE || !this.minInclusive;
+				boolean haveMax = this.max != Long.MAX_VALUE || !this.maxInclusive;
+				assert haveMin || haveMax : "No bounds, but still failed?";
+				message.append(" must be ");
+				if (haveMin) {
+					message.append("greater than ");
+					if (this.minInclusive) message.append("or equal to ");
+					message.append(this.min);
+				}
+				if (haveMin && haveMax) {
+					message.append(" and ");
+				}
+				if (haveMax) {
+					message.append("less than ");
+					if (this.maxInclusive) message.append("or equal to ");
+					message.append(this.max);
+				}
+				return message.toString();
+			});
 		}
 	}
 

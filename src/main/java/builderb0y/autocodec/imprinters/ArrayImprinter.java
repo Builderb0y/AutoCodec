@@ -50,7 +50,7 @@ public abstract class ArrayImprinter<T_DecodedElement, T_DecodedArray> extends N
 				int length = Array.getLength(to);
 				List<DecodeContext<T_Encoded>> from = context.forceAsList(this.singleton);
 				if (from.size() != length) {
-					throw new ImprintException("Wrong length: " + context.pathToString() + " should have a length of " + length + ", but it was length " + from.size());
+					throw new ImprintException(() -> context.pathToStringBuilder().append(" should have a length of ").append(length).append(", but it was length ").append(from.size()).toString());
 				}
 				for (int index = 0; index < length; index++) {
 					Array.set(to, index, from.get(index).decodeWith(this.componentDecoder));
@@ -84,7 +84,7 @@ public abstract class ArrayImprinter<T_DecodedElement, T_DecodedArray> extends N
 				int length = to.length;
 				List<DecodeContext<T_Encoded>> from = context.forceAsList(this.singleton);
 				if (from.size() != length) {
-					throw new ImprintException("Wrong length: " + context.pathToString() + " should have a length of " + length + ", but it was length " + from.size());
+					throw new ImprintException(() -> context.pathToStringBuilder().append(" should have a length of ").append(length).append(", but it was length ").append(from.size()).toString());
 				}
 				for (int index = 0; index < length; index++) {
 					to[index] = from.get(index).decodeWith(this.componentDecoder);

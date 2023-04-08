@@ -3,6 +3,7 @@ package builderb0y.autocodec.verifiers;
 import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.Map;
+import java.util.function.ToIntFunction;
 
 import org.jetbrains.annotations.ApiStatus.OverrideOnly;
 import org.jetbrains.annotations.NotNull;
@@ -49,31 +50,32 @@ public class SizeRangeVerifier<T_Collection> implements AutoVerifier<T_Collectio
 			return;
 		}
 		else {
-			StringBuilder message = new StringBuilder(128);
-			context.appendPathTo(message);
-			boolean haveMin = this.min != 0                 || !this.minInclusive;
-			boolean haveMax = this.max != Integer.MAX_VALUE || !this.maxInclusive;
-			message.append(" must have ");
-			if (haveMin) {
-				message
-				.append(this.minInclusive ? "at least " : "more than ")
-				.append(this.min)
-				.append(' ')
-				.append(this.min == 1 ? this.sizeGetter.singleElement : this.sizeGetter.multipleElements);
-			}
-			if (haveMin && haveMax) {
-				message.append(" and ");
-			}
-			if (haveMax) {
-				message
-				.append(this.maxInclusive ? "at most " : "less than ")
-				.append(this.max)
-				.append(' ')
-				//I don't know why you'd ever want less than (or equal to) 1 element,
-				//but handle this case sanely anyway.
-				.append(this.max == 1 ? this.sizeGetter.singleElement : this.sizeGetter.multipleElements);
-			}
-			throw new VerifyException(message.toString());
+			throw new VerifyException(() -> {
+				StringBuilder message = context.pathToStringBuilder();
+				boolean haveMin = this.min != 0 || !this.minInclusive;
+				boolean haveMax = this.max != Integer.MAX_VALUE || !this.maxInclusive;
+				message.append(" must have ");
+				if (haveMin) {
+					message
+					.append(this.minInclusive ? "at least " : "more than ")
+					.append(this.min)
+					.append(' ')
+					.append(this.min == 1 ? this.sizeGetter.singleElement : this.sizeGetter.multipleElements);
+				}
+				if (haveMin && haveMax) {
+					message.append(" and ");
+				}
+				if (haveMax) {
+					message
+					.append(this.maxInclusive ? "at most " : "less than ")
+					.append(this.max)
+					.append(' ')
+					//I don't know why you'd ever want less than (or equal to) 1 element,
+					//but handle this case sanely anyway.
+					.append(this.max == 1 ? this.sizeGetter.singleElement : this.sizeGetter.multipleElements);
+				}
+				return message.toString();
+			});
 		}
 	}
 
@@ -84,43 +86,38 @@ public class SizeRangeVerifier<T_Collection> implements AutoVerifier<T_Collectio
 
 	public static abstract class SizeGetter<T> {
 
-		public static final SizeGetter<CharSequence> STRING = new SizeGetter<>("character", "characters") {
-
-			@Override
-			public int get(@NotNull CharSequence size) {
-				return size.length();
-			}
-		};
-		public static final SizeGetter<Collection<?>> COLLECTION = new SizeGetter<>("element", "elements") {
-
-			@Override
-			public int get(@NotNull Collection<?> collection) {
-				return collection.size();
-			}
-		};
-		public static final SizeGetter<Map<?, ?>> MAP = new SizeGetter<>("entry", "entries") {
-
-			@Override
-			public int get(@NotNull Map<?, ?> map) {
-				return map.size();
-			}
-		};
-		public static final SizeGetter<Object> ARRAY = new SizeGetter<>("element", "elements") {
-
-			@Override
-			public int get(@NotNull Object array) {
-				return Array.getLength(array);
-			}
-		};
+		public static final SizeGetter<CharSequence>  STRING     = of("character", "characters", CharSequence::length   );
+		public static final SizeGetter<Collection<?>> COLLECTION = of("element",   "elements",     Collection::size     );
+		public static final SizeGetter<Map<?, ?>>     MAP        = of("entry",     "entries",             Map::size     );
+		public static final SizeGetter<Object>        ARRAY      = of("element",   "elements",          Array::getLength);
 
 		public final @NotNull String singleElement, multipleElements;
 
 		public SizeGetter(@NotNull String singleElement, @NotNull String multipleElements) {
-			this.singleElement = singleElement;
+			this.  singleElement  =   singleElement;
 			this.multipleElements = multipleElements;
 		}
 
+		public static <T> @NotNull SizeGetter<T> of(@NotNull String singleElement, @NotNull String multipleElements, @NotNull ToIntFunction<T> getter) {
+			return new Impl<>(singleElement, multipleElements, getter);
+		}
+
 		public abstract int get(@NotNull T collection);
+
+		public static class Impl<T> extends SizeGetter<T> {
+
+			public final @NotNull ToIntFunction<T> getter;
+
+			public Impl(@NotNull String singleElement, @NotNull String multipleElements, @NotNull ToIntFunction<T> getter) {
+				super(singleElement, multipleElements);
+				this.getter = getter;
+			}
+
+			@Override
+			public int get(@NotNull T collection) {
+				return this.getter.applyAsInt(collection);
+			}
+		}
 	}
 
 	public static class Factory extends NamedVerifierFactory {

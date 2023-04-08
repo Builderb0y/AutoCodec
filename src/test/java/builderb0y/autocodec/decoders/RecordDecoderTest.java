@@ -1,6 +1,5 @@
 package builderb0y.autocodec.decoders;
 
-import org.apache.commons.lang3.mutable.MutableLong;
 import org.junit.Test;
 
 import builderb0y.autocodec.annotations.AddPseudoField;
@@ -83,18 +82,44 @@ public class RecordDecoderTest {
 	}
 
 	@AddPseudoField(name = "encoded", getter = "getEncoded", setter = "setEncoded")
-	public static record PseudoEncodedPoint(int x, int y, @Hidden MutableLong encoded) {
+	public static record PseudoEncodedPoint(int x, int y, @Hidden LongBox encoded) {
 
 		public PseudoEncodedPoint(int x, int y, long encoded) {
-			this(x, y, new MutableLong(encoded));
+			this(x, y, new LongBox(encoded));
 		}
 
 		public long getEncoded() {
-			return this.encoded.longValue();
+			return this.encoded.value;
 		}
 
 		public void setEncoded(long value) {
-			this.encoded.setValue(value);
+			this.encoded.value = value;
+		}
+	}
+
+	public static class LongBox {
+
+		public long value;
+
+		public LongBox(long value) {
+			this.value = value;
+		}
+
+		public LongBox() {}
+
+		@Override
+		public int hashCode() {
+			return Long.hashCode(this.value);
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			return this == obj || (obj instanceof LongBox that && this.value == that.value);
+		}
+
+		@Override
+		public String toString() {
+			return "LongBox: { value: " + this.value + " }";
 		}
 	}
 }

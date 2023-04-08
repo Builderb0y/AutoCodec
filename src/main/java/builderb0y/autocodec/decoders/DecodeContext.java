@@ -68,9 +68,7 @@ public class DecodeContext<T_Encoded> extends DynamicOpsContext<T_Encoded> {
 	}
 
 	public @NotNull DecodeException notA(@NotNull String type) {
-		StringBuilder builder = new StringBuilder(64);
-		this.appendPathTo(builder);
-		return new DecodeException(builder.append(" is not a ").append(type).append(": ").append(this.input).toString());
+		return new DecodeException(() -> this.pathToStringBuilder().append(" is not a ").append(type).append(": ").append(this.input).toString());
 	}
 
 	//////////////// map ////////////////
@@ -85,7 +83,7 @@ public class DecodeContext<T_Encoded> extends DynamicOpsContext<T_Encoded> {
 			stream
 			.map((Pair<T_Encoded, T_Encoded> pair) -> {
 				String key = this.ops.getStringValue(pair.getFirst()).result().orElse(null);
-				if (key == null) throw AutoCodecUtil.rethrow(new DecodeException(this.pathToStringBuilder().append(".<key> is not a string: ").append(pair.getFirst()).toString()));
+				if (key == null) throw AutoCodecUtil.rethrow(new DecodeException(() -> this.pathToStringBuilder().append(".<key> is not a string: ").append(pair.getFirst()).toString()));
 				DecodeContext<T_Encoded> value = this.input(pair.getSecond(), new ObjectDecodePath(key));
 				return Pair.of(key, value);
 			})
@@ -110,7 +108,7 @@ public class DecodeContext<T_Encoded> extends DynamicOpsContext<T_Encoded> {
 			stream
 			.map((Pair<T_Encoded, T_Encoded> pair) -> {
 				String keyName = this.ops.getStringValue(pair.getFirst()).result().orElse(null);
-				if (keyName == null) throw AutoCodecUtil.rethrow(new DecodeException(this.pathToStringBuilder().append(".<key> is not a string: ").append(pair.getFirst()).toString()));
+				if (keyName == null) throw AutoCodecUtil.rethrow(new DecodeException(() -> this.pathToStringBuilder().append(".<key> is not a string: ").append(pair.getFirst()).toString()));
 				ObjectDecodePath path = new ObjectDecodePath(keyName);
 				return Pair.of(
 					this.input(pair.getFirst(), path),

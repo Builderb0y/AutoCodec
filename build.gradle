@@ -4,7 +4,7 @@ plugins() {
 }
 
 group('builderb0y')
-version('4.9.6')
+version('4.9.7')
 archivesBaseName = 'AutoCodec'
 
 repositories() {
@@ -15,10 +15,10 @@ repositories() {
 }
 
 dependencies() {
-	compileOnly       ('com.mojang:datafixerupper:4.1.27')
-	testImplementation('com.mojang:datafixerupper:4.1.27')
-	compileOnly       ('org.jetbrains:annotations:23.0.0')
-	testCompileOnly   ('org.jetbrains:annotations:23.0.0')
+	implementation    ('com.mojang:datafixerupper:6.0.6')
+	testImplementation('com.mojang:datafixerupper:6.0.6')
+	implementation    ('org.jetbrains:annotations:23.0.0')
+	testImplementation('org.jetbrains:annotations:23.0.0')
 	testImplementation('junit:junit:4.13.2')
 }
 
@@ -33,8 +33,7 @@ java() {
 	withSourcesJar()
 }
 
-//if you're reading this and trying to compile AutoCodec yourself,
-//you'll probably want to remove this part.
+/*
 publishing() {
 	publications() {
 		mavenJava(MavenPublication) {
@@ -51,3 +50,4 @@ publishing() {
 
 //and this part too.
 build.dependsOn(publish)
+*/

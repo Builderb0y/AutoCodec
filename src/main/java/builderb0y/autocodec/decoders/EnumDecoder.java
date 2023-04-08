@@ -36,23 +36,25 @@ public class EnumDecoder<T_DecodedEnum extends Enum<T_DecodedEnum>> extends Name
 	@OverrideOnly
 	public <T_Encoded> @Nullable T_DecodedEnum decode(@NotNull DecodeContext<T_Encoded> context) throws DecodeException {
 		if (context.isEmpty()) return null;
+		//note: check ordinal first, as some ops will implicitly convert numbers to strings.
 		Number ordinal = context.tryAsNumber();
 		if (ordinal != null) {
 			int actualOrdinal = ordinal.intValue();
-			if (actualOrdinal >= 0 && actualOrdinal < this.values.length) {
+			int length = this.values.length;
+			if (actualOrdinal >= 0 && actualOrdinal < length) {
 				return this.values[actualOrdinal];
 			}
 			else {
-				throw new DecodeException("Ordinal out of bounds: " + ordinal + " (there are only " + this.values.length + " enums to choose from)");
+				throw new DecodeException(() -> "Ordinal out of bounds: " + ordinal + " (there are only " + length + " enums to choose from)");
 			}
 		}
 		String name = context.tryAsString();
 		if (name != null) {
 			T_DecodedEnum value = this.valueMap.get(name);
 			if (value != null) return value;
-			else throw new DecodeException("Invalid name: " + name + " (valid names are: " + this.valueMap.keySet() + ')');
+			else throw new DecodeException(() -> "Invalid name: " + name + " (valid names are: " + this.valueMap.keySet() + ')');
 		}
-		throw new DecodeException("Not a string or number: " + context.input);
+		throw context.notA("string or number");
 	}
 
 	@Override

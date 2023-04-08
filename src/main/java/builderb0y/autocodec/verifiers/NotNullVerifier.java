@@ -16,9 +16,7 @@ public class NotNullVerifier<T> implements AutoVerifier<T> {
 	@OverrideOnly
 	public <T_Encoded> void verify(@NotNull VerifyContext<T_Encoded, T> context) throws VerifyException {
 		if (context.object == null) {
-			StringBuilder message = new StringBuilder(64);
-			context.appendPathTo(message);
-			throw new VerifyException(message.append(" cannot be null.").toString());
+			throw new VerifyException(() -> context.pathToStringBuilder().append(" cannot be null.").toString());
 		}
 	}
 

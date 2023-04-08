@@ -157,7 +157,7 @@ public class PrimitiveCoders {
 			if (number != null) return (char)(number.shortValue());
 			String string = context.tryAsString();
 			if (string != null && string.length() == 1) return string.charAt(0);
-			throw new DecodeException("Not a char: " + context.input);
+			throw new DecodeException(() -> context.pathToStringBuilder().append(" is not a char: ").append(context.input).toString());
 		}
 
 		@Override

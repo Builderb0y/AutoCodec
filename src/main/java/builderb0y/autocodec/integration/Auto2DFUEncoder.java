@@ -52,7 +52,7 @@ public interface Auto2DFUEncoder<T_Decoded> extends Encoder<T_Decoded> {
 			return DataResult.success(merged);
 		}
 		catch (EncodeException exception) {
-			return DataResult.error(exception.toString());
+			return DataResult.error(exception::toString);
 		}
 	}
 

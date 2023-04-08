@@ -41,7 +41,7 @@ public class SortedVerifier<T_Owner, T_Member> implements AutoVerifier<T_Owner> 
 	}
 
 	public void fail(@NotNull VerifyContext<?, T_Owner> context, @NotNull InstanceReader<T_Owner, ? extends T_Member> cause, @NotNull String why) throws VerifyException {
-		throw new VerifyException(context.pathToStringBuilder().append('.').append(this.mainField.getMember().getSerializedName()).append(" must be ").append(why).append(' ').append(cause.getMember().getSerializedName()).toString());
+		throw new VerifyException(() -> context.pathToStringBuilder().append('.').append(this.mainField.getMember().getSerializedName()).append(" must be ").append(why).append(' ').append(cause.getMember().getSerializedName()).toString());
 	}
 
 	@Override

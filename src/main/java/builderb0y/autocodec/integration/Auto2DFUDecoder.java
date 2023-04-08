@@ -47,7 +47,7 @@ public interface Auto2DFUDecoder<T_Decoded> extends Decoder<T_Decoded> {
 			);
 		}
 		catch (DecodeException exception) {
-			return DataResult.error(exception.toString());
+			return DataResult.error(exception::toString);
 		}
 	}
 
@@ -59,7 +59,7 @@ public interface Auto2DFUDecoder<T_Decoded> extends Decoder<T_Decoded> {
 			);
 		}
 		catch (DecodeException exception) {
-			return DataResult.error(exception.toString());
+			return DataResult.error(exception::toString);
 		}
 	}
 }

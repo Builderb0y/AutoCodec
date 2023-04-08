@@ -38,9 +38,7 @@ public class FloatRangeVerifier implements AutoVerifier<Number> {
 				return;
 			}
 			else {
-				StringBuilder message = new StringBuilder(64);
-				context.appendPathTo(message);
-				throw new VerifyException(message.append(" cannot be NaN").toString());
+				throw new VerifyException(() -> context.pathToStringBuilder().append(" cannot be NaN").toString());
 			}
 		}
 		else if (
@@ -50,26 +48,27 @@ public class FloatRangeVerifier implements AutoVerifier<Number> {
 			return;
 		}
 		else {
-			StringBuilder message = new StringBuilder(128);
-			context.appendPathTo(message);
-			boolean haveMin = this.min != Double.NEGATIVE_INFINITY || !this.minInclusive;
-			boolean haveMax = this.max != Double.POSITIVE_INFINITY || !this.maxInclusive;
-			assert haveMin || haveMax : "No bounds, but still failed?";
-			message.append(" must be ");
-			if (haveMin) {
-				message.append("greater than ");
-				if (this.minInclusive) message.append("or equal to ");
-				message.append(this.min);
-			}
-			if (haveMin && haveMax) {
-				message.append(" and ");
-			}
-			if (haveMax) {
-				message.append("less than ");
-				if (this.maxInclusive) message.append("or equal to ");
-				message.append(this.max);
-			}
-			throw new VerifyException(message.toString());
+			throw new VerifyException(() -> {
+				StringBuilder message = context.pathToStringBuilder();
+				boolean haveMin = this.min != Double.NEGATIVE_INFINITY || !this.minInclusive;
+				boolean haveMax = this.max != Double.POSITIVE_INFINITY || !this.maxInclusive;
+				assert haveMin || haveMax : "No bounds, but still failed?";
+				message.append(" must be ");
+				if (haveMin) {
+					message.append("greater than ");
+					if (this.minInclusive) message.append("or equal to ");
+					message.append(this.min);
+				}
+				if (haveMin && haveMax) {
+					message.append(" and ");
+				}
+				if (haveMax) {
+					message.append("less than ");
+					if (this.maxInclusive) message.append("or equal to ");
+					message.append(this.max);
+				}
+				return message.toString();
+			});
 		}
 	}
 
