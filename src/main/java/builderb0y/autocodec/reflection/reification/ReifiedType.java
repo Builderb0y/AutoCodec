@@ -9,9 +9,11 @@ import com.google.common.primitives.Primitives;
 import com.google.common.reflect.TypeToken;
 import it.unimi.dsi.fastutil.Hash;
 import it.unimi.dsi.fastutil.HashCommon;
+import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import builderb0y.autocodec.common.FactoryList;
 import builderb0y.autocodec.reflection.AnnotationContainer;
 import builderb0y.autocodec.util.*;
 import builderb0y.autocodec.util.HashStrategies.NamedHashStrategy;
@@ -33,6 +35,7 @@ obtaining a ReifiedType:
 		and {@link #wildcardSuper(ReifiedType)}.
 
 	option 2: instantiating a ReifiedType via an anonymous subclass.
+		for example: {@code new ReifiedType<@VerifyNullable String>() {}}.
 
 using a ReifiedType:
 	the primary task that ReifiedType's are designed for is type resolution.
@@ -120,6 +123,7 @@ public class ReifiedType<T> implements TypeFormatterAppendable {
 	this field will NOT be returned by {@link #getSuperClassType()}.
 	do NOT touch this field or try to use it in other code.
 	*/
+	@Internal
 	public static final @NotNull ReifiedType<?> NO_SUPER_CLASS = new ReifiedType<>();
 	/**
 	sentinel value for {@link #superInterfaceTypes} to indicate
@@ -127,7 +131,41 @@ public class ReifiedType<T> implements TypeFormatterAppendable {
 	this field will NOT be returned by {@link #getSuperInterfaceTypes()}.
 	do NOT touch this field or try to use it in other code.
 	*/
+	@Internal
 	public static final @NotNull ReifiedType<?> @NotNull [] NO_SUPER_INTERFACES = {};
+
+	/**
+	a cache used for anonymous direct subclasses of ReifiedType.
+	for example, {@code new ReifiedType<@VerifyNullable String>() {}}.
+	without this cache we would need to re-parse generic
+	type information every time the class is instantiated.
+	granted, I don't expect subclasses to be used all that often,
+	but I figure if {@link FactoryList} has a {@link FactoryList#cache},
+	then ReifiedType should too.
+	*/
+	@Internal
+	public static final ClassValue<ReifiedType<?>> LITERAL_CACHE = new ClassValue<>() {
+
+		@Override
+		public ReifiedType<?> computeValue(Class<?> type) {
+			if (type.getSuperclass() == ReifiedType.class) {
+				return (
+					from(
+						(
+							(AnnotatedParameterizedType)(
+								type.getAnnotatedSuperclass() //ReifiedType<?>
+							)
+						)
+						.getAnnotatedActualTypeArguments() //[T]
+						[0] //T
+					)
+				);
+			}
+			else {
+				throw new TypeReificationException("type must be *direct* subclass of ReifiedType");
+			}
+		}
+	};
 
 	//////////////////////////////// fields and factory methods ////////////////////////////////
 
@@ -197,20 +235,7 @@ public class ReifiedType<T> implements TypeFormatterAppendable {
 		}
 		else if (this.getClass().getSuperclass() == ReifiedType.class) {
 			@SuppressWarnings("unchecked")
-			ReifiedType<T> resolution = (ReifiedType<T>)(
-				from(
-					(
-						(AnnotatedParameterizedType)(
-							this
-							.getClass() //anonymous
-							.getAnnotatedSuperclass() //ReifiedType<T>
-						)
-					)
-					.getAnnotatedActualTypeArguments() //[T]
-					[0] //T
-				)
-			);
-			assert resolution != null;
+			ReifiedType<T> resolution = (ReifiedType<T>)(LITERAL_CACHE.get(this.getClass()));
 			this.annotationSources    = resolution.annotationSources;
 			this.classification       = resolution.classification;
 			this.rawClass             = resolution.rawClass;

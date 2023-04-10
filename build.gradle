@@ -4,7 +4,7 @@ plugins() {
 }
 
 group('builderb0y')
-version('4.9.7')
+version('4.9.8')
 archivesBaseName = 'AutoCodec'
 
 repositories() {
@@ -33,7 +33,6 @@ java() {
 	withSourcesJar()
 }
 
-/*
 publishing() {
 	publications() {
 		mavenJava(MavenPublication) {
@@ -43,11 +42,10 @@ publishing() {
 
 	repositories() {
 		mavenLocal() {
-			url('file:///home/builderb0y/Documents/Projects/AutoCodec/releases')
+			url("file://$projectDir/releases")
 		}
 	}
 }
 
 //and this part too.
 build.dependsOn(publish)
-*/

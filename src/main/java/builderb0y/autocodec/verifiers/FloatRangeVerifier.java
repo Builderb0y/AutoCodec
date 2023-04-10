@@ -42,8 +42,16 @@ public class FloatRangeVerifier implements AutoVerifier<Number> {
 			}
 		}
 		else if (
-			(this.minInclusive ? (value >= this.min) : (value > this.min)) &&
-			(this.maxInclusive ? (value <= this.max) : (value < this.max))
+			(
+				this.minInclusive
+				? (Double.compare(value, this.min) >= 0)
+				: (Double.compare(value, this.min) >  0)
+			)
+			&& (
+				this.maxInclusive
+				? (Double.compare(value, this.max) <= 0)
+				: (Double.compare(value, this.max) <  0)
+			)
 		) {
 			return;
 		}
