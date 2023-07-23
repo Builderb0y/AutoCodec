@@ -201,6 +201,20 @@ public class AnnotationContainer implements TypeFormatterAppendable {
 		return null;
 	}
 
+	/** similar to {@link #getFirst(Class)}, but can match multiple target classes. */
+	@SafeVarargs
+	public final @Nullable Annotation getFirst(@NotNull Class<? extends Annotation> @NotNull ... classes) {
+		for (Annotation annotation : this.annotations) {
+			Class<? extends Annotation> annotationClass = annotation.annotationType();
+			for (Class<? extends Annotation> expectedClass : classes) {
+				if (annotationClass == expectedClass) {
+					return expectedClass.cast(annotation);
+				}
+			}
+		}
+		return null;
+	}
+
 	/**
 	similar to {@link AnnotatedElement#getAnnotations()}
 	or {@link AnnotatedElement#getDeclaredAnnotations()},

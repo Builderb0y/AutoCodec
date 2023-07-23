@@ -24,8 +24,8 @@ public class PatternDecoder extends NamedDecoder<Pattern> {
 	@OverrideOnly
 	public <T_Encoded> @Nullable Pattern decode(@NotNull DecodeContext<T_Encoded> context) throws DecodeException {
 		if (context.isEmpty()) return null;
-		String patternString;
-		if ((patternString = context.tryAsString()) != null) {
+		String patternString = context.tryAsString();
+		if (patternString != null) {
 			return Pattern.compile(patternString);
 		}
 		patternString = context.getMember("pattern").forceAsString();

@@ -52,15 +52,17 @@ public class ReflectionManager {
 	searches through all of our {@link #getFields(ReflectContext, boolean)},
 	and collects the ones which match the given predicate into the requested format.
 	*/
-	public <T_Owner, T_Collect> @Nullable T_Collect searchFields(
+	public <T_Owner, T_Collect> T_Collect searchFields(
 		@NotNull ReflectContext<T_Owner> context,
 		boolean inherited,
 		@NotNull Predicate<? super FieldLikeMemberView<T_Owner, ?>> predicate,
 		@NotNull MemberCollector<FieldLikeMemberView<T_Owner, ?>, T_Collect> collector
 	)
 	throws ReflectException {
-		for (FieldLikeMemberView<T_Owner, ?> field : this.getFields(context, inherited)) {
-			if (predicate.test(field) && collector.accept(field)) {
+		FieldLikeMemberView<T_Owner, ?>[] fields = this.getFields(context, inherited);
+		for (FieldLikeMemberView<T_Owner, ?> field : fields) {
+			if (MemberPredicate.testAndDescribe(predicate, field, context.logger()) && collector.accept(field)) {
+				context.logger().logMessage("Collector said we should stop searching now.");
 				break;
 			}
 		}
@@ -87,15 +89,17 @@ public class ReflectionManager {
 	searches through all of our {@link #getMethods(ReflectContext, boolean)},
 	and collects the ones which match the given predicate into the requested format.
 	*/
-	public <T_Owner, T_Collect> @Nullable T_Collect searchMethods(
+	public <T_Owner, T_Collect> T_Collect searchMethods(
 		@NotNull ReflectContext<T_Owner> context,
 		boolean inherited,
 		@NotNull Predicate<? super MethodLikeMemberView<T_Owner, ?>> predicate,
 		@NotNull MemberCollector<MethodLikeMemberView<T_Owner, ?>, T_Collect> collector
 	)
 	throws ReflectException {
-		for (MethodLikeMemberView<T_Owner, ?> method : this.getMethods(context, inherited)) {
-			if (predicate.test(method) && collector.accept(method)) {
+		MethodLikeMemberView<T_Owner, ?>[] methods = this.getMethods(context, inherited);
+		for (MethodLikeMemberView<T_Owner, ?> method : methods) {
+			if (MemberPredicate.testAndDescribe(predicate, method, context.logger()) && collector.accept(method)) {
+				context.logger().logMessage("Collector said we should stop searching now.");
 				break;
 			}
 		}

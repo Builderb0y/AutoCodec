@@ -1,5 +1,7 @@
 package builderb0y.autocodec.common;
 
+import java.lang.annotation.Annotation;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,19 +27,29 @@ public record UseSpec(
 	}
 
 	public static @Nullable UseSpec fromUseEncoder(@NotNull ReifiedType<?> type) {
-		UseEncoder encoder = type.getAnnotations().getFirst(UseEncoder.class);
-		if (encoder != null) return new UseSpec(encoder.name(), inType(encoder.in(), type), encoder.usage(), encoder.strict());
-		UseCoder coder = type.getAnnotations().getFirst(UseCoder.class);
-		if (coder != null) return new UseSpec(coder.name(), inType(coder.in(), type), coder.usage(), coder.strict());
-		return null;
+		Annotation annotation = type.getAnnotations().getFirst(UseEncoder.class, UseCoder.class);
+		if (annotation instanceof UseEncoder encoder) {
+			return new UseSpec(encoder.name(), inType(encoder.in(), type), encoder.usage(), encoder.strict());
+		}
+		else if (annotation instanceof UseCoder coder) {
+			return new UseSpec(coder.name(), inType(coder.in(), type), coder.usage(), coder.strict());
+		}
+		else {
+			return null;
+		}
 	}
 
 	public static @Nullable UseSpec fromUseDecoder(@NotNull ReifiedType<?> type) {
-		UseDecoder annotation = type.getAnnotations().getFirst(UseDecoder.class);
-		if (annotation != null) return new UseSpec(annotation.name(), inType(annotation.in(), type), annotation.usage(), annotation.strict());
-		UseCoder coder = type.getAnnotations().getFirst(UseCoder.class);
-		if (coder != null) return new UseSpec(coder.name(), inType(coder.in(), type), coder.usage(), coder.strict());
-		return null;
+		Annotation annotation = type.getAnnotations().getFirst(UseDecoder.class, UseCoder.class);
+		if (annotation instanceof UseDecoder decoder) {
+			return new UseSpec(decoder.name(), inType(decoder.in(), type), decoder.usage(), decoder.strict());
+		}
+		else if (annotation instanceof UseCoder coder) {
+			return new UseSpec(coder.name(), inType(coder.in(), type), coder.usage(), coder.strict());
+		}
+		else {
+			return null;
+		}
 	}
 
 	public static @Nullable UseSpec fromUseConstructor(@NotNull ReifiedType<?> type) {

@@ -4,10 +4,13 @@ import java.util.function.Supplier;
 
 import builderb0y.autocodec.decoders.DecodeException;
 
+/** thrown when an error occurs while constructing an object. */
 public class ConstructException extends DecodeException {
 
 	public ConstructException() {}
 
+	/** @deprecated it will likely be more efficient to use ths Supplier-based constructor. */
+	@Deprecated
 	public ConstructException(String message) {
 		super(message);
 	}
@@ -16,6 +19,8 @@ public class ConstructException extends DecodeException {
 		super(messageSupplier);
 	}
 
+	/** @deprecated it will likely be more efficient to use ths Supplier-based constructor. */
+	@Deprecated
 	public ConstructException(String message, Throwable cause) {
 		super(message, cause);
 	}

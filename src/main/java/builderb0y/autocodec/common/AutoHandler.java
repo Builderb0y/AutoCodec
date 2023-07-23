@@ -98,7 +98,7 @@ public interface AutoHandler {
 		this field is non-final for the sole reason of allowing
 		subclasses to modify it in their constructors if desired.
 		*/
-		public final @NotNull String toString;
+		public @NotNull String toString;
 
 		public NamedHandler(@NotNull ReifiedType<T_Decoded> handledType) {
 			this.toString = defaultName(this, handledType);

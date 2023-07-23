@@ -126,7 +126,7 @@ public class MultiFieldImprinter<T_Decoded> extends NamedImprinter<T_Decoded> {
 		@OverrideOnly
 		public <T_Encoded> void imprint(@NotNull ImprintContext<T_Encoded, T_Owner> context) throws ImprintException {
 			try {
-				DecodeContext<T_Encoded> member = context.getMember(this.field.getSerializedName());
+				DecodeContext<T_Encoded> member = context.getFirstMember(this.field.getAliases());
 				T_Member object = member.decodeWith(this.decoder);
 				if (object != null) this.writer.set(context.object, object);
 			}
@@ -190,7 +190,7 @@ public class MultiFieldImprinter<T_Decoded> extends NamedImprinter<T_Decoded> {
 		@Override
 		@OverrideOnly
 		public <T_Encoded> void imprint(@NotNull ImprintContext<T_Encoded, T_Owner> context) throws ImprintException {
-			DecodeContext<T_Encoded> member = context.getMember(this.field.getSerializedName());
+			DecodeContext<T_Encoded> member = context.getFirstMember(this.field.getAliases());
 			T_Member object = this.reader.get(context.object);
 			if (object != null) member.imprintWith(this.imprinter, object);
 		}

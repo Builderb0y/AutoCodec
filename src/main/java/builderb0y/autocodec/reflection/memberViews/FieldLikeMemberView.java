@@ -6,10 +6,12 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.RecordComponent;
 
+import com.google.common.collect.ObjectArrays;
 import it.unimi.dsi.fastutil.Hash;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import builderb0y.autocodec.annotations.Alias;
 import builderb0y.autocodec.annotations.UseName;
 import builderb0y.autocodec.common.ReflectContextProvider;
 import builderb0y.autocodec.reflection.PseudoField;
@@ -38,7 +40,14 @@ public abstract class FieldLikeMemberView<T_Owner, T_Member> extends MemberView<
 	}
 
 	public @Nullable String serializedName; //lazily initialized.
+	public @NotNull String @Nullable [] aliases; //also lazily initialized.
 
+	/**
+	returns the name that this field should be serialized as.
+	if this field is annotated with {@link UseName},
+	then the serialized name is the annotation's {@link UseName#value()}.
+	otherwise, the serialized name is the field's actual name {@link #getName()}.
+	*/
 	public @NotNull String getSerializedName() {
 		String serializedName = this.serializedName;
 		if (serializedName == null) {
@@ -46,6 +55,34 @@ public abstract class FieldLikeMemberView<T_Owner, T_Member> extends MemberView<
 			this.serializedName = serializedName = annotation != null ? annotation.value() : this.getName();
 		}
 		return serializedName;
+	}
+
+	/**
+	returns the list of names to match this field against when decoding it.
+	this list INCLUDES the field's {@link #getSerializedName()} first.
+	if this field is annotated with {@link Alias}, then the list will also include
+	the field's aliases, in the order they are declared, after the field's serialized name.
+	if this field is NOT annotated with {@link Alias},
+	then the list will ONLY include the field's serialized name.
+	this method will never return an empty array,
+	so if the field's serialized name is not desired,
+	then index 0 of the returned array can simply be skipped over.
+
+	@implNote the returned array is NOT defensively cloned before being returned!
+	do not modify it in your own code!
+	*/
+	public @NotNull String @NotNull [] getAliases() {
+		String[] aliases = this.aliases;
+		if (aliases == null) {
+			Alias annotation = this.getType().getAnnotations().getFirst(Alias.class);
+			if (annotation != null) {
+				aliases = this.aliases = ObjectArrays.concat(this.getSerializedName(), annotation.value());
+			}
+			else {
+				aliases = this.aliases = new String[] { this.getSerializedName() };
+			}
+		}
+		return aliases;
 	}
 
 	public abstract @NotNull MethodHandle createInstanceReaderHandle(@NotNull ReflectContextProvider provider) throws IllegalAccessException;

@@ -1,10 +1,9 @@
 package builderb0y.autocodec.decoders;
 
+import org.jetbrains.annotations.ApiStatus.OverrideOnly;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import builderb0y.autocodec.coders.AutoCoder;
-import builderb0y.autocodec.coders.DefaultCoder;
 import builderb0y.autocodec.common.DefaultValue;
 import builderb0y.autocodec.common.DefaultValue.NullDefaultValue;
 import builderb0y.autocodec.common.FactoryContext;
@@ -27,22 +26,9 @@ public class DefaultDecoder<T_Decoded> extends NamedDecoder<T_Decoded> {
 		this.defaultValue = defaultValue;
 	}
 
-	public static <T_Decoded> DefaultDecoder<T_Decoded> of(
-		@NotNull ReifiedType<T_Decoded> type,
-		@NotNull AutoDecoder<T_Decoded> decoder,
-		@NotNull DefaultValue defaultValue
-	) {
-		return (
-			decoder instanceof AutoCoder<T_Decoded> coder
-			? new DefaultCoder<>(type, coder, defaultValue)
-			: new DefaultDecoder<>(type, decoder, defaultValue)
-		);
-	}
-
 	@Override
 	public <T_Encoded> @Nullable T_Decoded decode(@NotNull DecodeContext<T_Encoded> context) throws DecodeException {
-		if (context.isEmpty()) context = this.defaultValue.applyToContext(context);
-		return context.decodeWith(this.decoder);
+		return this.defaultValue.decode(context, this.decoder);
 	}
 
 	@Override
@@ -55,10 +41,11 @@ public class DefaultDecoder<T_Decoded> extends NamedDecoder<T_Decoded> {
 		public static final Factory INSTANCE = new Factory();
 
 		@Override
+		@OverrideOnly
 		public <T_HandledType> @Nullable AutoDecoder<?> tryCreate(@NotNull FactoryContext<T_HandledType> context) throws FactoryException {
-			DefaultValue defaultValue = DefaultValue.forType(context.type);
+			DefaultValue defaultValue = DefaultValue.forType(context, context.type, false);
 			if (defaultValue != NullDefaultValue.INSTANCE) {
-				return DefaultDecoder.of(context.type, context.forceCreateFallbackDecoder(this), defaultValue);
+				return new DefaultDecoder<>(context.type, context.forceCreateFallbackDecoder(this), defaultValue);
 			}
 			return null;
 		}

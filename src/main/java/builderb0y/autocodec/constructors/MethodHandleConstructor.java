@@ -89,20 +89,26 @@ public class MethodHandleConstructor<T_Decoded> extends NamedConstructor<T_Decod
 			);
 			//if no constructor taking ConstructContext<T_HandledType>
 			//is found, try a no-arg constructor next.
-			if (constructor == null) constructor = (
-				(MethodLikeMemberView<T_HandledType, T_HandledType>)(
-					context.reflect().searchMethods(
-						false,
-						new MethodPredicate()
-						.name("new")
-						.parameterCount(0)
-						.constructorLike(context.type),
-						MemberCollector.expectOne(false, true)
+			if (constructor == null) {
+				context.logger().logMessageLazy(() -> "Did not find a constructor taking a ConstructContext<" + context.type + '>');
+				constructor = (
+					(MethodLikeMemberView<T_HandledType, T_HandledType>)(
+						context.reflect().searchMethods(
+							false,
+							new MethodPredicate()
+							.name("new")
+							.parameterCount(0)
+							.constructorLike(context.type),
+							MemberCollector.expectOne(false, true)
+						)
 					)
-				)
-			);
-			//if neither type of constructor is found, abort.
-			if (constructor == null) return null;
+				);
+				if (constructor == null) {
+					context.logger().logMessage("Did not find a no-arg constructor either.");
+					//if neither type of constructor is found, abort.
+					return null;
+				}
+			}
 
 			try {
 				return new MethodHandleConstructor<>(context, constructor);

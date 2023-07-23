@@ -36,6 +36,7 @@ example usage: {@code
 @Retention(RetentionPolicy.RUNTIME)
 public @interface DefaultString {
 
+	/** returns the default value for the annotated element. */
 	public abstract String value();
 
 	/**

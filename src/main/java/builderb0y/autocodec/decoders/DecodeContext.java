@@ -142,6 +142,17 @@ public class DecodeContext<T_Encoded> extends DynamicOpsContext<T_Encoded> {
 		return this.input(this.ops.remove(this.input, name));
 	}
 
+	public @NotNull DecodeContext<T_Encoded> getFirstMember(@NotNull String @NotNull ... names) {
+		DecodeContext<T_Encoded> result = this.getMember(names[0]);
+		if (result.isEmpty()) {
+			for (int index = 1, length = names.length; index < length; index++) {
+				DecodeContext<T_Encoded> alternative = this.getMember(names[index]);
+				if (!alternative.isEmpty()) return alternative;
+			}
+		}
+		return result;
+	}
+
 	//////////////// list ////////////////
 
 	public boolean isList() {
@@ -219,7 +230,7 @@ public class DecodeContext<T_Encoded> extends DynamicOpsContext<T_Encoded> {
 
 	//////////////////////////////// handlers ////////////////////////////////
 
-	public <T_Decoded> @Nullable T_Decoded decodeWith(@NotNull AutoDecoder<T_Decoded> decoder) throws DecodeException {
+	public <T_Decoded> T_Decoded decodeWith(@NotNull AutoDecoder<T_Decoded> decoder) throws DecodeException {
 		return this.logger().decode(decoder, this);
 	}
 

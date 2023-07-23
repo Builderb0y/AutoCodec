@@ -37,6 +37,12 @@ public class ParameterView<T_Owner, T_Param> implements TypeFormatterAppendable 
 		return this.name;
 	}
 
+	public @NotNull String requireName() {
+		String name = this.name;
+		if (name != null) return name;
+		else throw new IllegalStateException("Parameter names are not available for " + this.method + ". Add -parameters to your javac arguments.");
+	}
+
 	public boolean hasName() {
 		return this.name != null;
 	}

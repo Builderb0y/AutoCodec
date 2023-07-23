@@ -1,5 +1,7 @@
 package builderb0y.autocodec.imprinters;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import org.junit.Test;
@@ -62,6 +64,25 @@ public class MultiFieldImprinterTest {
 				obj instanceof Category2 that &&
 				Objects.equals(this.default_b, that.default_b)
 			);
+		}
+	}
+
+	@Test
+	public void testPopulate() throws DecodeException {
+		Populatable populatable = new Populatable();
+		populatable.contents = new HashMap<>(2);
+		populatable.contents.put("a", "1");
+		populatable.contents.put("b", "2");
+		new CoderUnitTester<>(TestCommon.DEFAULT_CODEC, Populatable.class).test(populatable);
+	}
+
+	public static class Populatable {
+
+		public Map<String, String> contents;
+
+		@Override
+		public boolean equals(Object obj) {
+			return obj instanceof Populatable that && Objects.equals(this.contents, that.contents);
 		}
 	}
 }

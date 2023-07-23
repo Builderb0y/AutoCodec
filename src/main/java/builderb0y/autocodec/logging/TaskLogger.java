@@ -134,10 +134,24 @@ public abstract class TaskLogger {
 			(PartialResult<R> partialResult) -> {
 				R result = AutoCodecUtil.getPartialResult(partialResult);
 				if (result != null && allowPartial) {
-					this.logError(partialResult.message());
+					this.logErrorLazy(partialResult::message);
 					return result;
 				}
 				throw AutoCodecUtil.rethrow(onError.apply(partialResult.message()));
+			}
+		);
+	}
+
+	public <R, X extends Throwable> R unwrapLazy(@NotNull DataResult<R> dataResult, boolean allowPartial, Function<? super Supplier<String>, ? extends X> onError) throws X {
+		return dataResult.get().map(
+			Function.identity(),
+			(PartialResult<R> partialResult) -> {
+				R result = AutoCodecUtil.getPartialResult(partialResult);
+				if (result != null && allowPartial) {
+					this.logErrorLazy(partialResult::message);
+					return result;
+				}
+				throw AutoCodecUtil.rethrow(onError.apply((Supplier<String>)(partialResult::message)));
 			}
 		);
 	}

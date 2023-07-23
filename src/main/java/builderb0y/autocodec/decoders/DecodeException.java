@@ -2,6 +2,7 @@ package builderb0y.autocodec.decoders;
 
 import java.util.function.Supplier;
 
+/** thrown when an error occurs while decoding an object. */
 public class DecodeException extends Exception {
 
 	public Supplier<String> messageSupplier;
@@ -9,6 +10,8 @@ public class DecodeException extends Exception {
 
 	public DecodeException() {}
 
+	/** @deprecated it will likely be more efficient to use ths Supplier-based constructor. */
+	@Deprecated
 	public DecodeException(String message) {
 		this.message = message;
 	}
@@ -17,6 +20,8 @@ public class DecodeException extends Exception {
 		this.messageSupplier = messageSupplier;
 	}
 
+	/** @deprecated it will likely be more efficient to use ths Supplier-based constructor. */
+	@Deprecated
 	public DecodeException(String message, Throwable cause) {
 		super(cause);
 		this.message = message;

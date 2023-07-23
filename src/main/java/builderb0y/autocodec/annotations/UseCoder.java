@@ -57,5 +57,5 @@ public @interface UseCoder {
 	see the documentation on {@link MemberUsage} for more information
 	on how exactly these conditions are relaxed for each usage.
 	*/
-	public abstract boolean strict() default true;
+	public boolean strict() default true;
 }

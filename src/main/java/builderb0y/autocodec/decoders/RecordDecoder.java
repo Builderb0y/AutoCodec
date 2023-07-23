@@ -76,7 +76,7 @@ public class RecordDecoder<T_Decoded> extends NamedDecoder<T_Decoded> {
 
 	@Override
 	public String toString() {
-		return this.toString + ": { " + this.components.length + " components: " + Arrays.stream(this.components).map((FieldStrategy<?> parameter) -> parameter.fieldName).collect(Collectors.joining(", ")) + " }";
+		return this.toString + ": { " + this.components.length + " components: " + Arrays.stream(this.components).map((FieldStrategy<?> parameter) -> parameter.field.getSerializedName()).collect(Collectors.joining(", ")) + " }";
 	}
 
 	public static abstract class FieldStrategy<T_Member> extends NamedDecoder<T_Member> {
@@ -84,13 +84,11 @@ public class RecordDecoder<T_Decoded> extends NamedDecoder<T_Decoded> {
 		public static final @NotNull ObjectArrayFactory<FieldStrategy<?>> ARRAY_FACTORY = new ObjectArrayFactory<>(FieldStrategy.class).generic();
 
 		public final @NotNull FieldLikeMemberView<?, T_Member> field;
-		public final @NotNull String fieldName;
 		public final @NotNull AutoDecoder<T_Member> decoder;
 
 		public FieldStrategy(@NotNull FieldLikeMemberView<?, T_Member> field, @NotNull AutoDecoder<T_Member> decoder) {
 			super(field.getType());
 			this.field = field;
-			this.fieldName = field.getSerializedName();
 			this.decoder = decoder;
 		}
 
@@ -104,7 +102,7 @@ public class RecordDecoder<T_Decoded> extends NamedDecoder<T_Decoded> {
 
 		@Override
 		public String toString() {
-			return this.toString + ": [field: " + this.fieldName + ']';
+			return this.toString + ": [field: " + this.field.getSerializedName() + ']';
 		}
 	}
 
@@ -133,7 +131,7 @@ public class RecordDecoder<T_Decoded> extends NamedDecoder<T_Decoded> {
 		@Override
 		@OverrideOnly
 		public <T_Encoded> @Nullable T_Member decode(@NotNull DecodeContext<T_Encoded> context) throws DecodeException {
-			return context.getMember(this.fieldName).decodeWith(this.decoder);
+			return context.getFirstMember(this.field.getAliases()).decodeWith(this.decoder);
 		}
 	}
 
@@ -195,6 +193,7 @@ public class RecordDecoder<T_Decoded> extends NamedDecoder<T_Decoded> {
 			//first priority: the @RecordLike annotation.
 			RecordLike annotation = context.type.getAnnotations().getFirst(RecordLike.class);
 			if (annotation != null) {
+				context.logger().logMessageLazy(() -> "Found " + annotation);
 				FieldLikeMemberView<T_Owner, ?>[] fields = this.findFields(context, Arrays.stream(annotation.value()));
 				MethodLikeMemberView<?, ?> constructor = this.findConstructor(context, fields, annotation.name(), annotation.in() == void.class ? context.type : ReifiedType.parameterizeWithWildcards(annotation.in()));
 				return new ConstructorFields<>(constructor, fields);
@@ -202,6 +201,7 @@ public class RecordDecoder<T_Decoded> extends NamedDecoder<T_Decoded> {
 			//second priority: actual records.
 			Class<?> rawClass = context.type.getRawClass();
 			if (rawClass != null && rawClass.isRecord()) {
+				context.logger().logMessage("Class is an actual record.");
 				FieldLikeMemberView<T_Owner, ?>[] fields = (
 					context
 					.reflect()
@@ -230,10 +230,12 @@ public class RecordDecoder<T_Decoded> extends NamedDecoder<T_Decoded> {
 				)
 			);
 			if (constructor != null && constructor.getParameterCount() != 0) {
+				context.logger().logMessageLazy(() -> "Class has exactly one constructor: " + constructor);
 				FieldLikeMemberView<T_Owner, ?>[] fields = this.findFields(context, Arrays.stream(constructor.getParameters()).map(ParameterView::getName));
 				return new ConstructorFields<>(constructor, fields);
 			}
 			//all of the above tactics failed.
+			context.logger().logMessage("Not a record-like class.");
 			return null;
 		}
 

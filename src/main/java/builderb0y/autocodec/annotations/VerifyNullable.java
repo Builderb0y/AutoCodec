@@ -32,5 +32,23 @@ public @interface VerifyNullable {
 		public Class<? extends Annotation> annotationType() {
 			return VerifyNullable.class;
 		}
+
+		/** consistent with {@link sun.reflect.annotation.AnnotationInvocationHandler} */
+		@Override
+		public String toString() {
+			return '@' + VerifyNullable.class.getName() + "()";
+		}
+
+		/** consistent with {@link sun.reflect.annotation.AnnotationInvocationHandler} */
+		@Override
+		public int hashCode() {
+			return 0;
+		}
+
+		/** consistent with {@link sun.reflect.annotation.AnnotationInvocationHandler} */
+		@Override
+		public boolean equals(Object obj) {
+			return obj instanceof VerifyNullable;
+		}
 	};
 }

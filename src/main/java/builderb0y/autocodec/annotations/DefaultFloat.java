@@ -35,6 +35,7 @@ example usage: {@code
 @Retention(RetentionPolicy.RUNTIME)
 public @interface DefaultFloat {
 
+	/** returns the default value for the annotated element. */
 	public abstract float value();
 
 	/**

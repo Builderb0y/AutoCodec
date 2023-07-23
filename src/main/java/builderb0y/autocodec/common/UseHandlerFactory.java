@@ -22,8 +22,6 @@ import builderb0y.autocodec.util.TypeFormatter;
 
 public abstract class UseHandlerFactory<T_Handler extends AutoHandler> extends NamedFactory<T_Handler> {
 
-	public static final ReifiedType<?> VARIABLE = ReifiedType.unresolvableVariable(ReifiedType.OBJECT);
-
 	@Override
 	@OverrideOnly
 	public <T_HandledType> @Nullable T_Handler tryCreate(@NotNull FactoryContext<T_HandledType> context) throws FactoryException {

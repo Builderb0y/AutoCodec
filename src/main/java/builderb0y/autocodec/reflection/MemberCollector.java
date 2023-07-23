@@ -46,7 +46,7 @@ public interface MemberCollector<T_Member, T_Collection> {
 	returns a MemberCollector which yields the first member it encounters,
 	or null if no members matched the provided predicate.
 	*/
-	public static <T_Member> @NotNull MemberCollector<T_Member, T_Member> tryFirst() {
+	public static <T_Member> @NotNull MemberCollector<T_Member, @Nullable T_Member> tryFirst() {
 		return new First<>(false);
 	}
 
@@ -54,7 +54,7 @@ public interface MemberCollector<T_Member, T_Collection> {
 	returns a MemberCollector which yields the first member it encounters,
 	or throws a {@link ReflectException} if no members matched the provided predicate.
 	*/
-	public static <T_Member> @NotNull MemberCollector<T_Member, T_Member> forceFirst() {
+	public static <T_Member> @NotNull MemberCollector<T_Member, @NotNull T_Member> forceFirst() {
 		return new First<>(true);
 	}
 
@@ -62,7 +62,7 @@ public interface MemberCollector<T_Member, T_Collection> {
 	returns a MemberCollector which yields the only member it encounters.
 	the returned MemberCollector will yield null if it encounters 0 or more than 1 member.
 	*/
-	public static <T_Member> @NotNull MemberCollector<T_Member, T_Member> tryUnique() {
+	public static <T_Member> @NotNull MemberCollector<T_Member, @Nullable T_Member> tryUnique() {
 		return new One<>(false, false);
 	}
 
@@ -71,7 +71,7 @@ public interface MemberCollector<T_Member, T_Collection> {
 	the returned MemberCollector will throw a {@link ReflectException}
 	if it encounters 0 or more than 1 member.
 	*/
-	public static <T_Member> @NotNull MemberCollector<T_Member, T_Member> forceUnique() {
+	public static <T_Member> @NotNull MemberCollector<T_Member, @NotNull T_Member> forceUnique() {
 		return new One<>(true, true);
 	}
 
@@ -80,7 +80,7 @@ public interface MemberCollector<T_Member, T_Collection> {
 	if no members match the provided predicate,
 	then the returned MemberCollector will yield an empty List.
 	*/
-	public static <T_Member> @NotNull MemberCollector<T_Member, List<T_Member>> tryAll() {
+	public static <T_Member> @NotNull MemberCollector<T_Member, @NotNull List<T_Member>> tryAll() {
 		return new Many<>(false, false);
 	}
 
@@ -89,7 +89,7 @@ public interface MemberCollector<T_Member, T_Collection> {
 	if no members match the provided predicate,
 	then the returned MemberCollector will throw a {@link ReflectException}.
 	*/
-	public static <T_Member> @NotNull MemberCollector<T_Member, List<T_Member>> forceAll() {
+	public static <T_Member> @NotNull MemberCollector<T_Member, @NotNull List<T_Member>> forceAll() {
 		return new Many<>(true, false);
 	}
 

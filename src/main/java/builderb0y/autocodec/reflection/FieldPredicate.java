@@ -50,6 +50,30 @@ public class FieldPredicate extends MemberPredicate<FieldLikeMemberView<?, ?>> {
 		);
 	}
 
+	public @NotNull FieldPredicate alias(@NotNull String @NotNull ... aliases) {
+		if (aliases.length == 0) {
+			throw new IllegalArgumentException("Must provide at least one alias.");
+		}
+		return this.add(
+			field -> {
+				String[] realAliases = field.getAliases();
+				for (String requestedAlias : aliases) {
+					for (String realAlias : realAliases) {
+						if (realAlias.equals(requestedAlias)) return true;
+					}
+				}
+				return false;
+			},
+			builder -> {
+				builder.append("aliases: [").append(aliases[0]);
+				for (int index = 1, length = aliases.length; index < length; index++) {
+					builder.append(", ").append(aliases[index]);
+				}
+				builder.append(']');
+			}
+		);
+	}
+
 	public @NotNull FieldPredicate isStatic() {
 		this.isStaticV();
 		return this;

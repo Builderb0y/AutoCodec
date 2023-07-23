@@ -9,6 +9,7 @@ import java.util.function.Predicate;
 import it.unimi.dsi.fastutil.Hash;
 import org.jetbrains.annotations.NotNull;
 
+import builderb0y.autocodec.logging.TaskLogger;
 import builderb0y.autocodec.reflection.memberViews.MemberView;
 import builderb0y.autocodec.reflection.reification.ReifiedType;
 import builderb0y.autocodec.util.TypeFormatter;
@@ -86,6 +87,36 @@ public class MemberPredicate<M extends MemberView<?>> implements Predicate<M> {
 		for (int index = 0; index < size; index++) {
 			if (!predicates.get(index).test(object)) return false;
 		}
+		return true;
+	}
+
+	public static <M extends MemberView<?>> boolean testAndDescribe(Predicate<? super M> predicate, M member, TaskLogger logger) {
+		if (predicate instanceof MemberPredicate<? super M> memberPredicate) {
+			return memberPredicate.testAndDescribe(member, logger);
+		}
+		else {
+			boolean passed = predicate.test(member);
+			logger.logMessageLazy(() -> passed ? "PASSED: " + member : "FAILED: " + member + " because predicate " + predicate + " was false.");
+			return passed;
+		}
+	}
+
+	public boolean testAndDescribe(M member, TaskLogger logger) {
+		List<Predicate<? super M>> predicates = this.predicates;
+		int size = predicates.size();
+		for (int index = 0; index < size; index++) {
+			if (!predicates.get(index).test(member)) {
+				final int index_ = index; //lambdas -_-
+				logger.logMessageLazy(() -> {
+					StringBuilder builder = new StringBuilder(128);
+					builder.append("FAILED: ").append(member).append(" because condition '");
+					this.toStrings.get(index_).accept(builder);
+					return builder.append("' was false.").toString();
+				});
+				return false;
+			}
+		}
+		logger.logMessageLazy(() -> "PASSED: " + member);
 		return true;
 	}
 

@@ -48,7 +48,11 @@ public class ReflectContext<T_Owner> extends TaskContext implements ReflectConte
 		return this.logger().getFields(this, inherited);
 	}
 
-	public <T_Collect> T_Collect searchFields(boolean inherited, @NotNull Predicate<? super FieldLikeMemberView<T_Owner, ?>> predicate, @NotNull MemberCollector<FieldLikeMemberView<T_Owner, ?>, T_Collect> collector) {
+	public <T_Collect> T_Collect searchFields(
+		boolean inherited,
+		@NotNull Predicate<? super FieldLikeMemberView<T_Owner, ?>> predicate,
+		@NotNull MemberCollector<FieldLikeMemberView<T_Owner, ?>, T_Collect> collector
+	) {
 		return this.logger().searchFields(this, inherited, predicate, collector);
 	}
 
@@ -56,7 +60,11 @@ public class ReflectContext<T_Owner> extends TaskContext implements ReflectConte
 		return this.logger().getMethods(this, inherited);
 	}
 
-	public <T_Collect> T_Collect searchMethods(boolean inherited, @NotNull Predicate<? super MethodLikeMemberView<T_Owner, ?>> predicate, @NotNull MemberCollector<MethodLikeMemberView<T_Owner, ?>, T_Collect> collector) {
+	public <T_Collect> T_Collect searchMethods(
+		boolean inherited,
+		@NotNull Predicate<? super MethodLikeMemberView<T_Owner, ?>> predicate,
+		@NotNull MemberCollector<MethodLikeMemberView<T_Owner, ?>, T_Collect> collector
+	) {
 		return this.logger().searchMethods(this, inherited, predicate, collector);
 	}
 

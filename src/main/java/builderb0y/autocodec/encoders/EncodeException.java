@@ -2,6 +2,7 @@ package builderb0y.autocodec.encoders;
 
 import java.util.function.Supplier;
 
+/** thrown when an error occurs while encoding an object. */
 public class EncodeException extends RuntimeException {
 
 	public Supplier<String> messageSupplier;
@@ -9,6 +10,8 @@ public class EncodeException extends RuntimeException {
 
 	public EncodeException() {}
 
+	/** @deprecated it will likely be more efficient to use ths Supplier-based constructor. */
+	@Deprecated
 	public EncodeException(String message) {
 		this.message = message;
 	}
@@ -17,6 +20,8 @@ public class EncodeException extends RuntimeException {
 		this.messageSupplier = messageSupplier;
 	}
 
+	/** @deprecated it will likely be more efficient to use ths Supplier-based constructor. */
+	@Deprecated
 	public EncodeException(String message, Throwable cause) {
 		super(cause);
 		this.message = message;

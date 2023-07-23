@@ -3,6 +3,7 @@ package builderb0y.autocodec.encoders;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.mojang.datafixers.util.Pair;
@@ -11,7 +12,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import builderb0y.autocodec.annotations.EncodeInline;
-import builderb0y.autocodec.common.DefaultValue;
 import builderb0y.autocodec.common.FactoryContext;
 import builderb0y.autocodec.common.FactoryException;
 import builderb0y.autocodec.encoders.AutoEncoder.NamedEncoder;
@@ -54,18 +54,15 @@ public class MultiFieldEncoder<T_Decoded> extends NamedEncoder<T_Decoded> {
 		public final @NotNull FieldLikeMemberView<T_Owner, T_Member> field;
 		public final @NotNull InstanceReader<T_Owner, T_Member> reader;
 		public final @NotNull AutoEncoder<T_Member> encoder;
-		public final @NotNull DefaultValue defaultValue;
 
 		public FieldStrategy(
 			@NotNull FieldLikeMemberView<T_Owner, T_Member> field,
 			@NotNull InstanceReader<T_Owner, T_Member> reader,
-			@NotNull AutoEncoder<T_Member> encoder,
-			@NotNull DefaultValue defaultValue
+			@NotNull AutoEncoder<T_Member> encoder
 		) {
-			this.field        = field;
-			this.reader       = reader;
-			this.encoder      = encoder;
-			this.defaultValue = defaultValue;
+			this.field   = field;
+			this.reader  = reader;
+			this.encoder = encoder;
 		}
 
 		public static <T_Owner, T_Member> @Nullable FieldStrategy<T_Owner, T_Member> of(
@@ -85,12 +82,11 @@ public class MultiFieldEncoder<T_Decoded> extends NamedEncoder<T_Decoded> {
 		)
 		throws IllegalAccessException {
 			InstanceReader<T_Owner, T_Member> reader = field.createInstanceReader(context);
-			DefaultValue defaultValue = DefaultValue.forType(field.getType());
 			if (field.getType().getAnnotations().has(EncodeInline.class)) {
-				return new InlineFieldStrategy<>(field, reader, encoder, defaultValue);
+				return new InlineFieldStrategy<>(field, reader, encoder);
 			}
 			else {
-				return new NonInlineFieldStrategy<>(field, reader, encoder, defaultValue);
+				return new NonInlineFieldStrategy<>(field, reader, encoder);
 			}
 		}
 
@@ -102,10 +98,9 @@ public class MultiFieldEncoder<T_Decoded> extends NamedEncoder<T_Decoded> {
 		public InlineFieldStrategy(
 			@NotNull FieldLikeMemberView<T_Owner, T_Member> field,
 			@NotNull InstanceReader<T_Owner, T_Member> reader,
-			@NotNull AutoEncoder<T_Member> encoder,
-			@NotNull DefaultValue defaultValue
+			@NotNull AutoEncoder<T_Member> encoder
 		) {
-			super(field, reader, encoder, defaultValue);
+			super(field, reader, encoder);
 		}
 
 		@Override
@@ -113,14 +108,13 @@ public class MultiFieldEncoder<T_Decoded> extends NamedEncoder<T_Decoded> {
 			if (context.input == null) return;
 			T_Member member = this.reader.get(context.input);
 			T_Encoded newMap = context.input(member).encodeWith(this.encoder);
-			if (this.defaultValue.alwaysEncode() || !this.defaultValue.encodedValueEquals(newMap, context.ops)) {
-				context.logger().unwrap(
-					context.ops.getMapValues(newMap),
-					true,
-					EncodeException::new
-				)
-				.forEach((Pair<T_Encoded, T_Encoded> pair) -> map.put(pair.getFirst(), pair.getSecond()));
-			}
+			context.logger().unwrap(
+				context.ops.getMapValues(newMap),
+				true,
+				EncodeException::new
+			)
+			.filter((Pair<T_Encoded, T_Encoded> pair) -> !Objects.equals(context.ops.empty(), pair.getSecond()))
+			.forEach((Pair<T_Encoded, T_Encoded> pair) -> map.put(pair.getFirst(), pair.getSecond()));
 		}
 	}
 
@@ -129,10 +123,9 @@ public class MultiFieldEncoder<T_Decoded> extends NamedEncoder<T_Decoded> {
 		public NonInlineFieldStrategy(
 			@NotNull FieldLikeMemberView<T_Owner, T_Member> field,
 			@NotNull InstanceReader<T_Owner, T_Member> reader,
-			@NotNull AutoEncoder<T_Member> encoder,
-			@NotNull DefaultValue defaultValue
+			@NotNull AutoEncoder<T_Member> encoder
 		) {
-			super(field, reader, encoder, defaultValue);
+			super(field, reader, encoder);
 		}
 
 		@Override
@@ -140,7 +133,7 @@ public class MultiFieldEncoder<T_Decoded> extends NamedEncoder<T_Decoded> {
 			if (context.input == null) return;
 			T_Member decodedMember = this.reader.get(context.input);
 			T_Encoded encodedMember = context.input(decodedMember).encodeWith(this.encoder);
-			if (this.defaultValue.alwaysEncode() || !this.defaultValue.encodedValueEquals(encodedMember, context.ops)) {
+			if (!Objects.equals(context.ops.empty(), encodedMember)) {
 				map.put(context.createString(this.field.getSerializedName()), encodedMember);
 			}
 		}
@@ -160,6 +153,7 @@ public class MultiFieldEncoder<T_Decoded> extends NamedEncoder<T_Decoded> {
 				.toArray(FieldLikeMemberView.ARRAY_FACTORY.generic())
 			);
 			int length = fields.length;
+			context.logger().logMessageLazy(() -> "Found " + length + " field(s) that are applicable for imprinting.");
 			//if (length == 0) return null;
 			FieldStrategy<?, ?>[] strategies = FieldStrategy.ARRAY_FACTORY.applyGeneric(length);
 			for (int index = 0; index < length; index++) try {

@@ -5,22 +5,25 @@ AutoCodec is a high-level abstraction layer over [DataFixerUpper](https://github
 By default, AutoCodec will handle a variety of types automatically, including:
 * Primitive values
 * BigInteger and BigDecimal
+* Regex Patterns
 * Enums
 * Arrays
 * Collections
+	* Including abstract collections (meaning that you declared a field as type List instead of ArrayList; see [LookupConstructorFactory](https://github.com/Builderb0y/AutoCodec/blob/master/src/main/java/builderb0y/autocodec/constructors/LookupConstructorFactory.java) for the full list of default implementations)
 * Maps
-  * Including EnumMaps
+	* Including EnumMaps
 * Optionals
-  * Including OptionalInt/Long/Double
-* Dates, times, and other classes from the `java.time` package
+	* Including OptionalInt/Long/Double
+* Dates, times, and many other classes from the `java.time` package
+* Simple classes (classes with some fields that should be serialized with the class)
 * Records
 * Record-like classes (classes with one constructor and several fields which are populated by that constructor)
+	* Factory methods are also auto-detected, and will be used instead of actual constructors when applicable.
 * Generic type parameters (`List<String>`)
 * Self-referencing types. For example:
 ```java
 public class Node {
-	Node parent;
-	Node[] children;
+	public Node[] children;
 }
 ```
 
@@ -28,10 +31,11 @@ public class Node {
 
 First, you will want to add `-parameters` to your javac arguments. This will allow reflection to retrieve the names of method and constructor parameters. AutoCodec uses this information to determine which parameters are used to initialize which fields, which is important for record-like classes. If you are using Gradle, add the following to your build script:
 ```groovy
-compileJava() {
+compileJava {
 	options.compilerArgs.add('-parameters')
 }
 ```
+If you plan on using AutoCodec in a testing environment (like JUnit), you will need to add `-parameters` to the `compileTestJava` task too.
 
 Ok, got that? Good. Now onto the fun part: creating an AutoCodec instance. This part is fairly straightforward:
 ```java

@@ -59,4 +59,10 @@ public class CoderUnitTester<T_Decoded> {
 		T_Decoded newDecoded = this.autoCodec.decode(this.coder, encoded, ops);
 		assertEquals(decoded, newDecoded);
 	}
+
+	public <T_Encoded> void testEncoded(T_Encoded input, DynamicOps<T_Encoded> ops) throws EncodeException, DecodeException {
+		T_Decoded decoded = this.autoCodec.decode(this.coder, input, ops);
+		T_Encoded encoded = this.autoCodec.encode(this.coder, decoded, ops);
+		assertEquals(input, encoded);
+	}
 }
