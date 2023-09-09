@@ -108,7 +108,7 @@ public class MultiFieldEncoder<T_Decoded> extends NamedEncoder<T_Decoded> {
 			if (context.input == null) return;
 			T_Member member = this.reader.get(context.input);
 			T_Encoded newMap = context.input(member).encodeWith(this.encoder);
-			context.logger().unwrap(
+			context.logger().unwrapLazy(
 				context.ops.getMapValues(newMap),
 				true,
 				EncodeException::new
@@ -146,7 +146,7 @@ public class MultiFieldEncoder<T_Decoded> extends NamedEncoder<T_Decoded> {
 		@Override
 		@OverrideOnly
 		@SuppressWarnings({ "unchecked", "rawtypes" })
-		public @Nullable <T_HandledType> AutoEncoder<?> tryCreate(@NotNull FactoryContext<T_HandledType> context) throws FactoryException {
+		public <T_HandledType> @Nullable AutoEncoder<?> tryCreate(@NotNull FactoryContext<T_HandledType> context) throws FactoryException {
 			FieldLikeMemberView<?, ?>[] fields = (
 				Arrays.stream(context.reflect().getFields(true))
 				.filter(new FieldPredicate().notStatic())

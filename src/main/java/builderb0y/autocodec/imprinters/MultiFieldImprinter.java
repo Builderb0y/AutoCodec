@@ -220,7 +220,7 @@ public class MultiFieldImprinter<T_Decoded> extends NamedImprinter<T_Decoded> {
 		@Override
 		@OverrideOnly
 		@SuppressWarnings({ "unchecked", "rawtypes" })
-		public @Nullable <T_HandledType> AutoImprinter<T_HandledType> tryCreate(@NotNull FactoryContext<T_HandledType> context) throws FactoryException {
+		public <T_HandledType> @Nullable AutoImprinter<T_HandledType> tryCreate(@NotNull FactoryContext<T_HandledType> context) throws FactoryException {
 			FieldLikeMemberView<T_HandledType, ?>[] fields = (
 				context
 				.reflect(context.type.getLowerBoundOrSelf())

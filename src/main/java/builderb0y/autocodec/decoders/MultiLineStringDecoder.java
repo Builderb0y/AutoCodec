@@ -46,12 +46,11 @@ public class MultiLineStringDecoder extends NamedDecoder<@MultiLine String> {
 		public static final @NotNull Factory INSTANCE = new Factory();
 
 		@Override
-		@SuppressWarnings("unchecked")
 		public <T_HandledType> @Nullable AutoDecoder<?> tryCreate(@NotNull FactoryContext<T_HandledType> context) throws FactoryException {
 			return (
 				context.type.getRawClass() == String.class &&
 				context.type.getAnnotations().has(MultiLine.class)
-				? new MultiLineStringDecoder((ReifiedType<@MultiLine String>)(context.type))
+				? new MultiLineStringDecoder(context.type.uncheckedCast())
 				: null
 			);
 		}

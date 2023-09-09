@@ -90,7 +90,7 @@ public abstract class DefaultEmptyDecoder<T_Decoded> extends NamedDecoder<T_Deco
 		public static final Factory INSTANCE = new Factory();
 
 		@Override
-		public @Nullable <T_HandledType> AutoDecoder<?> tryCreate(@NotNull FactoryContext<T_HandledType> context) throws FactoryException {
+		public <T_HandledType> @Nullable AutoDecoder<?> tryCreate(@NotNull FactoryContext<T_HandledType> context) throws FactoryException {
 			DefaultEmpty annotation = context.type.getAnnotations().getFirst(DefaultEmpty.class);
 			if (annotation != null) {
 				AutoDecoder<T_HandledType> fallback = context.forceCreateFallbackDecoder(this);

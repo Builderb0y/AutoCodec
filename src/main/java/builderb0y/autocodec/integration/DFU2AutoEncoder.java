@@ -37,7 +37,7 @@ public interface DFU2AutoEncoder<T_Decoded> extends AutoEncoder<T_Decoded> {
 	@Override
 	@OverrideOnly
 	public default <T_Encoded> @NotNull T_Encoded encode(@NotNull EncodeContext<T_Encoded, T_Decoded> context) throws EncodeException {
-		return context.logger().unwrap(
+		return context.logger().unwrapLazy(
 			this.encoder().encodeStart(context.ops, context.input),
 			this.allowPartial(),
 			EncodeException::new

@@ -72,11 +72,10 @@ public class EnumDecoder<T_DecodedEnum extends Enum<T_DecodedEnum>> extends Name
 
 		@Override
 		@OverrideOnly
-		@SuppressWarnings({ "unchecked", "rawtypes" })
 		public <T_HandledType> @Nullable AutoDecoder<?> tryCreate(@NotNull FactoryContext<T_HandledType> context) throws FactoryException {
 			Class<?> rawClass = context.type.getBoundOrSelf().getRawClass();
 			if (rawClass != null && rawClass.isEnum()) {
-				return new EnumDecoder(rawClass, this.nameGetter);
+				return new EnumDecoder<>(rawClass.asSubclass(Enum.class), this.nameGetter);
 			}
 			return null;
 		}

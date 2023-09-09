@@ -24,20 +24,20 @@ public class UseVerifierFactory extends UseHandlerFactory<AutoVerifier<?>> imple
 
 	@Override
 	@OverrideOnly
-	public @Nullable <T_HandledType> AutoVerifier<?> tryCreate(@NotNull FactoryContext<T_HandledType> context) throws FactoryException {
+	public <T_HandledType> @Nullable AutoVerifier<?> tryCreate(@NotNull FactoryContext<T_HandledType> context) throws FactoryException {
 		return InheritedVerifierFactory.super.tryCreate(context);
 	}
 
 	@Override
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public @Nullable <T_HandledType> AutoVerifier<?> tryCreate(@NotNull FactoryContext<T_HandledType> context, @NotNull ReifiedType<? extends T_HandledType> originalType) throws FactoryException {
+	public <T_HandledType> @Nullable AutoVerifier<?> tryCreate(@NotNull FactoryContext<T_HandledType> context, @NotNull ReifiedType<? extends T_HandledType> originalType) throws FactoryException {
 		UseSpec[] specs = UseSpec.fromAllUseVerifiers(context.type);
 		int length = specs.length;
 		return switch (length) {
 			case 0 -> null;
 			case 1 -> this.doCreate(context, specs[0]);
 			default -> {
-				AutoVerifier<?>[] verifiers = AutoVerifier.ARRAY_FACTORY.applyGeneric(length);
+				AutoVerifier<?>[] verifiers = AutoVerifier.ARRAY_FACTORY.apply(length);
 				for (int index = 0; index < length; index++) {
 					verifiers[index] = this.doCreate(context, specs[index]);
 				}

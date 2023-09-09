@@ -126,7 +126,7 @@ public class SizeRangeVerifier<T_Collection> implements AutoVerifier<T_Collectio
 
 		@Override
 		@OverrideOnly
-		public @Nullable <T_HandledType> AutoVerifier<?> tryCreate(@NotNull FactoryContext<T_HandledType> context) throws FactoryException {
+		public <T_HandledType> @Nullable AutoVerifier<?> tryCreate(@NotNull FactoryContext<T_HandledType> context) throws FactoryException {
 			VerifySizeRange range = context.type.getAnnotations().getFirst(VerifySizeRange.class);
 			if (range == null) return null;
 

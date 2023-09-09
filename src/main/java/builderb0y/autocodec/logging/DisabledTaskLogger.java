@@ -117,7 +117,7 @@ public class DisabledTaskLogger extends TaskLogger {
 	}
 
 	@Override
-	public @Nullable <T_Owner, T_Collect> T_Collect searchFields(@NotNull ReflectContext<T_Owner> context, boolean inherited, @NotNull Predicate<? super FieldLikeMemberView<T_Owner, ?>> predicate, @NotNull MemberCollector<FieldLikeMemberView<T_Owner, ?>, T_Collect> collector) throws ReflectException {
+	public <T_Owner, T_Collect> @Nullable T_Collect searchFields(@NotNull ReflectContext<T_Owner> context, boolean inherited, @NotNull Predicate<? super FieldLikeMemberView<T_Owner, ?>> predicate, @NotNull MemberCollector<FieldLikeMemberView<T_Owner, ?>, T_Collect> collector) throws ReflectException {
 		return context.reflectionManager().searchFields(context, inherited, predicate, collector);
 	}
 

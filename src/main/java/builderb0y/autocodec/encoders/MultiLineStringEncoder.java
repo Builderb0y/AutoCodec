@@ -36,12 +36,11 @@ public class MultiLineStringEncoder extends NamedEncoder<@MultiLine String> {
 		public static final @NotNull Factory INSTANCE = new Factory();
 
 		@Override
-		@SuppressWarnings("unchecked")
 		public <T_HandledType> @Nullable AutoEncoder<?> tryCreate(@NotNull FactoryContext<T_HandledType> context) throws FactoryException {
 			return (
 				context.type.getRawClass() == String.class &&
 				context.type.getAnnotations().has(MultiLine.class)
-				? new MultiLineStringEncoder((ReifiedType<@MultiLine String>)(context.type))
+				? new MultiLineStringEncoder(context.type.uncheckedCast())
 				: null
 			);
 		}

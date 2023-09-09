@@ -60,12 +60,11 @@ public class MethodView<T_Owner, T_Return> extends MethodLikeMemberView<T_Owner,
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public @NotNull ReifiedType<T_Return> getReturnType() {
 		ReifiedType<T_Return> returnType = this.returnType;
 		if (returnType == null) {
-			returnType = this.returnType = (ReifiedType<T_Return>)(
-				this.getDeclaringType().resolveDeclaration(this.method.getAnnotatedReturnType())
+			returnType = this.returnType = (
+				this.getDeclaringType().resolveDeclaration(this.method.getAnnotatedReturnType()).uncheckedCast()
 			);
 		}
 		return returnType;

@@ -189,6 +189,23 @@ public class RecordDecoder<T_Decoded> extends NamedDecoder<T_Decoded> {
 			);
 		}
 
+		public <T_Owner> @NotNull FieldLikeMemberView<T_Owner, ?> @NotNull [] findFieldsWithTypes(@NotNull FactoryContext<?> context, @NotNull Stream<@NotNull ParameterView<T_Owner, ?>> toFind) {
+			Map<String, FieldLikeMemberView<?, ?>> map = (
+				Arrays.stream(context.reflect().getFields(true))
+				.filter(new FieldPredicate().notStatic())
+				.collect(Collectors.toMap(FieldLikeMemberView::getName, Function.identity()))
+			);
+			return (
+				toFind
+				.map((ParameterView<T_Owner, ?> parameter) -> {
+					FieldLikeMemberView<?, ?> field = map.get(parameter.getName());
+					if (field != null && ReifiedType.GENERIC_TYPE_STRATEGY.equals(field.getType(), parameter.getType())) return field;
+					else throw new FactoryException("Cannot find field " + parameter.getName() + " of type " + parameter.getType() + " in " + context.type + " or its super classes or super interfaces.");
+				})
+				.toArray(FieldLikeMemberView.ARRAY_FACTORY.generic())
+			);
+		}
+
 		public <T_Owner> @Nullable ConstructorFields<T_Owner> getApplicableConstructor(@NotNull FactoryContext<T_Owner> context) {
 			//first priority: the @RecordLike annotation.
 			RecordLike annotation = context.type.getAnnotations().getFirst(RecordLike.class);
@@ -231,7 +248,7 @@ public class RecordDecoder<T_Decoded> extends NamedDecoder<T_Decoded> {
 			);
 			if (constructor != null && constructor.getParameterCount() != 0) {
 				context.logger().logMessageLazy(() -> "Class has exactly one constructor: " + constructor);
-				FieldLikeMemberView<T_Owner, ?>[] fields = this.findFields(context, Arrays.stream(constructor.getParameters()).map(ParameterView::getName));
+				FieldLikeMemberView<T_Owner, ?>[] fields = this.findFieldsWithTypes(context, Arrays.stream(constructor.getParameters()));
 				return new ConstructorFields<>(constructor, fields);
 			}
 			//all of the above tactics failed.

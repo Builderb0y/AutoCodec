@@ -42,7 +42,7 @@ public class ConstructImprintDecoder<T_Decoded> extends NamedDecoder<T_Decoded> 
 
 		@Override
 		@OverrideOnly
-		public @Nullable <T_HandledType> AutoDecoder<?> tryCreate(@NotNull FactoryContext<T_HandledType> context) throws FactoryException {
+		public <T_HandledType> @Nullable AutoDecoder<?> tryCreate(@NotNull FactoryContext<T_HandledType> context) throws FactoryException {
 			AutoConstructor<T_HandledType> constructor = context.tryCreateConstructor();
 			if (constructor == null) return null;
 			//assume the AutoDecoder we're about to return

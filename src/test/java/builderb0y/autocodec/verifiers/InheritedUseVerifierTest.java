@@ -48,7 +48,7 @@ public class InheritedUseVerifierTest {
 
 		public static <T_Encoded> void verify(VerifyContext<T_Encoded, A> context) throws VerifyException {
 			if (context.object != null && !context.object.valid) {
-				throw new VerifyException("not valid");
+				throw new VerifyException(() -> "not valid");
 			}
 		}
 	}
@@ -65,7 +65,7 @@ public class InheritedUseVerifierTest {
 
 		public static <T_Encoded> void verify2(VerifyContext<T_Encoded, B> context) throws VerifyException {
 			if (context.object != null && !context.object.valid2) {
-				throw new VerifyException("not valid 2");
+				throw new VerifyException(() -> "not valid 2");
 			}
 		}
 	}

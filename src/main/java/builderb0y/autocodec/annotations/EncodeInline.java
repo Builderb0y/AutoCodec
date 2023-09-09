@@ -56,5 +56,23 @@ public @interface EncodeInline {
 		public Class<? extends Annotation> annotationType() {
 			return EncodeInline.class;
 		}
+
+		/** consistent with {@link sun.reflect.annotation.AnnotationInvocationHandler} */
+		@Override
+		public String toString() {
+			return '@' + EncodeInline.class.getName() + "()";
+		}
+
+		/** consistent with {@link sun.reflect.annotation.AnnotationInvocationHandler} */
+		@Override
+		public int hashCode() {
+			return 0;
+		}
+
+		/** consistent with {@link sun.reflect.annotation.AnnotationInvocationHandler} */
+		@Override
+		public boolean equals(Object obj) {
+			return obj instanceof EncodeInline;
+		}
 	};
 }

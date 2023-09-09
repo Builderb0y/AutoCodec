@@ -4,7 +4,7 @@ plugins() {
 }
 
 group('builderb0y')
-version('4.10.0')
+version('4.11.0')
 archivesBaseName = 'AutoCodec'
 
 repositories() {
@@ -22,8 +22,8 @@ dependencies() {
 	testImplementation('junit:junit:4.13.2')
 }
 
-compileJava() {
-	options.compilerArgs.add('-parameters')
+tasks.withType(JavaCompile).configureEach() {
+	it.options.compilerArgs.add('-parameters')
 }
 
 java() {
@@ -31,10 +31,6 @@ java() {
 	toolchain() {
 		languageVersion = JavaLanguageVersion.of(17)
 	}
-}
-
-compileTestJava() {
-	options.compilerArgs.add('-parameters')
 }
 
 test() {

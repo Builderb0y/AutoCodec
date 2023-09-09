@@ -40,5 +40,23 @@ public @interface SingletonArray {
 		public Class<? extends Annotation> annotationType() {
 			return SingletonArray.class;
 		}
+
+		/** consistent with {@link sun.reflect.annotation.AnnotationInvocationHandler} */
+		@Override
+		public String toString() {
+			return '@' + SingletonArray.class.getName() + "()";
+		}
+
+		/** consistent with {@link sun.reflect.annotation.AnnotationInvocationHandler} */
+		@Override
+		public int hashCode() {
+			return 0;
+		}
+
+		/** consistent with {@link sun.reflect.annotation.AnnotationInvocationHandler} */
+		@Override
+		public boolean equals(Object obj) {
+			return obj instanceof SingletonArray;
+		}
 	};
 }

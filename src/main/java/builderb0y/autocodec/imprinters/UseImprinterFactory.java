@@ -6,8 +6,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import builderb0y.autocodec.common.FactoryContext;
-import builderb0y.autocodec.common.UseSpec;
 import builderb0y.autocodec.common.UseHandlerFactory;
+import builderb0y.autocodec.common.UseSpec;
 import builderb0y.autocodec.imprinters.AutoImprinter.ImprinterFactory;
 import builderb0y.autocodec.reflection.MemberCollector;
 import builderb0y.autocodec.reflection.MethodPredicate;
@@ -21,7 +21,7 @@ public class UseImprinterFactory extends UseHandlerFactory<AutoImprinter<?>> imp
 	public static final @NotNull UseImprinterFactory INSTANCE = new UseImprinterFactory();
 
 	@Override
-	public @Nullable <T_HandledType> UseSpec getSpec(@NotNull FactoryContext<T_HandledType> context) {
+	public <T_HandledType> @Nullable UseSpec getSpec(@NotNull FactoryContext<T_HandledType> context) {
 		return UseSpec.fromUseImprinter(context.type);
 	}
 

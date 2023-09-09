@@ -34,7 +34,6 @@ public class EnumMapConstructor<K extends Enum<K>, V> extends NamedConstructor<E
 
 		@Override
 		@OverrideOnly
-		@SuppressWarnings({ "unchecked", "rawtypes" })
 		public <T_HandledType> @Nullable AutoConstructor<?> tryCreate(@NotNull FactoryContext<T_HandledType> context) throws FactoryException {
 			ReifiedType<?> keyType = context.type.getLowerBoundOrSelf().resolveParameter(EnumMap.class);
 			if (keyType != null) {
@@ -42,7 +41,7 @@ public class EnumMapConstructor<K extends Enum<K>, V> extends NamedConstructor<E
 				if ((keyClass = keyType.getRawClass()) == null || !keyClass.isEnum()) {
 					throw new FactoryException("EnumMap with non-enum keys: " + keyType);
 				}
-				return new EnumMapConstructor(context.type, keyClass);
+				return new EnumMapConstructor<>(context.type.uncheckedCast(), keyClass.asSubclass(Enum.class));
 			}
 			return null; //not an EnumMap.
 		}

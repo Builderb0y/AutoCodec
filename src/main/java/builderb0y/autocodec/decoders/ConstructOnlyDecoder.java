@@ -40,7 +40,7 @@ public class ConstructOnlyDecoder<T_Decoded> extends NamedDecoder<T_Decoded> {
 		public static final Factory INSTANCE = new Factory();
 
 		@Override
-		public @Nullable <T_HandledType> AutoDecoder<?> tryCreate(@NotNull FactoryContext<T_HandledType> context) throws FactoryException {
+		public <T_HandledType> @Nullable AutoDecoder<?> tryCreate(@NotNull FactoryContext<T_HandledType> context) throws FactoryException {
 			ConstructOnly annotation = context.type.getAnnotations().getFirst(ConstructOnly.class);
 			if (annotation != null) {
 				AutoConstructor<T_HandledType> constructor = context.forceCreateConstructor();

@@ -41,13 +41,12 @@ public class MapEncoder<T_Key, T_Value, T_Map extends Map<T_Key, T_Value>> exten
 
 		@Override
 		@OverrideOnly
-		@SuppressWarnings({ "unchecked", "rawtypes" })
 		public <T_HandledType> @Nullable AutoEncoder<?> tryCreate(@NotNull FactoryContext<T_HandledType> context) throws FactoryException {
 			ReifiedType<?>[] keyValueTypes = context.type.getUpperBoundOrSelf().resolveParameters(Map.class);
 			if (keyValueTypes != null) {
 				AutoEncoder<?>   keyEncoder = context.type(keyValueTypes[0]).forceCreateEncoder();
 				AutoEncoder<?> valueEncoder = context.type(keyValueTypes[1]).forceCreateEncoder();
-				return new MapEncoder(context.type, keyEncoder, valueEncoder);
+				return new MapEncoder<>(context.type.uncheckedCast(), keyEncoder, valueEncoder);
 			}
 			return null;
 		}

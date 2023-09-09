@@ -37,13 +37,12 @@ public class CollectionEncoder<T_Element, T_Collection extends Collection<T_Elem
 
 		@Override
 		@OverrideOnly
-		@SuppressWarnings({ "unchecked", "rawtypes" })
 		public <T_HandledType> @Nullable AutoEncoder<?> tryCreate(@NotNull FactoryContext<T_HandledType> context) throws FactoryException {
 			ReifiedType<?> elementType = context.type.getUpperBoundOrSelf().resolveParameter(Collection.class);
 			if (elementType != null) {
 				AutoEncoder<?> elementEncoder = context.type(elementType).forceCreateEncoder();
 				boolean singleton = context.type.getAnnotations().has(SingletonArray.class);
-				return new CollectionEncoder(context.type, elementEncoder, singleton);
+				return new CollectionEncoder<>(context.type.uncheckedCast(), elementEncoder, singleton);
 			}
 			return null;
 		}

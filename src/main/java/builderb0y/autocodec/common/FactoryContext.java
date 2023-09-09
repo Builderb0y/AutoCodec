@@ -66,8 +66,9 @@ public class FactoryContext<T_HandledType> extends TaskContext implements Reflec
 	is not provided because in almost all cases,
 	the type required is derived from another {@link ReifiedType}.
 	*/
+	@SuppressWarnings("unchecked")
 	public <T_NewHandledType> @NotNull FactoryContext<T_NewHandledType> type(@NotNull ReifiedType<T_NewHandledType> newType) {
-		return new FactoryContext<>(this.autoCodec, newType);
+		return this.type == newType ? (FactoryContext<T_NewHandledType>)(this) : new FactoryContext<>(this.autoCodec, newType);
 	}
 
 	//////////////////////////////// creating handlers ////////////////////////////////

@@ -19,7 +19,8 @@ public class TypeReifier {
 	public final @NotNull Map<@NotNull AnnotatedType, @NotNull ReifiedType<?>> seen;
 
 	/**
-	if true, when an {@link AnnotatedTypeVariable} is encountered,
+	if true, when an {@link AnnotatedTypeVariable} is
+	encountered which isn't in our {@link #variableLookup},
 	the result is a ReifiedType whose {@link ReifiedType#getClassification()}
 	is {@link TypeClassification#UNRESOLVABLE_VARIABLE}.
 
@@ -78,16 +79,27 @@ public class TypeReifier {
 		return to;
 	}
 
-	public @NotNull ReifiedType<?> unresolvable(@NotNull TypeVariable<?> variable, @NotNull AnnotatedType annotatedBound) {
-		ReifiedType<?> reifiedBound = this.reify(annotatedBound);
-		ReifiedType<?> type = ReifiedType.blank();
-		type.classification = TypeClassification.UNRESOLVABLE_VARIABLE;
-		type.sharedType = reifiedBound;
-		type.unresolvableVariable = variable;
-		return type;
+	public @NotNull ReifiedType<?> unresolvable(
+		@NotNull AnnotatedTypeVariable annotatedVariable,
+		@NotNull TypeVariable<?> variable,
+		@NotNull AnnotatedType annotatedBound
+	) {
+		ReifiedType<?> result = ReifiedType.blank();
+		if (this.seen.putIfAbsent(annotatedVariable, result) != null) {
+			throw new TypeReificationException("Already seen " + annotatedVariable + " (variable: " + variable + ", bound: " + annotatedBound + ')');
+		}
+		result.classification = TypeClassification.UNRESOLVABLE_VARIABLE;
+		result.unresolvableVariable = variable;
+		result.annotationSources.add(variable);
+		result.sharedType = this.reify(annotatedBound);
+		return result;
 	}
 
 	public @NotNull ReifiedType<?> reify(@NotNull AnnotatedType type) {
+		return this.reify(type, null);
+	}
+
+	public @NotNull ReifiedType<?> reify(@NotNull AnnotatedType type, @Nullable AnnotatedElement extraAnnotations) {
 		ReifiedType<?> seen = this.seen.get(type);
 		if (seen != null) {
 			return seen;
@@ -97,22 +109,27 @@ public class TypeReifier {
 			ReifiedType<?> resolution = this.variableLookup.get(typeVariable);
 			if (resolution == null) {
 				if (this.allowUnresolvableVariables) {
-					resolution = this.unresolvable(typeVariable, variable.getAnnotatedBounds()[0]);
+					resolution = this.unresolvable(variable, typeVariable, variable.getAnnotatedBounds()[0]);
 				}
 				else {
 					throw new TypeReificationException("Missing generic information to fully resolve " + variable);
 				}
 			}
-			resolution = copyForAnnotations(resolution, true);
-			//todo: try to understand why moving typeVariable to the end of the list works in this specific case.
-			resolution.annotationSources.remove(typeVariable);
-			resolution.annotationSources.add(type);
-			resolution.annotationSources.add(typeVariable);
+			else {
+				resolution = copyForAnnotations(resolution, true);
+				this.seen.put(type, resolution);
+				//todo: try to understand why moving typeVariable to the end of the list works in this specific case.
+				resolution.annotationSources.remove(typeVariable);
+				resolution.annotationSources.add(type);
+				resolution.annotationSources.add(typeVariable);
+				if (extraAnnotations != null) resolution.annotationSources.add(extraAnnotations);
+			}
 			return resolution;
 		}
 		ReifiedType<?> result = ReifiedType.blank();
 		this.seen.put(type, result);
 		result.annotationSources.add(type);
+		if (extraAnnotations != null) result.annotationSources.add(extraAnnotations);
 		if (type instanceof AnnotatedParameterizedType parameterized) {
 			this.populateParameterized(parameterized, result);
 		}
@@ -164,12 +181,10 @@ public class TypeReifier {
 			Map<TypeVariable<Class<?>>, ReifiedType<?>> newLookup = new HashMap<>(length);
 			ReifiedType<?>[] resultParameters = new ReifiedType<?>[length];
 			for (int index = 0; index < length; index++) {
-				ReifiedType<?> resultParameter = this.reify(to[index]);
+				ReifiedType<?> resultParameter = this.reify(to[index], from[index]);
 				if (resultParameter.isPrimitive()) {
 					throw new TypeReificationException("Primitive type parameter: " + resultParameter);
 				}
-				resultParameter = copyForAnnotations(resultParameter, true);
-				resultParameter.annotationSources.add(from[index]);
 				resultParameters[index] = resultParameter;
 				newLookup.put(from[index], resultParameter);
 			}
@@ -236,12 +251,10 @@ public class TypeReifier {
 			Map<TypeVariable<Class<?>>, ReifiedType<?>> newLookup = new HashMap<>(length);
 			ReifiedType<?>[] resultParameters = new ReifiedType<?>[length];
 			for (int index = 0; index < length; index++) {
-				ReifiedType<?> resultParameter = this.unresolvable(parameters[index], parameters[index].getAnnotatedBounds()[0]);
+				ReifiedType<?> resultParameter = this.unresolvable(new AnnotatedTypeVariableImpl(parameters[index]), parameters[index], parameters[index].getAnnotatedBounds()[0]);
 				if (resultParameter.isPrimitive()) {
 					throw new TypeReificationException("Primitive type parameter: " + resultParameter);
 				}
-				resultParameter = copyForAnnotations(resultParameter, true);
-				resultParameter.annotationSources.add(parameters[index]);
 				resultParameters[index] = resultParameter;
 				newLookup.put(parameters[index], resultParameter);
 			}

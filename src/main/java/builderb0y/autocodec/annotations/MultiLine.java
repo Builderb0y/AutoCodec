@@ -52,5 +52,23 @@ public @interface MultiLine {
 		public Class<? extends Annotation> annotationType() {
 			return MultiLine.class;
 		}
+
+		/** consistent with {@link sun.reflect.annotation.AnnotationInvocationHandler} */
+		@Override
+		public String toString() {
+			return '@' + MultiLine.class.getName() + "()";
+		}
+
+		/** consistent with {@link sun.reflect.annotation.AnnotationInvocationHandler} */
+		@Override
+		public int hashCode() {
+			return 0;
+		}
+
+		/** consistent with {@link sun.reflect.annotation.AnnotationInvocationHandler} */
+		@Override
+		public boolean equals(Object obj) {
+			return obj instanceof MultiLine;
+		}
 	};
 }

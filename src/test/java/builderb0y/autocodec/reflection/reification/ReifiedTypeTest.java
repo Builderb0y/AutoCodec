@@ -393,6 +393,22 @@ public class ReifiedTypeTest {
 		public class ParameterizedInner<B> {}
 	}
 
+	@Test
+	public void testInfiniteRecursion() throws NoSuchMethodException, NoSuchFieldException {
+		ReifiedType<?> typeA = new TypeReifier(Collections.emptyMap(), true).reify(ReifiedTypeTest.class.getDeclaredMethod("infiniteRecursion", Comparable.class).getAnnotatedParameterTypes()[0]);
+		ReifiedType<?> typeB = new TypeReifier(Collections.emptyMap(), true).reify(InfiniteRecursion.class.getDeclaredField("INSTANCE").getAnnotatedType());
+		assertEquals("unresolvable C extends java.lang.Comparable<C>", typeA.toString());
+		assertEquals("builderb0y.autocodec.reflection.reification.ReifiedTypeTest$InfiniteRecursion<unresolvable C extends java.lang.Comparable<C>>", typeB.toString());
+	}
+
+	public static <C extends Comparable<C>> void infiniteRecursion(C object) {}
+
+	public static class InfiniteRecursion<C extends Comparable<C>> {
+
+		@SuppressWarnings({ "rawtypes", "InstantiationOfUtilityClass" })
+		public static final InfiniteRecursion INSTANCE = new InfiniteRecursion();
+	}
+
 	public static List<String> allA(AnnotationContainer container) {
 		return Arrays.stream(container.getAll(A.class)).map(A::value).toList();
 	}

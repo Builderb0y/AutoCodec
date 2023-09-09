@@ -186,7 +186,7 @@ public abstract class DynamicOpsContext<T_Encoded> extends TaskContext {
 	public static <T> T unwrap(@NotNull DataResult<T> result) {
 		return result.get().map(
 			Function.identity(),
-			(PartialResult<T> partial) -> { throw new EncodeException(partial.message()); }
+			(PartialResult<T> partial) -> { throw new EncodeException(partial::message); }
 		);
 	}
 

@@ -29,13 +29,29 @@ public class Node {
 
 # Getting started
 
+## Building
+
+The provided gradle build script is sufficient to build AutoCodec. It will place the build artifacts in a platform-specific maven local directory. Other projects which depend on AutoCodec can then reference that directory via
+```groovy
+reposotories {
+	mavenLocal()
+}
+```
+
+## Using
+
 First, you will want to add `-parameters` to your javac arguments. This will allow reflection to retrieve the names of method and constructor parameters. AutoCodec uses this information to determine which parameters are used to initialize which fields, which is important for record-like classes. If you are using Gradle, add the following to your build script:
 ```groovy
 compileJava {
 	options.compilerArgs.add('-parameters')
 }
 ```
-If you plan on using AutoCodec in a testing environment (like JUnit), you will need to add `-parameters` to the `compileTestJava` task too.
+If you plan on using AutoCodec in a testing environment (like JUnit), you will need to add `-parameters` to the `compileTestJava` task too. If you want to quickly configure all java-compiling tasks at once, you can also do:
+```groovy
+tasks.withType(JavaCompile).configureEach {
+	it.options.compilerArgs.add('-parameters')
+}
+```
 
 Ok, got that? Good. Now onto the fun part: creating an AutoCodec instance. This part is fairly straightforward:
 ```java
@@ -49,7 +65,7 @@ Or, if your class is generic or needs to be annotated:
 ```java
 Codec<List<String>> codec = AUTO_CODEC.createDFUCodec(new ReifiedType<@SingletonArray List<@VerifyIntRange(min = 0, max = 100) Integer>>() {});
 ```
-Either way, the returned Codec will be capable of encoding and decoding instances of the requested class. Codecs are also cached, so you can request a Codec for the same Class or ReifiedType many times without additional overhead.
+Either way, the returned Codec will be capable of encoding and decoding instances of the requested type. Codecs are also cached, so you can request a Codec for the same Class or ReifiedType many times without additional overhead.
 
 ## Compare and contrast how Codecs are normally created:
 
@@ -79,8 +95,8 @@ public static final AutoCodec AUTO_CODEC = new AutoCodec() {
 # How it works under the hood
 
 When customizing AutoCodec to fit the types you need to (de)serialize, it helps to know how AutoCodec is internally structured. AutoCodec divides the work of encoding and decoding into 5 tasks:
-* Encoding is the process of taking some data and converting it to a java object in some way.
-* Decoding is the process of taking a java object and converting it to data in some way.
+* Encoding is the process of taking a java object and converting it to data in some way.
+* Decoding is the process of taking some data and converting it to a java object in some way.
 * Constructing is the process of creating a java object without any data.
 * Imprinting is the process of taking a java object and some data, and applying that data to that object in some way.
 * Verifying is the process of ensuring that a java object meets some criteria. For example, ensuring that it is not null.
@@ -98,6 +114,10 @@ There are a few classes associated with each task:
 At the very end, an AutoEncoder and AutoDecoder are typically either wrapped to produce an Encoder and Decoder, which are combined to form a Codec, OR the AutoEncoder and AutoDecoder are combined into an AutoCoder, which is then wrapped to form a Codec. Regardless of whether wrapping or combining happens first, the result is the same: a Codec which can encode and decode instances of the requested type.
 
 It is also worth mentioning that none of the above handlers rely on DataResult. When something goes wrong, a checked exception is thrown. The lack of reliance on DataResult also means that AutoCodec is more efficient at encoding and decoding than regular DFU is, due to the highly reduced number of lambda expressions involved.
+
+## Compare and contrast how Codecs normally work:
+
+I don't know how Codecs normally work.
 
 # Logging
 

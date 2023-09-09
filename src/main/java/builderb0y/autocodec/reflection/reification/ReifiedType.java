@@ -45,7 +45,7 @@ using a ReifiedType:
 		{@link #resolveParameter(Class)},
 		{@link #resolveVariable(TypeVariable)},
 		and {@link #resolveDeclaration(AnnotatedType)},
-	see the docs on all of these methods for what they all do.
+	see the docs on all of these methods for information about what they all do.
 
 important: instances of ReifiedType should be treated as if they were immutable,
 even though all the backing fields are non-final.
@@ -58,6 +58,52 @@ which want to build on top of the ReifiedType system.
 public class ReifiedType<T> implements TypeFormatterAppendable {
 
 	public static final @NotNull ObjectArrayFactory<ReifiedType<?>> ARRAY_FACTORY = ArrayFactories.REIFIED_TYPE;
+
+	/**
+	a cache used for {@link #from(Class)}.
+	I figure that method is probably called often enough to deserve a cache.
+	*/
+	@Internal
+	public static final ClassValue<ReifiedType<?>> FROM_CACHE = new ClassValue<>() {
+
+		@Override
+		public ReifiedType<?> computeValue(Class<?> type) {
+			return TypeReifier.create(type, null, ARRAY_FACTORY.empty());
+		}
+	};
+
+	/**
+	a cache used for anonymous direct subclasses of ReifiedType.
+	for example, {@code new ReifiedType<@VerifyNullable String>() {}}.
+	without this cache we would need to re-parse generic
+	type information every time the class is instantiated.
+	granted, I don't expect subclasses to be used all that often,
+	but I figure if {@link FactoryList} has a {@link FactoryList#cache},
+	then ReifiedType should too.
+	*/
+	@Internal
+	public static final ClassValue<ReifiedType<?>> LITERAL_CACHE = new ClassValue<>() {
+
+		@Override
+		public ReifiedType<?> computeValue(Class<?> type) {
+			if (type.getSuperclass() == ReifiedType.class) {
+				return (
+					from(
+						(
+							(AnnotatedParameterizedType)(
+								type.getAnnotatedSuperclass() //ReifiedType<T>
+							)
+						)
+						.getAnnotatedActualTypeArguments() //[T]
+						[0] //T
+					)
+				);
+			}
+			else {
+				throw new TypeReificationException("type must be *direct* subclass of ReifiedType");
+			}
+		}
+	};
 
 	public static final Hash.@NotNull Strategy<@Nullable ReifiedType<?>>
 		RAW_TYPE_STRATEGY = new NamedHashStrategy<>("ReifiedType.RAW_TYPE_STRATEGY") {
@@ -134,39 +180,6 @@ public class ReifiedType<T> implements TypeFormatterAppendable {
 	@Internal
 	public static final @NotNull ReifiedType<?> @NotNull [] NO_SUPER_INTERFACES = {};
 
-	/**
-	a cache used for anonymous direct subclasses of ReifiedType.
-	for example, {@code new ReifiedType<@VerifyNullable String>() {}}.
-	without this cache we would need to re-parse generic
-	type information every time the class is instantiated.
-	granted, I don't expect subclasses to be used all that often,
-	but I figure if {@link FactoryList} has a {@link FactoryList#cache},
-	then ReifiedType should too.
-	*/
-	@Internal
-	public static final ClassValue<ReifiedType<?>> LITERAL_CACHE = new ClassValue<>() {
-
-		@Override
-		public ReifiedType<?> computeValue(Class<?> type) {
-			if (type.getSuperclass() == ReifiedType.class) {
-				return (
-					from(
-						(
-							(AnnotatedParameterizedType)(
-								type.getAnnotatedSuperclass() //ReifiedType<?>
-							)
-						)
-						.getAnnotatedActualTypeArguments() //[T]
-						[0] //T
-					)
-				);
-			}
-			else {
-				throw new TypeReificationException("type must be *direct* subclass of ReifiedType");
-			}
-		}
-	};
-
 	//////////////////////////////// fields and factory methods ////////////////////////////////
 
 	//late-initialized.
@@ -224,6 +237,8 @@ public class ReifiedType<T> implements TypeFormatterAppendable {
 	without a subclass, this information is impossible to reify.
 	note that non-anonymous subclasses will also work,
 	though why you'd want to do this I don't know.
+	note also that indirect subclasses (A extends B extends ReifiedType)
+	will NOT work. but I don't know why you'd want to do that either.
 
 	if you *really* want an instance of ReifiedType which does
 	NOT have the necessary information to reify {@link T},
@@ -257,6 +272,10 @@ public class ReifiedType<T> implements TypeFormatterAppendable {
 	attempting to use the returned ReifiedType
 	before initializing it externally will most
 	likely result in exceptions being thrown.
+
+	this method is provided solely for APIs which
+	want to build on top of the ReifiedType system.
+	it is also used internally by {@link TypeReifier}.
 	*/
 	public static <T> @NotNull ReifiedType<T> blank() {
 		return new ReifiedType<>();
@@ -270,8 +289,8 @@ public class ReifiedType<T> implements TypeFormatterAppendable {
 	/**
 	returns a ReifiedType whose {@link #getRawClass()} is the provided class.
 
-	if the given class has {@link Class#getTypeParameters()},
-	this method throws an {@link TypeReificationException}.
+	if the given class has one or more {@link Class#getTypeParameters()},
+	this method throws a {@link TypeReificationException}.
 
 	if the provided class is a non-static inner class,
 	then the returned ReifiedType will have an {@link #getOwner()}
@@ -285,7 +304,7 @@ public class ReifiedType<T> implements TypeFormatterAppendable {
 	from(Inner.class) will return a ReifiedType<Outer<?>.Inner>.
 	*/
 	public static <T> @NotNull ReifiedType<T> from(@NotNull Class<T> clazz) {
-		return TypeReifier.create(clazz, null, ARRAY_FACTORY.empty());
+		return FROM_CACHE.get(clazz).uncheckedCast();
 	}
 
 	/**
@@ -293,7 +312,7 @@ public class ReifiedType<T> implements TypeFormatterAppendable {
 	whose {@link #getRawClass()} is the provided rawClass,
 	and whose {@link #getParameters()} are the provided parameters.
 
-	throws {@link IllegalArgumentException} if the provided
+	throws {@link TypeReificationException} if the provided
 	rawClass does not declare any {@link Class#getTypeParameters()},
 	or if it declares a different number of type parameters than what is given.
 
@@ -306,7 +325,7 @@ public class ReifiedType<T> implements TypeFormatterAppendable {
 			public class Inner<B> {}
 		}
 	},
-	from(Inner.class) will return a ReifiedType<Outer<?>.Inner<?>>.
+	from(Inner.class) will return a ReifiedType<Outer<?>.Inner<...>>.
 	*/
 	public static <T> @NotNull ReifiedType<T> parameterize(@NotNull Class<? super T> rawClass, @NotNull ReifiedType<?> @NotNull ... parameters) {
 		return TypeReifier.create(rawClass, null, parameters);
@@ -316,10 +335,10 @@ public class ReifiedType<T> implements TypeFormatterAppendable {
 	returns a ReifiedType whose {@link #getRawClass()} is the provided rawClass,
 	and whose {@link #getOwner()} is the provided owner.
 
-	if the given class has {@link Class#getTypeParameters()},
+	if the given class has 1 or more {@link Class#getTypeParameters()},
 	this method throws an {@link TypeReificationException}.
 
-	throws {@link IllegalArgumentException} if the provided
+	throws {@link TypeReificationException} if the provided
 	owner's {@link ReifiedType#getRawClass()} does not
 	match the rawClass's {@link Class#getEnclosingClass()}.
 	*/
@@ -333,11 +352,11 @@ public class ReifiedType<T> implements TypeFormatterAppendable {
 	whose {@link #getOwner()} is the provided owner,
 	and whose {@link #getParameters()} are the provided parameters.
 
-	throws {@link IllegalArgumentException} if the provided
+	throws {@link TypeReificationException} if the provided
 	owner's {@link ReifiedType#getRawClass()} does not
 	match the rawClass's {@link Class#getEnclosingClass()}.
 
-	also throws {@link IllegalArgumentException} if the provided
+	also throws {@link TypeReificationException} if the provided
 	rawClass does not declare any {@link Class#getTypeParameters()},
 	or if it declares a different number of type parameters than what is given.
 	*/
@@ -348,7 +367,7 @@ public class ReifiedType<T> implements TypeFormatterAppendable {
 	/**
 	returns a ReifiedType whose {@link #getRawClass()} is the provided class.
 
-	if the provided rawClass has {@link Class#getTypeParameters()},
+	if the provided rawClass has 1 or more {@link Class#getTypeParameters()},
 	then these will be filled in with {@link #WILDCARD},
 	and the returned ReifiedType's {@link #getClassification()}
 	will be {@link TypeClassification#PARAMETERIZED}.
@@ -411,12 +430,16 @@ public class ReifiedType<T> implements TypeFormatterAppendable {
 	/**
 	returns a ReifiedType whose {@link #getClassification()}
 	is {@link TypeClassification#UNRESOLVABLE_VARIABLE},
-	and whose {@link #getUpperBound()} is the provided upperBound.
+	whose {@link #getUnresolvableVariable()} is the provided variable,
+	and whose {@link #getUpperBound()} is the reification of the
+	provided variable's {@link TypeVariable#getAnnotatedBounds()}[0].
 	*/
-	public static <T> @NotNull ReifiedType<? extends T> unresolvableVariable(@NotNull ReifiedType<T> upperBound) {
+	public static <T> @NotNull ReifiedType<? extends T> unresolvableVariable(@NotNull TypeVariable<?> variable) {
 		ReifiedType<? extends T> result = blank();
 		result.classification = TypeClassification.UNRESOLVABLE_VARIABLE;
-		result.sharedType = upperBound;
+		result.sharedType = from(variable.getAnnotatedBounds()[0]);
+		result.unresolvableVariable = variable;
+		result.annotationSources.add(variable);
 		return result;
 	}
 
@@ -1031,6 +1054,7 @@ public class ReifiedType<T> implements TypeFormatterAppendable {
 	public void appendTo(TypeFormatter formatter) {
 		if (this.classification == null) {
 			formatter.append("null classification");
+			return;
 		}
 		AnnotationContainer annotations = formatter.annotations ? this.getAnnotations() : AnnotationContainer.EMPTY_ANNOTATION_CONTAINER;
 		switch (this.getClassification()) {
@@ -1103,16 +1127,40 @@ public class ReifiedType<T> implements TypeFormatterAppendable {
 				this.appendWildcard(formatter, annotations, "super");
 			}
 			case UNRESOLVABLE_VARIABLE -> {
-				formatter.append("unresolvable ");
-				TypeVariable<?> variable = this.unresolvableVariable;
-				if (variable != null) formatter.append(variable);
-				else formatter.append("null variable");
-				formatter.append(" extends ");
-				ReifiedType<? super T> bound = this.getUpperBound();
-				if (bound != null) formatter.append(bound);
-				else formatter.append("null bound");
+				if (EVIL_TO_STRING_INFINITE_RECURSION_BLOCKER.get().add(this)) try {
+					formatter.append("unresolvable ");
+					TypeVariable<?> variable = this.unresolvableVariable;
+					if (variable != null) formatter.append(variable);
+					else formatter.append("null variable");
+					formatter.append(" extends ");
+					ReifiedType<? super T> bound = this.getUpperBound();
+					if (bound != null) formatter.append(bound);
+					else formatter.append("null bound");
+				}
+				finally {
+					EVIL_TO_STRING_INFINITE_RECURSION_BLOCKER.get().remove(this);
+				}
+				else {
+					TypeVariable<?> variable = this.unresolvableVariable;
+					if (variable != null) formatter.append(variable);
+					else formatter.append("null variable");
+				}
 			}
 		}
+	}
+
+	@Internal
+	protected static final ThreadLocal<Set<ReifiedType<?>>> EVIL_TO_STRING_INFINITE_RECURSION_BLOCKER = ThreadLocal.withInitial(() -> Collections.newSetFromMap(new IdentityHashMap<>(2)));
+
+	/**
+	does what it says in the method name.
+	useful for when you have already done runtime checks on the {@link #getRawClass()}
+	or {@link #getParameters()} as necessary, but still need to suppress compile-time
+	checks that this ReifiedType is being used improperly.
+	*/
+	@SuppressWarnings("unchecked")
+	public <T2> ReifiedType<T2> uncheckedCast() {
+		return (ReifiedType<T2>)(this);
 	}
 
 	public static class RecursiveHashStrategy extends NamedHashStrategy<@Nullable ReifiedType<?>> {
