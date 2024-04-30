@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import builderb0y.autocodec.AutoCodec;
 import builderb0y.autocodec.decoders.AutoDecoder;
 import builderb0y.autocodec.decoders.DecodeException;
-import builderb0y.autocodec.util.Compatibility;
+import builderb0y.autocodec.util.DFUVersions;
 
 public interface Auto2DFUDecoder<T_Decoded> extends Decoder<T_Decoded> {
 
@@ -48,7 +48,7 @@ public interface Auto2DFUDecoder<T_Decoded> extends Decoder<T_Decoded> {
 			);
 		}
 		catch (DecodeException exception) {
-			return Compatibility.createErrorDataResult(exception::toString);
+			return DFUVersions.createErrorDataResult(exception::toString);
 		}
 	}
 
@@ -60,7 +60,7 @@ public interface Auto2DFUDecoder<T_Decoded> extends Decoder<T_Decoded> {
 			);
 		}
 		catch (DecodeException exception) {
-			return Compatibility.createErrorDataResult(exception::toString);
+			return DFUVersions.createErrorDataResult(exception::toString);
 		}
 	}
 }

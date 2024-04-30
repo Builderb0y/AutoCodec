@@ -15,8 +15,13 @@ repositories() {
 }
 
 dependencies() {
-	implementation    ('com.mojang:datafixerupper:6.0.6')
-	testImplementation('com.mojang:datafixerupper:6.0.6')
+	//versions of DFU that Minecraft actually uses:
+	//1.19.2 - 5.0.28
+	//1.19.4 - 6.0.6
+	//1.20.1 - 6.0.8
+	//1.20.5 - 7.0.14
+	implementation    ('com.mojang:datafixerupper:7.0.14')
+	testImplementation('com.mojang:datafixerupper:7.0.14')
 	implementation    ('org.jetbrains:annotations:23.0.0')
 	testImplementation('org.jetbrains:annotations:23.0.0')
 	testImplementation('junit:junit:4.13.2')

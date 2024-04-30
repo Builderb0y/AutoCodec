@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
@@ -13,13 +12,13 @@ import java.util.stream.Stream;
 
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.DataResult;
-import com.mojang.serialization.DataResult.PartialResult;
 import com.mojang.serialization.DynamicOps;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import builderb0y.autocodec.AutoCodec;
 import builderb0y.autocodec.encoders.EncodeException;
+import builderb0y.autocodec.util.DFUVersions;
 import builderb0y.autocodec.util.ObjectArrayFactory;
 
 public abstract class DynamicOpsContext<T_Encoded> extends TaskContext {
@@ -184,10 +183,9 @@ public abstract class DynamicOpsContext<T_Encoded> extends TaskContext {
 	//////////////// merging ////////////////
 
 	public static <T> T unwrap(@NotNull DataResult<T> result) {
-		return result.get().map(
-			Function.identity(),
-			(PartialResult<T> partial) -> { throw new EncodeException(partial::message); }
-		);
+		T actualResult = DFUVersions.getResult(result);
+		if (actualResult != null) return actualResult;
+		else throw new EncodeException(DFUVersions.getMessageLazy(result));
 	}
 
 	//////////////// merging lists ////////////////

@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import builderb0y.autocodec.AutoCodec;
 import builderb0y.autocodec.encoders.AutoEncoder;
 import builderb0y.autocodec.encoders.EncodeException;
-import builderb0y.autocodec.util.Compatibility;
+import builderb0y.autocodec.util.DFUVersions;
 
 public interface Auto2DFUEncoder<T_Decoded> extends Encoder<T_Decoded> {
 
@@ -53,7 +53,7 @@ public interface Auto2DFUEncoder<T_Decoded> extends Encoder<T_Decoded> {
 			return DataResult.success(merged);
 		}
 		catch (EncodeException exception) {
-			return Compatibility.createErrorDataResult(exception::toString);
+			return DFUVersions.createErrorDataResult(exception::toString);
 		}
 	}
 

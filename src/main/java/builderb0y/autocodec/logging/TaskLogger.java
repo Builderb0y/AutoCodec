@@ -5,7 +5,6 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import com.mojang.serialization.DataResult;
-import com.mojang.serialization.DataResult.PartialResult;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,6 +31,7 @@ import builderb0y.autocodec.reflection.ReflectException;
 import builderb0y.autocodec.reflection.memberViews.FieldLikeMemberView;
 import builderb0y.autocodec.reflection.memberViews.MethodLikeMemberView;
 import builderb0y.autocodec.util.AutoCodecUtil;
+import builderb0y.autocodec.util.DFUVersions;
 import builderb0y.autocodec.util.TypeFormatter;
 import builderb0y.autocodec.verifiers.AutoVerifier;
 import builderb0y.autocodec.verifiers.VerifyContext;
@@ -128,32 +128,34 @@ public abstract class TaskLogger {
 	*/
 	public abstract <R, X extends Throwable> R runTask(@NotNull LoggableTask<R, X> task) throws X;
 
-	public <R, X extends Throwable> R unwrap(@NotNull DataResult<R> dataResult, boolean allowPartial, Function<? super String, ? extends X> onError) throws X {
-		return dataResult.get().map(
-			Function.identity(),
-			(PartialResult<R> partialResult) -> {
-				R result = AutoCodecUtil.getPartialResult(partialResult);
-				if (result != null && allowPartial) {
-					this.logErrorLazy(partialResult::message);
-					return result;
-				}
-				throw AutoCodecUtil.rethrow(onError.apply(partialResult.message()));
+	public <R, X extends Throwable> R unwrap(@NotNull DataResult<R> dataResult, boolean allowPartial, @NotNull Function<? super @NotNull String, ? extends @NotNull X> onError) throws X {
+		R actualResult = DFUVersions.getResult(dataResult);
+		if (actualResult != null) return actualResult;
+		if (allowPartial) {
+			R partialResult = DFUVersions.getPartialResult(dataResult);
+			if (partialResult != null) {
+				Supplier<String> message = DFUVersions.getMessageLazy(dataResult);
+				this.logErrorLazy(message != null ? message : () -> dataResult + " has a partial result, but no message?");
+				return partialResult;
 			}
-		);
+		}
+		String message = DFUVersions.getMessage(dataResult);
+		throw AutoCodecUtil.rethrow(onError.apply(message != null ? message : dataResult + " has no result, and no message?"));
 	}
 
-	public <R, X extends Throwable> R unwrapLazy(@NotNull DataResult<R> dataResult, boolean allowPartial, Function<? super Supplier<String>, ? extends X> onError) throws X {
-		return dataResult.get().map(
-			Function.identity(),
-			(PartialResult<R> partialResult) -> {
-				R result = AutoCodecUtil.getPartialResult(partialResult);
-				if (result != null && allowPartial) {
-					this.logErrorLazy(partialResult::message);
-					return result;
-				}
-				throw AutoCodecUtil.rethrow(onError.apply((Supplier<String>)(partialResult::message)));
+	public <R, X extends Throwable> R unwrapLazy(@NotNull DataResult<R> dataResult, boolean allowPartial, Function<? super @NotNull Supplier<@NotNull String>, ? extends @NotNull X> onError) throws X {
+		R actualResult = DFUVersions.getResult(dataResult);
+		if (actualResult != null) return actualResult;
+		if (allowPartial) {
+			R partialResult = DFUVersions.getPartialResult(dataResult);
+			if (partialResult != null) {
+				Supplier<String> message = DFUVersions.getMessageLazy(dataResult);
+				this.logErrorLazy(message != null ? message : () -> dataResult + " has a partial result, but no message?");
+				return partialResult;
 			}
-		);
+		}
+		Supplier<String> message = DFUVersions.getMessageLazy(dataResult);
+		throw AutoCodecUtil.rethrow(onError.apply(message != null ? message : (Supplier<String>)() -> dataResult + " has no result, and no message?"));
 	}
 
 	//////////////////////////////// built-in tasks ////////////////////////////////

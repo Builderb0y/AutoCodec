@@ -11,8 +11,8 @@ public class CompatibilityTest {
 
 	@Test
 	public void testHandles() throws Throwable {
-		assertEquals("old", ((DataResult<?>)(Compatibility.createDataResultErrorHandle(CompatibilityTest.class, "oldMethod").invokeExact((Supplier<String>)() -> "shouldBeIgnored"))).error().orElseThrow().message());
-		assertEquals("new", ((DataResult<?>)(Compatibility.createDataResultErrorHandle(CompatibilityTest.class, "newMethod").invokeExact((Supplier<String>)() -> "shouldBeIgnored"))).error().orElseThrow().message());
+		assertEquals("old", ((DataResult<?>)(DFUVersions.createDataResultErrorHandle(CompatibilityTest.class, "oldMethod").invokeExact((Supplier<String>)() -> "shouldBeIgnored"))).error().orElseThrow().message());
+		assertEquals("new", ((DataResult<?>)(DFUVersions.createDataResultErrorHandle(CompatibilityTest.class, "newMethod").invokeExact((Supplier<String>)() -> "shouldBeIgnored"))).error().orElseThrow().message());
 	}
 
 	public static <R> DataResult<R> oldMethod(String ignored) {

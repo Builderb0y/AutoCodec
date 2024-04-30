@@ -2,10 +2,7 @@ package builderb0y.autocodec.util;
 
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
-import java.util.function.Function;
 
-import com.mojang.datafixers.util.Unit;
-import com.mojang.serialization.DataResult.PartialResult;
 import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -53,26 +50,6 @@ public class AutoCodecUtil {
 			clazz.getDeclaringClass() != null &&
 			!Modifier.isStatic(clazz.getModifiers())
 		);
-	}
-
-	/**
-	{@link PartialResult} does not have a getter for its {@link PartialResult#partialResult},
-	so this method gets the partial result in a slightly hackier way.
-	*/
-	public static <R> @Nullable R getPartialResult(@NotNull PartialResult<R> partialResult) {
-		class Getter implements Function<R, Unit> {
-
-			public R gotValue;
-
-			@Override
-			public Unit apply(R r) {
-				this.gotValue = r;
-				return Unit.INSTANCE;
-			}
-		}
-		Getter getter = new Getter();
-		partialResult.map(getter);
-		return getter.gotValue;
 	}
 
 	public static @NotNull String deepToString(@Nullable Object object) {

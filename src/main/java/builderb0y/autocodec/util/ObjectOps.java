@@ -32,7 +32,7 @@ public class ObjectOps implements DynamicOps<Object> {
 	}
 
 	public static <R> DataResult<R> notA(String type, Object object) {
-		return Compatibility.createErrorDataResult(() -> "Not a " + type + ": " + object);
+		return DFUVersions.createErrorDataResult(() -> "Not a " + type + ": " + object);
 	}
 
 	@Override
@@ -299,7 +299,7 @@ public class ObjectOps implements DynamicOps<Object> {
 			if (value != null) {
 				return DataResult.success(value);
 			}
-			return Compatibility.createErrorDataResult(() -> "No element " + key + " in the map " + actualMap);
+			return DFUVersions.createErrorDataResult(() -> "No element " + key + " in the map " + actualMap);
 		}
 		return notA("Map", input);
 	}
