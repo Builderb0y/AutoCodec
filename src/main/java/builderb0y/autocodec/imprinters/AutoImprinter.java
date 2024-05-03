@@ -1,5 +1,9 @@
 package builderb0y.autocodec.imprinters;
 
+import java.util.stream.Stream;
+
+import com.mojang.serialization.Decoder;
+import com.mojang.serialization.MapDecoder;
 import org.jetbrains.annotations.ApiStatus.OverrideOnly;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -7,12 +11,13 @@ import org.jetbrains.annotations.Nullable;
 import builderb0y.autocodec.common.AutoHandler;
 import builderb0y.autocodec.common.FactoryContext;
 import builderb0y.autocodec.common.FactoryException;
+import builderb0y.autocodec.common.KeyHolder;
 import builderb0y.autocodec.decoders.DecodeContext;
 import builderb0y.autocodec.reflection.reification.ReifiedType;
 import builderb0y.autocodec.util.ObjectArrayFactory;
 import builderb0y.autocodec.verifiers.AutoVerifier;
 
-public interface AutoImprinter<T_Decoded> extends AutoHandler {
+public interface AutoImprinter<T_Decoded> extends AutoHandler, KeyHolder {
 
 	public static final @NotNull ObjectArrayFactory<AutoImprinter<?>> ARRAY_FACTORY = new ObjectArrayFactory<>(AutoImprinter.class).generic();
 
@@ -35,6 +40,21 @@ public interface AutoImprinter<T_Decoded> extends AutoHandler {
 	*/
 	@OverrideOnly
 	public abstract <T_Encoded> void imprint(@NotNull ImprintContext<T_Encoded, T_Decoded> context) throws ImprintException;
+
+	/**
+	if this AutoImprinter imprints from an object with known keys,
+	then this method returns those keys.
+	if this AutoImprinter imprints from any other type of encoded value,
+	or if this AutoImprinter decodes from an object but the keys are not known in advance,
+	then this method returns null.
+
+	this method is used in the implementation of {@link MapDecoder}'s,
+	which are sometimes desired over regular {@link Decoder}'s.
+	*/
+	@Override
+	public default @Nullable Stream<String> getKeys() {
+		return null;
+	}
 
 	public static abstract class NamedImprinter<T_Decoded> extends NamedHandler<T_Decoded> implements AutoImprinter<T_Decoded> {
 

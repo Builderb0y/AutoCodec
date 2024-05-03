@@ -1,6 +1,7 @@
 package builderb0y.autocodec.decoders;
 
 import java.lang.reflect.Array;
+import java.util.stream.Stream;
 
 import com.google.gson.JsonNull;
 import com.mojang.serialization.JsonOps;
@@ -33,6 +34,11 @@ public abstract class DefaultEmptyDecoder<T_Decoded> extends NamedDecoder<T_Deco
 	public <T_Encoded> @Nullable T_Decoded decode(@NotNull DecodeContext<T_Encoded> context) throws DecodeException {
 		if (context.isEmpty()) return this.supplyEmpty(context);
 		else return context.decodeWith(this.nonEmptyDecoder);
+	}
+
+	@Override
+	public @Nullable Stream<String> getKeys() {
+		return this.nonEmptyDecoder.getKeys();
 	}
 
 	public static class DefaultEmptySharedDecoder<T_Decoded> extends DefaultEmptyDecoder<T_Decoded> {

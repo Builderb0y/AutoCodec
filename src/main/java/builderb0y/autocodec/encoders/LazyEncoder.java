@@ -1,5 +1,7 @@
 package builderb0y.autocodec.encoders;
 
+import java.util.stream.Stream;
+
 import org.jetbrains.annotations.ApiStatus.OverrideOnly;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -24,5 +26,10 @@ public class LazyEncoder<T> extends LazyHandler<AutoEncoder<T>> implements AutoE
 	@OverrideOnly
 	public <T_Encoded> @NotNull T_Encoded encode(@NotNull EncodeContext<T_Encoded, T> context) throws EncodeException {
 		return context.encodeWith(this.getDelegateHandler());
+	}
+
+	@Override
+	public @Nullable Stream<String> getKeys() {
+		return this.getDelegateHandler().getKeys();
 	}
 }

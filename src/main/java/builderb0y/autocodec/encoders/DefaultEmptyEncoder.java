@@ -37,6 +37,11 @@ public class DefaultEmptyEncoder<T_Decoded> extends NamedEncoder<T_Decoded> {
 		return encoded;
 	}
 
+	@Override
+	public @Nullable Stream<String> getKeys() {
+		return this.fallbackEncoder.getKeys();
+	}
+
 	public static class Factory extends NamedEncoderFactory {
 
 		public static final Factory INSTANCE = new Factory();

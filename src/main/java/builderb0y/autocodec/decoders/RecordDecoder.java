@@ -75,6 +75,34 @@ public class RecordDecoder<T_Decoded> extends NamedDecoder<T_Decoded> {
 	}
 
 	@Override
+	public @Nullable Stream<String> getKeys() {
+		//requirements:
+		//	1: if any of our components lack keys, then we lack keys too.
+		//	2: since the only way to check if a component has keys is
+		//	to get the keys, if any components have no keys, all the
+		//	rest of the keys (or Stream's of keys) need to be closed.
+		//algorithm:
+		//	1. dump the streams of keys into an array.
+		//	2. if we ever encounter a null Stream,
+		//	then we close all previous Stream's in the array,
+		//	and return null immediately.
+		//	3. if we do not encounter a null Stream,
+		//	then concatenate the Stream's in the array.
+		int componentCount = this.components.length;
+		@SuppressWarnings("unchecked") //generic array.
+		Stream<String>[] streams = new Stream[componentCount];
+		for (int index = 0; index < componentCount; index++) {
+			if ((streams[index] = this.components[index].getKeys()) == null) {
+				for (int index2 = 0; index2 < index; index2++) {
+					streams[index2].close();
+				}
+				return null;
+			}
+		}
+		return Arrays.stream(streams).flatMap(Function.identity());
+	}
+
+	@Override
 	public String toString() {
 		return this.toString + ": { " + this.components.length + " components: " + Arrays.stream(this.components).map((FieldStrategy<?> parameter) -> parameter.field.getSerializedName()).collect(Collectors.joining(", ")) + " }";
 	}
@@ -101,6 +129,9 @@ public class RecordDecoder<T_Decoded> extends NamedDecoder<T_Decoded> {
 		}
 
 		@Override
+		public abstract @Nullable Stream<String> getKeys();
+
+		@Override
 		public String toString() {
 			return this.toString + ": [field: " + this.field.getSerializedName() + ']';
 		}
@@ -115,6 +146,11 @@ public class RecordDecoder<T_Decoded> extends NamedDecoder<T_Decoded> {
 		}
 
 		@Override
+		public @Nullable Stream<String> getKeys() {
+			return this.decoder.getKeys();
+		}
+
+		@Override
 		public <T_Encoded> @Nullable T_Member decode(@NotNull DecodeContext<T_Encoded> context) throws DecodeException {
 			return context.decodeWith(this.decoder);
 		}
@@ -126,6 +162,11 @@ public class RecordDecoder<T_Decoded> extends NamedDecoder<T_Decoded> {
 
 		public NonInlineFieldStrategy(@NotNull FieldLikeMemberView<?, T_Member> field, @NotNull AutoDecoder<T_Member> decoder) {
 			super(field, decoder);
+		}
+
+		@Override
+		public @Nullable Stream<String> getKeys() {
+			return Stream.of(this.field.getAliases());
 		}
 
 		@Override

@@ -1,5 +1,7 @@
 package builderb0y.autocodec.decoders;
 
+import java.util.stream.Stream;
+
 import org.jetbrains.annotations.ApiStatus.OverrideOnly;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -44,6 +46,11 @@ public class VerifyingDecoder<T_Decoded> extends NamedDecoder<T_Decoded> {
 		T_Decoded result = context.decodeWith(this.decoder);
 		context.verifyWith(this.verifier, result);
 		return result;
+	}
+
+	@Override
+	public @Nullable Stream<String> getKeys() {
+		return this.decoder.getKeys();
 	}
 
 	@Override

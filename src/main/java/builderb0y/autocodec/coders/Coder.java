@@ -1,5 +1,7 @@
 package builderb0y.autocodec.coders;
 
+import java.util.stream.Stream;
+
 import org.jetbrains.annotations.ApiStatus.OverrideOnly;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -21,6 +23,15 @@ public record Coder<T_Decoded>(@NotNull AutoEncoder<T_Decoded> encoder, @NotNull
 	public Coder(@NotNull AutoEncoder<T_Decoded> encoder, @NotNull AutoDecoder<T_Decoded> decoder) {
 		this.encoder = encoder instanceof Coder<T_Decoded> both ? both.encoder() : encoder;
 		this.decoder = decoder instanceof Coder<T_Decoded> both ? both.decoder() : decoder;
+	}
+
+	@Override
+	public @Nullable Stream<String> getKeys() {
+		Stream<String> encoderKeys = this.encoder.getKeys();
+		if (encoderKeys == null) return null;
+		Stream<String> decoderKeys = this.decoder.getKeys();
+		if (decoderKeys == null) { encoderKeys.close(); return null; }
+		return Stream.concat(encoderKeys, decoderKeys);
 	}
 
 	@Override

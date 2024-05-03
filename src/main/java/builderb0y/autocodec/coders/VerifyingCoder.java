@@ -1,6 +1,9 @@
 package builderb0y.autocodec.coders;
 
+import java.util.stream.Stream;
+
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import builderb0y.autocodec.decoders.AutoDecoder;
 import builderb0y.autocodec.decoders.VerifyingDecoder;
@@ -30,6 +33,15 @@ public class VerifyingCoder<T_Decoded> extends VerifyingDecoder<T_Decoded> imple
 		@NotNull AutoVerifier<T_Decoded> verifier
 	) {
 		this(type, coder, coder, verifier);
+	}
+
+	@Override
+	public @Nullable Stream<String> getKeys() {
+		Stream<String> encoderKeys = this.encoder.getKeys();
+		if (encoderKeys == null) return null;
+		Stream<String> decoderKeys = this.decoder.getKeys();
+		if (decoderKeys == null) { encoderKeys.close(); return null; }
+		return Stream.concat(encoderKeys, decoderKeys);
 	}
 
 	@Override

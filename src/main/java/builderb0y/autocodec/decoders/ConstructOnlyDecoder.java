@@ -1,5 +1,7 @@
 package builderb0y.autocodec.decoders;
 
+import java.util.stream.Stream;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,6 +35,11 @@ public class ConstructOnlyDecoder<T_Decoded> extends NamedDecoder<T_Decoded> {
 		else {
 			return context.constructWith(this.constructor);
 		}
+	}
+
+	@Override
+	public @Nullable Stream<String> getKeys() {
+		return this.fallback != null ? this.fallback.getKeys() : null;
 	}
 
 	public static class Factory extends NamedDecoderFactory {

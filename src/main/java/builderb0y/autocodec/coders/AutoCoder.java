@@ -1,6 +1,9 @@
 package builderb0y.autocodec.coders;
 
+import java.util.stream.Stream;
+
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,6 +28,21 @@ public interface AutoCoder<T_Decoded> extends AutoEncoder<T_Decoded>, AutoDecode
 
 	public static <T_Decoded> @NotNull AutoCoder<T_Decoded> of(@NotNull AutoEncoder<T_Decoded> encoder, @NotNull AutoDecoder<T_Decoded> decoder) {
 		return new Coder<>(encoder, decoder);
+	}
+
+	/**
+	if this AutoCoder encodes or decodes to or from an object with known keys,
+	then this method returns those keys.
+	if this AutoCoder encodes or decodes to or from into any other type of encoded value,
+	or if this AutoCoder encodes or decodes to or from into an object but
+	the keys are not known in advance, then this method returns null.
+
+	this method is used in the implementation of {@link MapCodec}'s,
+	which are sometimes desired over regular {@link Codec}'s.
+	*/
+	@Override
+	public default @Nullable Stream<String> getKeys() {
+		return null;
 	}
 
 	/**

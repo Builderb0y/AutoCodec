@@ -1,5 +1,9 @@
 package builderb0y.autocodec.encoders;
 
+import java.util.stream.Stream;
+
+import com.mojang.serialization.Encoder;
+import com.mojang.serialization.MapEncoder;
 import org.jetbrains.annotations.ApiStatus.OverrideOnly;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -7,10 +11,12 @@ import org.jetbrains.annotations.Nullable;
 import builderb0y.autocodec.common.AutoHandler;
 import builderb0y.autocodec.common.FactoryContext;
 import builderb0y.autocodec.common.FactoryException;
+import builderb0y.autocodec.common.KeyHolder;
 import builderb0y.autocodec.reflection.reification.ReifiedType;
 import builderb0y.autocodec.util.ObjectArrayFactory;
 
-public interface AutoEncoder<T_Decoded> extends AutoHandler {
+/** analogous to {@link Encoder}. */
+public interface AutoEncoder<T_Decoded> extends AutoHandler, KeyHolder {
 
 	public static final @NotNull ObjectArrayFactory<AutoEncoder<?>> ARRAY_FACTORY = new ObjectArrayFactory<>(AutoEncoder.class).generic();
 
@@ -30,6 +36,21 @@ public interface AutoEncoder<T_Decoded> extends AutoHandler {
 	*/
 	@OverrideOnly
 	public abstract <T_Encoded> @NotNull T_Encoded encode(@NotNull EncodeContext<T_Encoded, T_Decoded> context) throws EncodeException;
+
+	/**
+	if this AutoEncoder encodes into an object with known keys,
+	then this method returns those keys.
+	if this AutoEncoder encodes into any other type of encoded value,
+	or if this AutoEncoder encodes into an object but the keys are not known in advance,
+	then this method returns null.
+
+	this method is used in the implementation of {@link MapEncoder}'s,
+	which are sometimes desired over regular {@link Encoder}'s.
+	*/
+	@Override
+	public default @Nullable Stream<String> getKeys() {
+		return null;
+	}
 
 	/**
 	adapts this AutoEncoder to work on a different type. specifically type T_To.

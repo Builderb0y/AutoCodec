@@ -1,5 +1,7 @@
 package builderb0y.autocodec.decoders;
 
+import java.util.stream.Stream;
+
 import org.jetbrains.annotations.ApiStatus.OverrideOnly;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -29,6 +31,11 @@ public class ConstructImprintDecoder<T_Decoded> extends NamedDecoder<T_Decoded> 
 		T_Decoded object = context.constructWith(this.constructor);
 		context.imprintWith(this.imprinter, object);
 		return object;
+	}
+
+	@Override
+	public @Nullable Stream<String> getKeys() {
+		return this.imprinter.getKeys();
 	}
 
 	@Override

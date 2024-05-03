@@ -1,7 +1,9 @@
 package builderb0y.autocodec.imprinters;
 
 import java.util.Arrays;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.jetbrains.annotations.ApiStatus.OverrideOnly;
 import org.jetbrains.annotations.NotNull;
@@ -41,6 +43,35 @@ public class MultiFieldImprinter<T_Decoded> extends NamedImprinter<T_Decoded> {
 		for (AutoImprinter<T_Decoded> field : this.fields) {
 			context.imprintWith(field);
 		}
+	}
+
+	@Override
+	public @Nullable Stream<String> getKeys() {
+		//requirements:
+		//	1: if any of our fields lack keys, then we lack keys too.
+		//	2: since the only way to check if a field has keys is
+		//	to get the keys, if any fields have no keys, all the
+		//	rest of the keys (or Stream's of keys) need to be closed.
+		//algorithm:
+		//	1. dump the streams of keys into an array.
+		//	2. if we ever encounter a null Stream,
+		//	then we close all previous Stream's in the array,
+		//	and return null immediately.
+		//	3. if we do not encounter a null Stream,
+		//	then concatenate the Stream's in the array.
+		int componentCount = this.fields.length;
+		@SuppressWarnings("unchecked") //generic array.
+		Stream<String>[] streams = new Stream[componentCount];
+		for (int index = 0; index < componentCount; index++) {
+			if ((streams[index] = this.fields[index].getKeys()) == null) {
+				for (int index2 = 0; index2 < index; index2++) {
+					streams[index2].close();
+				}
+				return null;
+			}
+		}
+		return Arrays.stream(streams).flatMap(Function.identity());
+
 	}
 
 	@Override
@@ -94,6 +125,9 @@ public class MultiFieldImprinter<T_Decoded> extends NamedImprinter<T_Decoded> {
 				}
 			}
 		}
+
+		@Override
+		public abstract @Nullable Stream<String> getKeys();
 	}
 
 	public static abstract class DecodingFieldStrategy<T_Owner, T_Member> extends FieldStrategy<T_Owner, T_Member> {
@@ -112,6 +146,7 @@ public class MultiFieldImprinter<T_Decoded> extends NamedImprinter<T_Decoded> {
 		}
 	}
 
+	//Decodable field;
 	public static class NonInlineDecodingFieldStrategy<T_Owner, T_Member> extends DecodingFieldStrategy<T_Owner, T_Member> {
 
 		public NonInlineDecodingFieldStrategy(
@@ -137,8 +172,14 @@ public class MultiFieldImprinter<T_Decoded> extends NamedImprinter<T_Decoded> {
 				throw new ImprintException(exception);
 			}
 		}
+
+		@Override
+		public @Nullable Stream<String> getKeys() {
+			return Arrays.stream(this.field.getAliases());
+		}
 	}
 
+	//@EncodeInline Decodable field;
 	public static class InlineDecodingFieldStrategy<T_Owner, T_Member> extends DecodingFieldStrategy<T_Owner, T_Member> {
 
 		public InlineDecodingFieldStrategy(
@@ -159,6 +200,11 @@ public class MultiFieldImprinter<T_Decoded> extends NamedImprinter<T_Decoded> {
 				throw new ImprintException(exception);
 			}
 		}
+
+		@Override
+		public @Nullable Stream<String> getKeys() {
+			return this.decoder.getKeys();
+		}
 	}
 
 	public static abstract class ImprintingFieldStrategy<T_Owner, T_Member> extends FieldStrategy<T_Owner, T_Member> {
@@ -177,6 +223,7 @@ public class MultiFieldImprinter<T_Decoded> extends NamedImprinter<T_Decoded> {
 		}
 	}
 
+	//Imprintable field;
 	public static class NonInlineImprintingFieldStrategy<T_Owner, T_Member> extends ImprintingFieldStrategy<T_Owner, T_Member> {
 
 		public NonInlineImprintingFieldStrategy(
@@ -194,8 +241,14 @@ public class MultiFieldImprinter<T_Decoded> extends NamedImprinter<T_Decoded> {
 			T_Member object = this.reader.get(context.object);
 			if (object != null) member.imprintWith(this.imprinter, object);
 		}
+
+		@Override
+		public @Nullable Stream<String> getKeys() {
+			return Arrays.stream(this.field.getAliases());
+		}
 	}
 
+	//@EncodeInline Imprintable field;
 	public static class InlineImprintingFieldStrategy<T_Owner, T_Member> extends ImprintingFieldStrategy<T_Owner, T_Member> {
 
 		public InlineImprintingFieldStrategy(
@@ -210,6 +263,11 @@ public class MultiFieldImprinter<T_Decoded> extends NamedImprinter<T_Decoded> {
 		@OverrideOnly
 		public <T_Encoded> void imprint(@NotNull ImprintContext<T_Encoded, T_Owner> context) throws ImprintException {
 			context.imprintWith(this.imprinter, this.reader.get(context.object));
+		}
+
+		@Override
+		public @Nullable Stream<String> getKeys() {
+			return this.imprinter.getKeys();
 		}
 	}
 

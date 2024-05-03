@@ -81,7 +81,7 @@ public interface AutoHandler {
 		without throwing a NullPointerException.
 		the provided mapper will never need to handle null.
 		*/
-		public static <T_From, T_To> @NotNull HandlerMapper<@Nullable T_From, T_To> nullSafe(@NotNull HandlerMapper<@NotNull T_From, T_To> mapper) {
+		public static <T_From, T_To> @NotNull HandlerMapper<@Nullable T_From, @Nullable T_To> nullSafe(@NotNull HandlerMapper<@NotNull T_From, T_To> mapper) {
 			return (@Nullable T_From object) -> object == null ? null : mapper.apply(object);
 		}
 	}

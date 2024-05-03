@@ -1,5 +1,7 @@
 package builderb0y.autocodec.decoders;
 
+import java.util.stream.Stream;
+
 import org.jetbrains.annotations.ApiStatus.OverrideOnly;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -29,6 +31,11 @@ public class DefaultDecoder<T_Decoded> extends NamedDecoder<T_Decoded> {
 	@Override
 	public <T_Encoded> @Nullable T_Decoded decode(@NotNull DecodeContext<T_Encoded> context) throws DecodeException {
 		return this.defaultValue.decode(context, this.decoder);
+	}
+
+	@Override
+	public @Nullable Stream<String> getKeys() {
+		return this.decoder.getKeys();
 	}
 
 	@Override

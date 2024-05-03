@@ -3,10 +3,7 @@ package builderb0y.autocodec;
 import java.lang.invoke.MethodHandles;
 import java.util.concurrent.locks.ReentrantLock;
 
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.Decoder;
-import com.mojang.serialization.DynamicOps;
-import com.mojang.serialization.Encoder;
+import com.mojang.serialization.*;
 import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.ApiStatus.OverrideOnly;
 import org.jetbrains.annotations.NotNull;
@@ -113,6 +110,28 @@ public class AutoCodec implements ReflectContextProvider {
 
 	public <T_Decoded> @NotNull AutoCoder<T_Decoded> wrapDFUCodec(@NotNull Codec<T_Decoded> codec, boolean allowPartial) {
 		return DFU2AutoCodec.of(codec, allowPartial);
+	}
+
+	//////////////// map codecs ////////////////
+
+	/** creates a DFU {@link MapCodec} which can encode and decode instances of the given class. */
+	public <T_Decoded> @NotNull MapCodec<T_Decoded> createDFUMapCodec(@NotNull Class<T_Decoded> clazz) {
+		return Auto2DFUMapCodec.of(this, this.createCoder(clazz));
+	}
+
+	/** creates a DFU {@link MapCodec} which can encode and decode instances of the given type. */
+	public <T_Decoded> @NotNull MapCodec<T_Decoded> createDFUMapCodec(@NotNull ReifiedType<T_Decoded> type) {
+		return Auto2DFUMapCodec.of(this, this.createCoder(type));
+	}
+
+	/** creates a DFU {@link MapCodec} which delegates to the provided {@link AutoEncoder} and {@link AutoDecoder}. */
+	public <T_Decoded> @NotNull MapCodec<T_Decoded> createDFUMapCodec(@NotNull AutoEncoder<T_Decoded> encoder, @NotNull AutoDecoder<T_Decoded> decoder) {
+		return Auto2DFUMapCodec.of(this, encoder, decoder);
+	}
+
+	/** creates a DFU {@link MapCodec} which delegates to the provided {@link AutoCoder}. */
+	public <T_Decoded> @NotNull MapCodec<T_Decoded> createDFUMapCodec(@NotNull AutoCoder<T_Decoded> both) {
+		return Auto2DFUMapCodec.of(this, both);
 	}
 
 	//////////////// encoders ////////////////

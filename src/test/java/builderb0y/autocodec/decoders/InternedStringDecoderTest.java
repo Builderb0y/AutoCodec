@@ -32,7 +32,7 @@ public class InternedStringDecoderTest {
 
 	@Test
 	public void testMultiLine() throws DecodeException {
-		String expected = "hello\nworld";
+		String expected = ("hello" + System.lineSeparator() + "world").intern();
 		List<String> from = List.of(new String("hello"), new String("world"));
 		String to = TestCommon.DEFAULT_CODEC.decode(
 			TestCommon.DEFAULT_CODEC.createDecoder(

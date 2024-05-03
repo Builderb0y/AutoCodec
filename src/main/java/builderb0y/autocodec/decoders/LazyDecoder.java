@@ -1,5 +1,7 @@
 package builderb0y.autocodec.decoders;
 
+import java.util.stream.Stream;
+
 import org.jetbrains.annotations.ApiStatus.OverrideOnly;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -24,5 +26,10 @@ public class LazyDecoder<T> extends LazyHandler<AutoDecoder<T>> implements AutoD
 	@OverrideOnly
 	public <T_Encoded> @Nullable T decode(@NotNull DecodeContext<T_Encoded> context) throws DecodeException {
 		return context.decodeWith(this.getDelegateHandler());
+	}
+
+	@Override
+	public @Nullable Stream<String> getKeys() {
+		return this.getDelegateHandler().getKeys();
 	}
 }

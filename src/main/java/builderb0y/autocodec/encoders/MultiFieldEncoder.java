@@ -4,7 +4,9 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.mojang.datafixers.util.Pair;
 import org.jetbrains.annotations.ApiStatus.OverrideOnly;
@@ -14,6 +16,7 @@ import org.jetbrains.annotations.Nullable;
 import builderb0y.autocodec.annotations.EncodeInline;
 import builderb0y.autocodec.common.FactoryContext;
 import builderb0y.autocodec.common.FactoryException;
+import builderb0y.autocodec.common.KeyHolder;
 import builderb0y.autocodec.encoders.AutoEncoder.NamedEncoder;
 import builderb0y.autocodec.reflection.FieldPredicate;
 import builderb0y.autocodec.reflection.manipulators.InstanceReader;
@@ -43,11 +46,39 @@ public class MultiFieldEncoder<T_Decoded> extends NamedEncoder<T_Decoded> {
 	}
 
 	@Override
+	public @Nullable Stream<String> getKeys() {
+		//requirements:
+		//	1: if any of our fields lack keys, then we lack keys too.
+		//	2: since the only way to check if a field has keys is
+		//	to get the keys, if any fields have no keys, all the
+		//	rest of the keys (or Stream's of keys) need to be closed.
+		//algorithm:
+		//	1. dump the streams of keys into an array.
+		//	2. if we ever encounter a null Stream,
+		//	then we close all previous Stream's in the array,
+		//	and return null immediately.
+		//	3. if we do not encounter a null Stream,
+		//	then concatenate the Stream's in the array.
+		int componentCount = this.fields.length;
+		@SuppressWarnings("unchecked") //generic array.
+		Stream<String>[] streams = new Stream[componentCount];
+		for (int index = 0; index < componentCount; index++) {
+			if ((streams[index] = this.fields[index].getKeys()) == null) {
+				for (int index2 = 0; index2 < index; index2++) {
+					streams[index2].close();
+				}
+				return null;
+			}
+		}
+		return Arrays.stream(streams).flatMap(Function.identity());
+	}
+
+	@Override
 	public String toString() {
 		return this.toString + ": { " + this.fields.length + " fields: " + Arrays.stream(this.fields).map((FieldStrategy<T_Decoded, ?> field) -> field.field.getSerializedName()).collect(Collectors.joining(", ")) + " }";
 	}
 
-	public static abstract class FieldStrategy<T_Owner, T_Member> {
+	public static abstract class FieldStrategy<T_Owner, T_Member> implements KeyHolder {
 
 		public static final @NotNull ObjectArrayFactory<FieldStrategy<?, ?>> ARRAY_FACTORY = new ObjectArrayFactory<>(FieldStrategy.class).generic();
 
@@ -91,6 +122,9 @@ public class MultiFieldEncoder<T_Decoded> extends NamedEncoder<T_Decoded> {
 		}
 
 		public abstract <T_Encoded> void encodeOnto(@NotNull Map<T_Encoded, T_Encoded> map, @NotNull EncodeContext<T_Encoded, T_Owner> context) throws EncodeException;
+
+		@Override
+		public abstract @Nullable Stream<String> getKeys();
 	}
 
 	public static class InlineFieldStrategy<T_Owner, T_Member> extends FieldStrategy<T_Owner, T_Member> {
@@ -116,6 +150,11 @@ public class MultiFieldEncoder<T_Decoded> extends NamedEncoder<T_Decoded> {
 			.filter((Pair<T_Encoded, T_Encoded> pair) -> !Objects.equals(context.ops.empty(), pair.getSecond()))
 			.forEach((Pair<T_Encoded, T_Encoded> pair) -> map.put(pair.getFirst(), pair.getSecond()));
 		}
+
+		@Override
+		public @Nullable Stream<String> getKeys() {
+			return this.encoder.getKeys();
+		}
 	}
 
 	public static class NonInlineFieldStrategy<T_Owner, T_Member> extends FieldStrategy<T_Owner, T_Member> {
@@ -136,6 +175,13 @@ public class MultiFieldEncoder<T_Decoded> extends NamedEncoder<T_Decoded> {
 			if (!Objects.equals(context.ops.empty(), encodedMember)) {
 				map.put(context.createString(this.field.getSerializedName()), encodedMember);
 			}
+		}
+
+		@Override
+		public @Nullable Stream<String> getKeys() {
+			//decoding can make use of aliases,
+			//but encoding will always choose the canonical serialized name.
+			return Stream.of(this.field.getSerializedName());
 		}
 	}
 
