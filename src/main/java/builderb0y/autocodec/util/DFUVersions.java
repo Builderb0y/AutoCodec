@@ -17,6 +17,16 @@ import org.jetbrains.annotations.Nullable;
 public class DFUVersions {
 
 	@Internal
+	public static final MethodHandle DATA_RESULT_SUCCESS;
+	static {
+		try {
+			DATA_RESULT_SUCCESS = MethodHandles.lookup().findStatic(DataResult.class, "success", MethodType.methodType(DataResult.class, Object.class));
+		}
+		catch (Exception exception) {
+			throw AutoCodecUtil.rethrow(exception);
+		}
+	}
+	@Internal
 	public static final MethodHandle DATA_RESULT_ERROR = createDataResultErrorHandle(DataResult.class, "error");
 	@Internal
 	public static final DataResultAccessor DATA_RESULT_ACCESSOR;
@@ -25,6 +35,22 @@ public class DFUVersions {
 		else if (V6DataResultAccessor.VALID) DATA_RESULT_ACCESSOR = new V6DataResultAccessor();
 		else if (V7DataResultAccessor.VALID) DATA_RESULT_ACCESSOR = new V7DataResultAccessor();
 		else throw new IllegalStateException("DFU is either not on the class path, or changed incompatibly since AutoCodec was last updated. Try updating AutoCodec, and if that doesn't fix the issue, report this to Builderb0y.");
+	}
+
+	/**
+	used to work around the fact that DataResult changed from a class to an interface at one point.
+	the method {@link DataResult#success(Object)} is now marked as an interface method,
+	and if the runtime type of DataResult is not an interface, then the JVM throws an error.
+	luckily, MethodHandle's can adapt to these changes and choose an appropriate invoke mode at runtime.
+	*/
+	@SuppressWarnings("unchecked")
+	public static <R> DataResult<R> createSuccessDataResult(R result) {
+		try {
+			return (DataResult<R>)(DATA_RESULT_SUCCESS.invokeExact(result));
+		}
+		catch (Throwable throwable) {
+			throw AutoCodecUtil.rethrow(throwable);
+		}
 	}
 
 	/**

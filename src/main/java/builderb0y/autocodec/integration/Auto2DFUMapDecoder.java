@@ -43,7 +43,7 @@ public interface Auto2DFUMapDecoder<T_Decoded> extends MapDecoder<T_Decoded> {
 	@Override
 	public default <T_Encoded> DataResult<T_Decoded> decode(DynamicOps<T_Encoded> ops, MapLike<T_Encoded> input) {
 		try {
-			return DataResult.success(this.autoCodec().decode(this.autoDecoder(), ops.createMap(input.entries()), ops));
+			return DFUVersions.createSuccessDataResult(this.autoCodec().decode(this.autoDecoder(), ops.createMap(input.entries()), ops));
 		}
 		catch (DecodeException exception) {
 			return DFUVersions.createErrorDataResult(exception::toString);

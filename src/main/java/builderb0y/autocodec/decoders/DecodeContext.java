@@ -18,6 +18,7 @@ import builderb0y.autocodec.imprinters.ImprintContext;
 import builderb0y.autocodec.imprinters.ImprintException;
 import builderb0y.autocodec.logging.TaskLogger;
 import builderb0y.autocodec.util.AutoCodecUtil;
+import builderb0y.autocodec.util.DFUVersions;
 import builderb0y.autocodec.util.ObjectArrayFactory;
 import builderb0y.autocodec.verifiers.AutoVerifier;
 import builderb0y.autocodec.verifiers.VerifyContext;
@@ -74,15 +75,15 @@ public class DecodeContext<T_Encoded> extends DynamicOpsContext<T_Encoded> {
 	//////////////// map ////////////////
 
 	public boolean isMap() {
-		return this.ops.getMapValues(this.input).result().isPresent();
+		return DFUVersions.getResult(this.ops.getMapValues(this.input)) != null;
 	}
 
 	public @Nullable Map<@NotNull String, @NotNull DecodeContext<T_Encoded>> tryAsStringMap() {
-		Stream<Pair<T_Encoded, T_Encoded>> stream = this.ops.getMapValues(this.input).result().orElse(null);
+		Stream<Pair<T_Encoded, T_Encoded>> stream = DFUVersions.getResult(this.ops.getMapValues(this.input));
 		return stream == null ? null : (
 			stream
 			.map((Pair<T_Encoded, T_Encoded> pair) -> {
-				String key = this.ops.getStringValue(pair.getFirst()).result().orElse(null);
+				String key = DFUVersions.getResult(this.ops.getStringValue(pair.getFirst()));
 				if (key == null) throw AutoCodecUtil.rethrow(new DecodeException(() -> this.pathToStringBuilder().append(".<key> is not a string: ").append(pair.getFirst()).toString()));
 				DecodeContext<T_Encoded> value = this.input(pair.getSecond(), new ObjectDecodePath(key));
 				return Pair.of(key, value);
@@ -103,11 +104,11 @@ public class DecodeContext<T_Encoded> extends DynamicOpsContext<T_Encoded> {
 	}
 
 	public @Nullable Map<@NotNull DecodeContext<T_Encoded>, @NotNull DecodeContext<T_Encoded>> tryAsContextMap() {
-		Stream<Pair<T_Encoded, T_Encoded>> stream = this.ops.getMapValues(this.input).result().orElse(null);
+		Stream<Pair<T_Encoded, T_Encoded>> stream = DFUVersions.getResult(this.ops.getMapValues(this.input));
 		return stream == null ? null : (
 			stream
 			.map((Pair<T_Encoded, T_Encoded> pair) -> {
-				String keyName = this.ops.getStringValue(pair.getFirst()).result().orElse(null);
+				String keyName = DFUVersions.getResult(this.ops.getStringValue(pair.getFirst()));
 				if (keyName == null) throw AutoCodecUtil.rethrow(new DecodeException(() -> this.pathToStringBuilder().append(".<key> is not a string: ").append(pair.getFirst()).toString()));
 				ObjectDecodePath path = new ObjectDecodePath(keyName);
 				return Pair.of(
@@ -131,7 +132,8 @@ public class DecodeContext<T_Encoded> extends DynamicOpsContext<T_Encoded> {
 	}
 
 	public @NotNull T_Encoded getPrimitiveMember(@NotNull String name) {
-		return this.ops.get(this.input, name).result().orElse(this.ops.empty());
+		T_Encoded result = DFUVersions.getResult(this.ops.get(this.input, name));
+		return result != null ? result : this.ops.empty();
 	}
 
 	public @NotNull DecodeContext<T_Encoded> getMember(@NotNull String name) {
@@ -156,11 +158,11 @@ public class DecodeContext<T_Encoded> extends DynamicOpsContext<T_Encoded> {
 	//////////////// list ////////////////
 
 	public boolean isList() {
-		return this.ops.getStream(this.input).result().isPresent();
+		return DFUVersions.getResult(this.ops.getStream(this.input)) != null;
 	}
 
 	public @Nullable List<@NotNull DecodeContext<T_Encoded>> tryAsList(boolean allowSingleton) {
-		Stream<T_Encoded> stream = this.ops.getStream(this.input).result().orElse(null);
+		Stream<T_Encoded> stream = DFUVersions.getResult(this.ops.getStream(this.input));
 		if (stream == null) {
 			return allowSingleton ? List.of(this) : null;
 		}
@@ -183,11 +185,11 @@ public class DecodeContext<T_Encoded> extends DynamicOpsContext<T_Encoded> {
 	//////////////// number ////////////////
 
 	public boolean isNumber() {
-		return this.ops.getNumberValue(this.input).result().isPresent();
+		return DFUVersions.getResult(this.ops.getNumberValue(this.input)) != null;
 	}
 
 	public @Nullable Number tryAsNumber() {
-		return this.ops.getNumberValue(this.input).result().orElse(null);
+		return DFUVersions.getResult(this.ops.getNumberValue(this.input));
 	}
 
 	public @NotNull Number forceAsNumber() throws DecodeException {
@@ -199,11 +201,11 @@ public class DecodeContext<T_Encoded> extends DynamicOpsContext<T_Encoded> {
 	//////////////// boolean ////////////////
 
 	public boolean isBoolean() {
-		return this.ops.getBooleanValue(this.input).result().isPresent();
+		return DFUVersions.getResult(this.ops.getBooleanValue(this.input)) != null;
 	}
 
 	public @Nullable Boolean tryAsBoolean() {
-		return this.ops.getBooleanValue(this.input).result().orElse(null);
+		return DFUVersions.getResult(this.ops.getBooleanValue(this.input));
 	}
 
 	public @NotNull Boolean forceAsBoolean() throws DecodeException {
@@ -215,11 +217,11 @@ public class DecodeContext<T_Encoded> extends DynamicOpsContext<T_Encoded> {
 	//////////////// string ////////////////
 
 	public boolean isString() {
-		return this.ops.getStringValue(this.input).result().isPresent();
+		return DFUVersions.getResult(this.ops.getStringValue(this.input)) != null;
 	}
 
 	public @Nullable String tryAsString() {
-		return this.ops.getStringValue(this.input).result().orElse(null);
+		return DFUVersions.getResult(this.ops.getStringValue(this.input));
 	}
 
 	public @NotNull String forceAsString() throws DecodeException {

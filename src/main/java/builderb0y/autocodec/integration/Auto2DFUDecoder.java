@@ -40,7 +40,7 @@ public interface Auto2DFUDecoder<T_Decoded> extends Decoder<T_Decoded> {
 	@Override
 	public default <T> DataResult<Pair<T_Decoded, T>> decode(DynamicOps<T> ops, T input) {
 		try {
-			return DataResult.success(
+			return DFUVersions.createSuccessDataResult(
 				Pair.of(
 					this.autoCodec().decode(this.decoder(), input, ops),
 					ops.empty()
@@ -55,7 +55,7 @@ public interface Auto2DFUDecoder<T_Decoded> extends Decoder<T_Decoded> {
 	@Override
 	public default <T> DataResult<T_Decoded> parse(DynamicOps<T> ops, T input) {
 		try {
-			return DataResult.success(
+			return DFUVersions.createSuccessDataResult(
 				this.autoCodec().decode(this.decoder(), input, ops)
 			);
 		}

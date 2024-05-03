@@ -1,6 +1,5 @@
 package builderb0y.autocodec.encoders;
 
-import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.jetbrains.annotations.NotNull;
@@ -11,6 +10,7 @@ import builderb0y.autocodec.common.FactoryContext;
 import builderb0y.autocodec.common.FactoryException;
 import builderb0y.autocodec.encoders.AutoEncoder.NamedEncoder;
 import builderb0y.autocodec.reflection.reification.ReifiedType;
+import builderb0y.autocodec.util.DFUVersions;
 
 public class DefaultEmptyEncoder<T_Decoded> extends NamedEncoder<T_Decoded> {
 
@@ -24,13 +24,13 @@ public class DefaultEmptyEncoder<T_Decoded> extends NamedEncoder<T_Decoded> {
 	@Override
 	public <T_Encoded> @NotNull T_Encoded encode(@NotNull EncodeContext<T_Encoded, T_Decoded> context) throws EncodeException {
 		T_Encoded encoded = context.encodeWith(this.fallbackEncoder);
-		Optional<? extends Stream<?>> stream = context.ops.getStream(encoded).result();
-		if (stream.isPresent() && stream.get().limit(1L).findAny().isEmpty()) {
+		Stream<?> stream = DFUVersions.getResult(context.ops.getStream(encoded));
+		if (stream != null && stream.findAny().isEmpty()) {
 			encoded = context.empty();
 		}
 		else {
-			stream = context.ops.getMapValues(encoded).result();
-			if (stream.isPresent() && stream.get().limit(1L).findAny().isEmpty()) {
+			stream = DFUVersions.getResult(context.ops.getMapValues(encoded));
+			if (stream != null && stream.findAny().isEmpty()) {
 				encoded = context.empty();
 			}
 		}

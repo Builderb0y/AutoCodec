@@ -61,7 +61,7 @@ public class ObjectOps implements DynamicOps<Object> {
 
 	@Override
 	public DataResult<Number> getNumberValue(Object input) {
-		return input instanceof Number number ? DataResult.success(number) : notA("Number", input);
+		return input instanceof Number number ? DFUVersions.createSuccessDataResult(number) : notA("Number", input);
 	}
 
 	@Override
@@ -71,7 +71,7 @@ public class ObjectOps implements DynamicOps<Object> {
 
 	@Override
 	public DataResult<String> getStringValue(Object input) {
-		return input instanceof String string ? DataResult.success(string) : notA("String", input);
+		return input instanceof String string ? DFUVersions.createSuccessDataResult(string) : notA("String", input);
 	}
 
 	@Override
@@ -86,12 +86,12 @@ public class ObjectOps implements DynamicOps<Object> {
 				ArrayList newList = new ArrayList(actualList.size() + otherList.size());
 				newList.addAll(actualList);
 				newList.addAll(otherList);
-				return DataResult.success(newList);
+				return DFUVersions.createSuccessDataResult(newList);
 			}
 			ArrayList newList = new ArrayList(actualList.size() + 1);
 			newList.addAll(actualList);
 			newList.add(value);
-			return DataResult.success(newList);
+			return DFUVersions.createSuccessDataResult(newList);
 		}
 		return notA("List", list);
 	}
@@ -102,7 +102,7 @@ public class ObjectOps implements DynamicOps<Object> {
 			HashMap newMap = new HashMap(actualMap.size() + 1);
 			newMap.putAll(actualMap);
 			newMap.put(key, value);
-			return DataResult.success(newMap);
+			return DFUVersions.createSuccessDataResult(newMap);
 		}
 		return notA("Map", map);
 	}
@@ -110,7 +110,7 @@ public class ObjectOps implements DynamicOps<Object> {
 	@Override
 	public DataResult<Stream<Pair<Object, Object>>> getMapValues(Object input) {
 		if (input instanceof Map<?, ?> actualMap) {
-			return DataResult.success(actualMap.entrySet().stream().map(entry -> Pair.of(entry.getKey(), entry.getValue())));
+			return DFUVersions.createSuccessDataResult(actualMap.entrySet().stream().map(entry -> Pair.of(entry.getKey(), entry.getValue())));
 		}
 		return notA("Map", input);
 	}
@@ -123,10 +123,10 @@ public class ObjectOps implements DynamicOps<Object> {
 	@Override
 	public DataResult<Stream<Object>> getStream(Object input) {
 		if (input instanceof List list) {
-			return DataResult.success(list.stream());
+			return DFUVersions.createSuccessDataResult(list.stream());
 		}
 		if (input.getClass().isArray()) {
-			return DataResult.success(IntStream.range(0, Array.getLength(input)).mapToObj((int index) -> Array.get(input, index)));
+			return DFUVersions.createSuccessDataResult(IntStream.range(0, Array.getLength(input)).mapToObj((int index) -> Array.get(input, index)));
 		}
 		return notA("List", input);
 	}
@@ -193,7 +193,7 @@ public class ObjectOps implements DynamicOps<Object> {
 
 	@Override
 	public DataResult<Boolean> getBooleanValue(Object input) {
-		return input instanceof Boolean bool ? DataResult.success(bool) : notA("Boolean", input);
+		return input instanceof Boolean bool ? DFUVersions.createSuccessDataResult(bool) : notA("Boolean", input);
 	}
 
 	@Override
@@ -207,7 +207,7 @@ public class ObjectOps implements DynamicOps<Object> {
 			ArrayList newList = new ArrayList(actualList.size() + values.size());
 			newList.addAll(actualList);
 			newList.addAll(values);
-			return DataResult.success(newList);
+			return DFUVersions.createSuccessDataResult(newList);
 		}
 		return notA("List", list);
 	}
@@ -218,7 +218,7 @@ public class ObjectOps implements DynamicOps<Object> {
 			HashMap newMap = new HashMap(actualMap.size() + values.size());
 			newMap.putAll(actualMap);
 			newMap.putAll(values);
-			return DataResult.success(newMap);
+			return DFUVersions.createSuccessDataResult(newMap);
 		}
 		return notA("Map", map);
 	}
@@ -228,7 +228,7 @@ public class ObjectOps implements DynamicOps<Object> {
 		if (map instanceof Map actualMap) {
 			HashMap newMap = new HashMap(actualMap);
 			values.entries().forEach((Pair pair) -> newMap.put(pair.getFirst(), pair.getSecond()));
-			return DataResult.success(newMap);
+			return DFUVersions.createSuccessDataResult(newMap);
 		}
 		return notA("Map", map);
 	}
@@ -236,7 +236,7 @@ public class ObjectOps implements DynamicOps<Object> {
 	@Override
 	public DataResult<MapLike<Object>> getMap(Object input) {
 		if (input instanceof Map actualMap) {
-			return DataResult.success(MapLike.forMap(actualMap, this));
+			return DFUVersions.createSuccessDataResult(MapLike.forMap(actualMap, this));
 		}
 		return notA("Map", input);
 	}
@@ -249,7 +249,7 @@ public class ObjectOps implements DynamicOps<Object> {
 	@Override
 	public DataResult<ByteBuffer> getByteBuffer(Object input) {
 		if (input instanceof byte[] bytes) {
-			return DataResult.success(ByteBuffer.wrap(bytes));
+			return DFUVersions.createSuccessDataResult(ByteBuffer.wrap(bytes));
 		}
 		return notA("byte[]", input);
 	}
@@ -264,7 +264,7 @@ public class ObjectOps implements DynamicOps<Object> {
 	@Override
 	public DataResult<IntStream> getIntStream(Object input) {
 		if (input instanceof int[] ints) {
-			return DataResult.success(Arrays.stream(ints));
+			return DFUVersions.createSuccessDataResult(Arrays.stream(ints));
 		}
 		return notA("int[]", input);
 	}
@@ -277,7 +277,7 @@ public class ObjectOps implements DynamicOps<Object> {
 	@Override
 	public DataResult<LongStream> getLongStream(Object input) {
 		if (input instanceof long[] longs) {
-			return DataResult.success(Arrays.stream(longs));
+			return DFUVersions.createSuccessDataResult(Arrays.stream(longs));
 		}
 		return notA("long[]", input);
 	}
@@ -297,7 +297,7 @@ public class ObjectOps implements DynamicOps<Object> {
 		if (input instanceof Map actualMap) {
 			Object value = actualMap.get(key);
 			if (value != null) {
-				return DataResult.success(value);
+				return DFUVersions.createSuccessDataResult(value);
 			}
 			return DFUVersions.createErrorDataResult(() -> "No element " + key + " in the map " + actualMap);
 		}

@@ -1,7 +1,6 @@
 package builderb0y.autocodec.integration;
 
 import java.util.Objects;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.mojang.serialization.DataResult;
@@ -45,12 +44,26 @@ public interface Auto2DFUEncoder<T_Decoded> extends Encoder<T_Decoded> {
 	public default <T_Encoded> DataResult<T_Encoded> encode(T_Decoded input, DynamicOps<T_Encoded> ops, T_Encoded prefix) {
 		try {
 			T_Encoded result = this.autoCodec().encode(this.encoder(), input, ops);
-			if (Objects.equals(result, ops.empty())) return DataResult.success(result);
-			T_Encoded merged = ops.mergeToPrimitive(prefix, result).result().orElse(null);
-			if (merged == null) merged = ops.getMap(result).flatMap((MapLike<T_Encoded> map) -> ops.mergeToMap(prefix, map)).result().orElse(null);
-			if (merged == null) merged = ops.getStream(result).flatMap((Stream<T_Encoded> stream) -> ops.mergeToList(prefix, stream.collect(Collectors.toList()))).result().orElse(null);
-			if (merged == null) merged = result;
-			return DataResult.success(merged);
+			if (Objects.equals(result, ops.empty())) {
+				return DFUVersions.createSuccessDataResult(result);
+			}
+			T_Encoded merged = DFUVersions.getResult(ops.mergeToPrimitive(prefix, result));
+			if (merged == null) {
+				MapLike<T_Encoded> map = DFUVersions.getResult(ops.getMap(result));
+				if (map != null) {
+					merged = DFUVersions.getResult(ops.mergeToMap(prefix, map));
+				}
+			}
+			if (merged == null) {
+				Stream<T_Encoded> stream = DFUVersions.getResult(ops.getStream(result));
+				if (stream != null) {
+					merged = DFUVersions.getResult(ops.mergeToList(prefix, stream.toList()));
+				}
+			}
+			if (merged == null) {
+				merged = result;
+			}
+			return DFUVersions.createSuccessDataResult(merged);
 		}
 		catch (EncodeException exception) {
 			return DFUVersions.createErrorDataResult(exception::toString);
@@ -59,6 +72,6 @@ public interface Auto2DFUEncoder<T_Decoded> extends Encoder<T_Decoded> {
 
 	@Override
 	public default <T_Encoded> DataResult<T_Encoded> encodeStart(DynamicOps<T_Encoded> ops, T_Decoded input) {
-		return DataResult.success(this.autoCodec().encode(this.encoder(), input, ops));
+		return DFUVersions.createSuccessDataResult(this.autoCodec().encode(this.encoder(), input, ops));
 	}
 }
