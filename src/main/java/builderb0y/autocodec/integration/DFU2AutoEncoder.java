@@ -16,7 +16,13 @@ public interface DFU2AutoEncoder<T_Decoded> extends AutoEncoder<T_Decoded> {
 
 	public abstract @NotNull Encoder<T_Decoded> encoder();
 
-	public abstract boolean allowPartial();
+	public default boolean allowPartial() {
+		return false;
+	}
+
+	public default boolean nullSafe() {
+		return true;
+	}
 
 	@Override
 	public default boolean hasKeys() {
@@ -33,29 +39,23 @@ public interface DFU2AutoEncoder<T_Decoded> extends AutoEncoder<T_Decoded> {
 		}
 	}
 
+	public static <T_Decoded> @NotNull DFU2AutoEncoder<T_Decoded> of(@NotNull Encoder<T_Decoded> encoder) {
+		return of(encoder, false, true);
+	}
+
 	public static <T_Decoded> @NotNull DFU2AutoEncoder<T_Decoded> of(@NotNull Encoder<T_Decoded> encoder, boolean allowPartial) {
-		return new DFU2AutoEncoder<>() {
+		return of(encoder, allowPartial, true);
+	}
 
-			@Override
-			public @NotNull Encoder<T_Decoded> encoder() {
-				return encoder;
-			}
-
-			@Override
-			public boolean allowPartial() {
-				return allowPartial;
-			}
-
-			@Override
-			public String toString() {
-				return encoder.toString();
-			}
-		};
+	public static <T_Decoded> @NotNull DFU2AutoEncoder<T_Decoded> of(@NotNull Encoder<T_Decoded> encoder, boolean allowPartial, boolean nullSafe) {
+		record Impl<T_Decoded>(@NotNull Encoder<T_Decoded> encoder, boolean allowPartial, boolean nullSafe) implements DFU2AutoEncoder<T_Decoded> {}
+		return new Impl<>(encoder, allowPartial, nullSafe);
 	}
 
 	@Override
 	@OverrideOnly
 	public default <T_Encoded> @NotNull T_Encoded encode(@NotNull EncodeContext<T_Encoded, T_Decoded> context) throws EncodeException {
+		if (context.input == null && !this.nullSafe()) return context.empty();
 		return context.logger().unwrapLazy(
 			this.encoder().encodeStart(context.ops, context.input),
 			this.allowPartial(),

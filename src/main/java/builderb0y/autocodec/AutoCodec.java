@@ -104,12 +104,113 @@ public class AutoCodec implements ReflectContextProvider {
 		return Auto2DFUCodec.of(this, both);
 	}
 
+	/**
+	returns an {@link AutoCoder} which delegates to the provided DFU {@link Encoder} and {@link Decoder}.
+
+	this method does not allow partial results.
+	any DataResult's returned by the provided
+	Encoder or Decoder which have a message
+	will be thrown as checked exceptions.
+	only complete successes will be returned normally.
+	if partial results should be accepted (but still logged),
+	consider using {@link #wrapDFUCodec(Encoder, Decoder, boolean)} instead.
+
+	this method assumes that the provided Encoder and Decoder are null-safe,
+	meaning that they can handle null or empty inputs on their own.
+	if this is not the case, consider using
+	{@link #wrapDFUCodec(Encoder, Decoder, boolean, boolean)} instead.
+	*/
+	public <T_Decoded> @NotNull AutoCoder<T_Decoded> wrapDFUCodec(@NotNull Encoder<T_Decoded> encoder, @NotNull Decoder<T_Decoded> decoder) {
+		return DFU2AutoCodec.of(encoder, decoder);
+	}
+
+	/**
+	returns an {@link AutoCoder} which delegates to the provided DFU {@link Encoder} and {@link Decoder}.
+
+	@param allowPartial if true, partial results will be returned,
+	and errors will be logged. if false, partial results will be ignored,
+	and errors will be thrown. note that in all cases, complete successes
+	will always be returned, and complete failures will always be thrown.
+
+	this method assumes that the provided Encoder and Decoder are null-safe,
+	meaning that they can handle null or empty inputs on their own.
+	if this is not the case, consider using
+	{@link #wrapDFUCodec(Encoder, Decoder, boolean, boolean)} instead.
+	*/
 	public <T_Decoded> @NotNull AutoCoder<T_Decoded> wrapDFUCodec(@NotNull Encoder<T_Decoded> encoder, @NotNull Decoder<T_Decoded> decoder, boolean allowPartial) {
 		return DFU2AutoCodec.of(encoder, decoder, allowPartial);
 	}
 
+	/**
+	returns an {@link AutoCoder} which delegates to the provided DFU {@link Codec}.
+
+	this method does not allow partial results.
+	any DataResult's returned by the provided Codec which
+	have a message will be thrown as checked exceptions.
+	only complete successes will be returned normally.
+	if partial results should be accepted (but still logged),
+	consider using {@link #wrapDFUCodec(Codec, boolean)} instead.
+
+	this method assumes that the provided Codec is null-safe,
+	meaning that it can handle null or empty inputs on its own.
+	if this is not the case, consider using
+	{@link #wrapDFUCodec(Codec, boolean, boolean)} instead.
+	*/
+	public <T_Decoded> @NotNull AutoCoder<T_Decoded> wrapDFUCodec(@NotNull Codec<T_Decoded> codec) {
+		return DFU2AutoCodec.of(codec);
+	}
+
+	/**
+	returns an {@link AutoCoder} which delegates to the provided DFU {@link Codec}.
+
+	@param allowPartial if true, partial results will be returned,
+	and errors will be logged. if false, partial results will be ignored,
+	and errors will be thrown. note that in all cases, complete successes
+	will always be returned, and complete failures will always be thrown.
+
+	this method assumes that the provided Codec is null-safe,
+	meaning that it can handle null or empty inputs on its own.
+	if this is not the case, consider using
+	{@link #wrapDFUCodec(Codec, boolean, boolean)} instead.
+	*/
 	public <T_Decoded> @NotNull AutoCoder<T_Decoded> wrapDFUCodec(@NotNull Codec<T_Decoded> codec, boolean allowPartial) {
 		return DFU2AutoCodec.of(codec, allowPartial);
+	}
+
+	/**
+	returns an {@link AutoCoder} which delegates to the provided DFU {@link Encoder} and {@link Decoder{.
+
+	@param allowPartial if true, partial results will be returned,
+	and errors will be logged. if false, partial results will be ignored,
+	and errors will be thrown. note that in all cases, complete successes
+	will always be returned, and complete failures will always be thrown.
+
+	@param nullSafe if true, the returned AutoCoder assumes that the provided
+	Encoder and Decoder are capable of handling null or empty inputs sanely.
+	if false, the returned AutoCoder short-circuits on null/empty inputs,
+	and returns null/empty as its output, without passing null/empty into
+	the provided Encoder or Decoder.
+	*/
+	public <T_Decoded> @NotNull AutoCoder<T_Decoded> wrapDFUCodec(@NotNull Encoder<T_Decoded> encoder, @NotNull Decoder<T_Decoded> decoder, boolean allowPartial, boolean nullSafe) {
+		return DFU2AutoCodec.of(encoder, decoder, allowPartial, nullSafe);
+	}
+
+	/**
+	returns an {@link AutoCoder} which delegates to the provided DFU {@link Codec}.
+
+	@param allowPartial if true, partial results will be returned,
+	and errors will be logged. if false, partial results will be ignored,
+	and errors will be thrown. note that in all cases, complete successes
+	will always be returned, and complete failures will always be thrown.
+
+	@param nullSafe if true, the returned AutoCoder assumes that the
+	provided Codec is capable of handling null or empty inputs sanely.
+	if false, the returned AutoCoder short-circuits on null/empty inputs,
+	and returns null/empty as its output, without passing null/empty into
+	the provided Codec.
+	*/
+	public <T_Decoded> @NotNull AutoCoder<T_Decoded> wrapDFUCodec(@NotNull Codec<T_Decoded> codec, boolean allowPartial, boolean nullSafe) {
+		return DFU2AutoCodec.of(codec, allowPartial, nullSafe);
 	}
 
 	//////////////// map codecs ////////////////
@@ -152,14 +253,57 @@ public class AutoCodec implements ReflectContextProvider {
 	}
 
 	/**
-	creates an {@link AutoEncoder} which delegates to the provided DFU {@link Encoder}.
+	returns an {@link AutoEncoder} which delegates to the provided DFU {@link Encoder}.
+
+	this method does not allow partial results.
+	any DataResult's returned by the provided Encoder which
+	have a message will be thrown as checked exceptions.
+	only complete successes will be returned normally.
+	if partial results should be accepted (but still logged),
+	consider using {@link #wrapDFUEncoder(Encoder, boolean)} instead.
+
+	this method assumes that the provided Encoder is null-safe,
+	meaning that it can handle null or empty inputs on its own.
+	if this is not the case, consider using
+	{@link #wrapDFUEncoder(Encoder, boolean, boolean)} instead.
+	*/
+	public <T_Decoded> @NotNull AutoEncoder<T_Decoded> wrapDFUEncoder(@NotNull Encoder<T_Decoded> encoder) {
+		return DFU2AutoEncoder.of(encoder);
+	}
+
+	/**
+	returns an {@link AutoEncoder} which delegates to the provided DFU {@link Encoder}.
+
 	@param allowPartial if true, partial results will be returned,
 	and errors will be logged. if false, partial results will be ignored,
 	and errors will be thrown. note that in all cases, complete successes
 	will always be returned, and complete failures will always be thrown.
+
+	this method assumes that the provided Encoder is null-safe,
+	meaning that it can handle null or empty inputs on its own.
+	if this is not the case, consider using
+	{@link #wrapDFUEncoder(Encoder, boolean, boolean)} instead.
 	*/
 	public <T_Decoded> @NotNull AutoEncoder<T_Decoded> wrapDFUEncoder(@NotNull Encoder<T_Decoded> encoder, boolean allowPartial) {
 		return DFU2AutoEncoder.of(encoder, allowPartial);
+	}
+
+	/**
+	returns an {@link AutoEncoder} which delegates to the provided DFU {@link Encoder}.
+
+	@param allowPartial if true, partial results will be returned,
+	and errors will be logged. if false, partial results will be ignored,
+	and errors will be thrown. note that in all cases, complete successes
+	will always be returned, and complete failures will always be thrown.
+
+	@param nullSafe if true, the returned AutoEncoder assumes that the
+	provided Encoder is capable of handling null inputs sanely.
+	if false, the returned AutoEncoder short-circuits on null inputs,
+	and returns empty as its output, without passing null into
+	the provided Encoder.
+	*/
+	public <T_Decoded> @NotNull AutoEncoder<T_Decoded> wrapDFUEncoder(@NotNull Encoder<T_Decoded> encoder, boolean allowPartial, boolean nullSafe) {
+		return DFU2AutoEncoder.of(encoder, allowPartial, nullSafe);
 	}
 
 	//////////////// decoders ////////////////
@@ -180,14 +324,57 @@ public class AutoCodec implements ReflectContextProvider {
 	}
 
 	/**
-	creates an {@link AutoDecoder} which delegates to the provided DFU {@link Decoder}
+	returns an {@link AutoDecoder} which delegates to the provided DFU {@link Decoder}.
+
+	this method does not allow partial results.
+	any DataResult's returned by the provided Encoder which
+	have a message will be thrown as checked exceptions.
+	only complete successes will be returned normally.
+	if partial results should be accepted (but still logged),
+	consider using {@link #wrapDFUDecoder(Decoder, boolean)} instead.
+
+	this method assumes that the provided Encoder is null-safe,
+	meaning that it can handle null or empty inputs on its own.
+	if this is not the case, consider using
+	{@link #wrapDFUDecoder(Decoder, boolean, boolean)} instead.
+	*/
+	public <T_Decoded> @NotNull AutoDecoder<T_Decoded> wrapDFUDecoder(@NotNull Decoder<T_Decoded> decoder) {
+		return DFU2AutoDecoder.of(decoder);
+	}
+
+	/**
+	returns an {@link AutoDecoder} which delegates to the provided DFU {@link Decoder}.
+
 	@param allowPartial if true, partial results will be returned,
 	and errors will be logged. if false, partial results will be ignored,
 	and errors will be thrown. note that in all cases, complete successes
 	will always be returned, and complete failures will always be thrown.
+
+	this method assumes that the provided Encoder is null-safe,
+	meaning that it can handle null or empty inputs on its own.
+	if this is not the case, consider using
+	{@link #wrapDFUDecoder(Decoder, boolean, boolean)} instead.
 	*/
 	public <T_Decoded> @NotNull AutoDecoder<T_Decoded> wrapDFUDecoder(@NotNull Decoder<T_Decoded> decoder, boolean allowPartial) {
 		return DFU2AutoDecoder.of(decoder, allowPartial);
+	}
+
+	/**
+	returns an {@link AutoDecoder} which delegates to the provided DFU {@link Decoder}.
+
+	@param allowPartial if true, partial results will be returned,
+	and errors will be logged. if false, partial results will be ignored,
+	and errors will be thrown. note that in all cases, complete successes
+	will always be returned, and complete failures will always be thrown.
+
+	@param nullSafe if true, the returned AutoDecoder assumes that the
+	provided Decoder is capable of handling empty inputs sanely.
+	if false, the returned AutoDecoder short-circuits on empty inputs,
+	and returns null as its output, without passing empty into
+	the provided Decoder.
+	*/
+	public <T_Decoded> @NotNull AutoDecoder<T_Decoded> wrapDFUDecoder(@NotNull Decoder<T_Decoded> decoder, boolean allowPartial, boolean nullSafe) {
+		return DFU2AutoDecoder.of(decoder, allowPartial, nullSafe);
 	}
 
 
@@ -199,8 +386,9 @@ public class AutoCodec implements ReflectContextProvider {
 	/**
 	creates a {@link FactoryContext} for the given class.
 
-	this method is marked as {@link Internal} because it is
-	preferable to call the "create<handler type>" methods instead.
+	this method is marked as {@link Internal} because the primary
+	intended use for FactoryContext's is to create handlers,
+	and "create<handler type>" methods are provided to do just that.
 	*/
 	@Internal
 	public <T_Decoded> @NotNull FactoryContext<T_Decoded> newFactoryContext(@NotNull Class<T_Decoded> clazz) {
@@ -210,8 +398,9 @@ public class AutoCodec implements ReflectContextProvider {
 	/**
 	creates a {@link FactoryContext} for the given type.
 
-	this method is marked as {@link Internal} because it is
-	preferable to call the "create<handler type>" methods instead.
+	this method is marked as {@link Internal} because the primary
+	intended use for FactoryContext's is to create handlers,
+	and "create<handler type>" methods are provided to do just that.
 	*/
 	@Internal
 	public <T_Decoded> @NotNull FactoryContext<T_Decoded> newFactoryContext(@NotNull ReifiedType<T_Decoded> type) {
@@ -280,7 +469,7 @@ public class AutoCodec implements ReflectContextProvider {
 	if such a constructor could not be created for any reason, a {@link FactoryException} is thrown.
 
 	this method is marked as {@link TestOnly} because from a serialization perspective,
-	an {@link AutoConstructor} has no use without an associated {@link AutoImprinter}.
+	an {@link AutoConstructor} has little use without an associated {@link AutoImprinter}.
 	if both are desired and you are trying to write your own {@link AutoDecoder},
 	consider using the methods on {@link FactoryContext} instead.
 	*/
@@ -408,8 +597,8 @@ public class AutoCodec implements ReflectContextProvider {
 	any exceptions thrown by the constructor are relayed to the caller.
 
 	this method is marked as {@link TestOnly} because construction is
-	typically not useful without imprinting, and at that point you might
-	as well use {@link #decode(AutoDecoder, Object, DynamicOps)} instead.
+	typically not useful without imprinting, and if you intend to do both,
+	it is recommended to use {@link #decode(AutoDecoder, Object, DynamicOps)} instead.
 	*/
 	@TestOnly
 	public <T_Encoded, T_Decoded> @NotNull T_Decoded construct(@NotNull AutoConstructor<T_Decoded> constructor, @NotNull T_Encoded input, @NotNull DynamicOps<T_Encoded> ops) throws ConstructException {
@@ -421,8 +610,8 @@ public class AutoCodec implements ReflectContextProvider {
 	any exceptions thrown by the imprinter are relayed to the caller.
 
 	this method is marked as {@link TestOnly} because imprinting is
-	typically not useful without constructing, and at that point you might
-	as well use {@link #decode(AutoDecoder, Object, DynamicOps)} instead.
+	typically not useful without constructing, and if you intend to do both,
+	it is recommended to use {@link #decode(AutoDecoder, Object, DynamicOps)} instead.
 	*/
 	@TestOnly
 	public <T_Encoded, T_Decoded> void imprint(@NotNull AutoImprinter<T_Decoded> imprinter, @NotNull T_Decoded object, @NotNull T_Encoded input, @NotNull DynamicOps<T_Encoded> ops) throws ImprintException {

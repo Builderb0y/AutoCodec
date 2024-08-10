@@ -17,6 +17,16 @@ import builderb0y.autocodec.util.ObjectOps;
 public interface DFU2AutoCodec<T_Decoded> extends DFU2AutoEncoder<T_Decoded>, DFU2AutoDecoder<T_Decoded>, AutoCoder<T_Decoded> {
 
 	@Override
+	public default boolean allowPartial() {
+		return false;
+	}
+
+	@Override
+	public default boolean nullSafe() {
+		return true;
+	}
+
+	@Override
 	public default boolean hasKeys() {
 		return this.encoder() instanceof MapCodec.MapCodecCodec<T_Decoded> || this.decoder() instanceof MapCodec.MapCodecCodec<T_Decoded>;
 	}
@@ -54,36 +64,38 @@ public interface DFU2AutoCodec<T_Decoded> extends DFU2AutoEncoder<T_Decoded>, DF
 		});
 	}
 
+	public static <T_Decoded> @NotNull DFU2AutoCodec<T_Decoded> of(@NotNull Codec<T_Decoded> codec) {
+		return of(codec, codec, false, true);
+	}
+
+	public static <T_Decoded> @NotNull DFU2AutoCodec<T_Decoded> of(@NotNull Codec<T_Decoded> codec, boolean allowPartial) {
+		return of(codec, codec, allowPartial, true);
+	}
+
+	public static <T_Decoded> @NotNull DFU2AutoCodec<T_Decoded> of(@NotNull Codec<T_Decoded> codec, boolean allowPartial, boolean nullSafe) {
+		return of(codec, codec, allowPartial, nullSafe);
+	}
+
+	public static <T_Decoded> @NotNull DFU2AutoCodec<T_Decoded> of(@NotNull Encoder<T_Decoded> encoder, @NotNull Decoder<T_Decoded> decoder) {
+		return of(encoder, decoder, false, true);
+	}
+
 	public static <T_Decoded> @NotNull DFU2AutoCodec<T_Decoded> of(@NotNull Encoder<T_Decoded> encoder, @NotNull Decoder<T_Decoded> decoder, boolean allowPartial) {
-		return new DFU2AutoCodec<>() {
+		return of(encoder, decoder, allowPartial, true);
+	}
 
-			@Override
-			public @NotNull Encoder<T_Decoded> encoder() {
-				return encoder;
-			}
-
-			@Override
-			public @NotNull Decoder<T_Decoded> decoder() {
-				return decoder;
-			}
-
-			@Override
-			public boolean allowPartial() {
-				return allowPartial;
-			}
+	public static <T_Decoded> @NotNull DFU2AutoCodec<T_Decoded> of(@NotNull Encoder<T_Decoded> encoder, @NotNull Decoder<T_Decoded> decoder, boolean allowPartial, boolean nullSafe) {
+		record Impl<T_Decoded>(@NotNull Encoder<T_Decoded> encoder, @NotNull Decoder<T_Decoded> decoder, boolean allowPartial, boolean nullSafe) implements DFU2AutoCodec<T_Decoded> {
 
 			@Override
 			public String toString() {
 				return (
-					encoder == decoder
-					? "DFU2AutoCodec: { coder: " + encoder + ", allowPartial: " + allowPartial + " }"
-					: "DFU2AutoCodec: { encoder: " + encoder + ", decoder: " + decoder + ", allowPartial: " + allowPartial + " }"
+					this.encoder == this.decoder
+					? "DFU2AutoCodec: { codec: " + this.encoder + ", allowPartial: " + this.allowPartial + ", nullSafe: " + this.nullSafe + " }"
+					: "DFU2AutoCodec: { encoder: " + this.encoder + ", decoder: " + this.decoder + ", allowPartial: " + this.allowPartial + ", nullSafe: " + this.nullSafe + " }"
 				);
 			}
-		};
-	}
-
-	public static <T_Decoded> @NotNull DFU2AutoCodec<T_Decoded> of(@NotNull Codec<T_Decoded> codec, boolean allowPartial) {
-		return of(codec, codec, allowPartial);
+		}
+		return new Impl<>(encoder, decoder, allowPartial, nullSafe);
 	}
 }

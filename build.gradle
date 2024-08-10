@@ -4,7 +4,7 @@ plugins() {
 }
 
 group('builderb0y')
-version('4.12.0')
+version('4.12.1')
 archivesBaseName = 'AutoCodec'
 
 repositories() {
