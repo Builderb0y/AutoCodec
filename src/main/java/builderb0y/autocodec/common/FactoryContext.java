@@ -5,7 +5,8 @@ import org.jetbrains.annotations.Nullable;
 
 import builderb0y.autocodec.AutoCodec;
 import builderb0y.autocodec.coders.AutoCoder;
-import builderb0y.autocodec.coders.Coder;
+import builderb0y.autocodec.coders.AutoCoder.CoderFactory;
+import builderb0y.autocodec.coders.CoderFactoryList;
 import builderb0y.autocodec.common.AutoHandler.AutoFactory;
 import builderb0y.autocodec.constructors.AutoConstructor;
 import builderb0y.autocodec.constructors.AutoConstructor.ConstructorFactory;
@@ -72,6 +73,71 @@ public class FactoryContext<T_HandledType> extends TaskContext implements Reflec
 	}
 
 	//////////////////////////////// creating handlers ////////////////////////////////
+
+	/**
+	attempts to create an {@link AutoCoder} from all factories
+	in our {@link #autoCodec}'s {@link AutoCodec#coders} list.
+	if no factories in that list are able to create the requested
+	{@link AutoCoder}, returns null.
+	if more than one factory in the list is able to create
+	an {@link AutoCoder}, the first successful one is returned,
+	and the rest are not asked to try to create an {@link AutoCoder}.
+	throws {@link FactoryException} if any factories encountered
+	an error while trying to create the requested {@link AutoCoder}.
+	*/
+	public @Nullable AutoCoder<T_HandledType> tryCreateCoder() throws FactoryException {
+		return this.tryCreateCoder(this.autoCodec.coders);
+	}
+
+	/**
+	same as {@link #tryCreateCoder()}, but will throw a
+	{@link FactoryException} on failure instead of returning null.
+	*/
+	public @NotNull AutoCoder<T_HandledType> forceCreateCoder() throws FactoryException {
+		return this.forceCreateCoder(this.autoCodec.coders);
+	}
+
+	/**
+	attempts to create an {@link AutoCoder} with the provided factory.
+	if the factory is unable to create the requested {@link AutoCoder}, returns null.
+	throws {@link FactoryException} if the factory encountered
+	an error while trying to create the requested {@link AutoCoder}.
+	*/
+	@SuppressWarnings("unchecked")
+	public @Nullable AutoCoder<T_HandledType> tryCreateCoder(@NotNull CoderFactory factory) throws FactoryException {
+		return (AutoCoder<T_HandledType>)(this.logger().tryCreateHandler(factory, this));
+	}
+
+	/**
+	same as {@link #tryCreateCoder(CoderFactory)}, but will throw
+	a {@link FactoryException} on failure instead of returning null.
+	*/
+	@SuppressWarnings("unchecked")
+	public @NotNull AutoCoder<T_HandledType> forceCreateCoder(@NotNull CoderFactory factory) throws FactoryException {
+		return (AutoCoder<T_HandledType>)(this.logger().forceCreateHandler(factory, this));
+	}
+
+	/**
+	returns the {@link AutoCoder} which *would* be returned
+	by {@link #tryCreateCoder()} if the provided factory
+	(caller) and all factories that come before it in the
+	{@link CoderFactoryList} were not present at all.
+	this can be used by factories which want to wrap
+	an existing handler in a different handler.
+	*/
+	@SuppressWarnings("unchecked")
+	public @Nullable AutoCoder<T_HandledType> tryCreateFallbackCoder(@NotNull CoderFactory caller) throws FactoryException {
+		return (AutoCoder<T_HandledType>)(this.logger().tryCreateFallbackHandler(this.autoCodec.coders, this, caller));
+	}
+
+	/**
+	same as {@link #tryCreateFallbackCoder(CoderFactory)}, but will
+	throw a {@link FactoryException} on failure instead of returning null.
+	*/
+	@SuppressWarnings("unchecked")
+	public @NotNull AutoCoder<T_HandledType> forceCreateFallbackCoder(@NotNull CoderFactory caller) throws FactoryException {
+		return (AutoCoder<T_HandledType>)(this.logger().forceCreateFallbackHandler(this.autoCodec.coders, this, caller));
+	}
 
 	//////////////// encoders ////////////////
 
@@ -415,30 +481,6 @@ public class FactoryContext<T_HandledType> extends TaskContext implements Reflec
 	@SuppressWarnings("unchecked")
 	public @NotNull AutoVerifier<T_HandledType> forceCreateFallbackVerifier(@NotNull VerifierFactory caller) throws FactoryException {
 		return (AutoVerifier<T_HandledType>)(this.logger().forceCreateFallbackHandler(this.autoCodec.verifiers, this, caller));
-	}
-
-	//////////////// combo ////////////////
-
-	public @Nullable AutoCoder<T_HandledType> tryCreateCoder() throws FactoryException {
-		AutoDecoder<T_HandledType> decoder = this.tryCreateDecoder();
-		if (decoder == null) return null;
-		if (decoder instanceof AutoCoder<T_HandledType> coder) return coder;
-
-		AutoEncoder<T_HandledType> encoder = this.tryCreateEncoder();
-		if (encoder == null) return null;
-		if (encoder instanceof AutoCoder<T_HandledType> coder) return coder;
-
-		return new Coder<>(encoder, decoder);
-	}
-
-	public @NotNull AutoCoder<T_HandledType> forceCreateCoder() throws FactoryException {
-		AutoDecoder<T_HandledType> decoder = this.forceCreateDecoder();
-		if (decoder instanceof AutoCoder<T_HandledType> coder) return coder;
-
-		AutoEncoder<T_HandledType> encoder = this.forceCreateEncoder();
-		if (encoder instanceof AutoCoder<T_HandledType> coder) return coder;
-
-		return new Coder<>(encoder, decoder);
 	}
 
 	@Override

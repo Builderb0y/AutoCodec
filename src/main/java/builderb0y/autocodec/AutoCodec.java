@@ -11,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.TestOnly;
 
 import builderb0y.autocodec.coders.AutoCoder;
+import builderb0y.autocodec.coders.CoderFactoryList;
 import builderb0y.autocodec.common.AutoHandler.AutoFactory;
 import builderb0y.autocodec.common.FactoryContext;
 import builderb0y.autocodec.common.FactoryException;
@@ -55,6 +56,7 @@ public class AutoCodec implements ReflectContextProvider {
 
 	public final @NotNull ReflectionManager reflectionManager;
 
+	public final @NotNull       CoderFactoryList coders;
 	public final @NotNull     EncoderFactoryList encoders;
 	public final @NotNull ConstructorFactoryList constructors;
 	public final @NotNull   ImprinterFactoryList imprinters;
@@ -69,6 +71,7 @@ public class AutoCodec implements ReflectContextProvider {
 
 		this.reflectionManager = this.createReflectionManager();
 
+		this.coders            = this.createCoders();
 		this.encoders          = this.createEncoders();
 		this.constructors      = this.createConstructors();
 		this.imprinters        = this.createImprinters();
@@ -235,148 +238,6 @@ public class AutoCodec implements ReflectContextProvider {
 		return Auto2DFUMapCodec.of(this, both);
 	}
 
-	//////////////// encoders ////////////////
-
-	/** creates a DFU {@link Encoder} which can encode instances of the given class. */
-	public <T_Decoded> @NotNull Encoder<T_Decoded> createDFUEncoder(@NotNull Class<T_Decoded> clazz) {
-		return Auto2DFUEncoder.of(this, this.createEncoder(clazz));
-	}
-
-	/** creates a DFU {@link Encoder} which can encode instances of the given type. */
-	public <T_Decoded> @NotNull Encoder<T_Decoded> createDFUEncoder(@NotNull ReifiedType<T_Decoded> type) {
-		return Auto2DFUEncoder.of(this, this.createEncoder(type));
-	}
-
-	/** creates a DFU {@link Encoder} which delegates to the provided {@link AutoEncoder}. */
-	public <T_Decoded> @NotNull Encoder<T_Decoded> createDFUEncoder(@NotNull AutoEncoder<T_Decoded> encoder) {
-		return Auto2DFUEncoder.of(this, encoder);
-	}
-
-	/**
-	returns an {@link AutoEncoder} which delegates to the provided DFU {@link Encoder}.
-
-	this method does not allow partial results.
-	any DataResult's returned by the provided Encoder which
-	have a message will be thrown as checked exceptions.
-	only complete successes will be returned normally.
-	if partial results should be accepted (but still logged),
-	consider using {@link #wrapDFUEncoder(Encoder, boolean)} instead.
-
-	this method assumes that the provided Encoder is null-safe,
-	meaning that it can handle null or empty inputs on its own.
-	if this is not the case, consider using
-	{@link #wrapDFUEncoder(Encoder, boolean, boolean)} instead.
-	*/
-	public <T_Decoded> @NotNull AutoEncoder<T_Decoded> wrapDFUEncoder(@NotNull Encoder<T_Decoded> encoder) {
-		return DFU2AutoEncoder.of(encoder);
-	}
-
-	/**
-	returns an {@link AutoEncoder} which delegates to the provided DFU {@link Encoder}.
-
-	@param allowPartial if true, partial results will be returned,
-	and errors will be logged. if false, partial results will be ignored,
-	and errors will be thrown. note that in all cases, complete successes
-	will always be returned, and complete failures will always be thrown.
-
-	this method assumes that the provided Encoder is null-safe,
-	meaning that it can handle null or empty inputs on its own.
-	if this is not the case, consider using
-	{@link #wrapDFUEncoder(Encoder, boolean, boolean)} instead.
-	*/
-	public <T_Decoded> @NotNull AutoEncoder<T_Decoded> wrapDFUEncoder(@NotNull Encoder<T_Decoded> encoder, boolean allowPartial) {
-		return DFU2AutoEncoder.of(encoder, allowPartial);
-	}
-
-	/**
-	returns an {@link AutoEncoder} which delegates to the provided DFU {@link Encoder}.
-
-	@param allowPartial if true, partial results will be returned,
-	and errors will be logged. if false, partial results will be ignored,
-	and errors will be thrown. note that in all cases, complete successes
-	will always be returned, and complete failures will always be thrown.
-
-	@param nullSafe if true, the returned AutoEncoder assumes that the
-	provided Encoder is capable of handling null inputs sanely.
-	if false, the returned AutoEncoder short-circuits on null inputs,
-	and returns empty as its output, without passing null into
-	the provided Encoder.
-	*/
-	public <T_Decoded> @NotNull AutoEncoder<T_Decoded> wrapDFUEncoder(@NotNull Encoder<T_Decoded> encoder, boolean allowPartial, boolean nullSafe) {
-		return DFU2AutoEncoder.of(encoder, allowPartial, nullSafe);
-	}
-
-	//////////////// decoders ////////////////
-
-	/** creates a DFU {@link Decoder} which can decode instances of the given class. */
-	public <T_Decoded> @NotNull Decoder<T_Decoded> createDFUDecoder(@NotNull Class<T_Decoded> clazz) {
-		return Auto2DFUDecoder.of(this, this.createDecoder(clazz));
-	}
-
-	/** creates a DFU {@link Decoder} which can decode instances of the given type. */
-	public <T_Decoded> @NotNull Decoder<T_Decoded> createDFUDecoder(@NotNull ReifiedType<T_Decoded> type) {
-		return Auto2DFUDecoder.of(this, this.createDecoder(type));
-	}
-
-	/** creates a DFU {@link Decoder} which delegates to the provided {@link AutoDecoder} */
-	public <T_Decoded> @NotNull Decoder<T_Decoded> createDFUDecoder(@NotNull AutoDecoder<T_Decoded> decoder) {
-		return Auto2DFUDecoder.of(this, decoder);
-	}
-
-	/**
-	returns an {@link AutoDecoder} which delegates to the provided DFU {@link Decoder}.
-
-	this method does not allow partial results.
-	any DataResult's returned by the provided Encoder which
-	have a message will be thrown as checked exceptions.
-	only complete successes will be returned normally.
-	if partial results should be accepted (but still logged),
-	consider using {@link #wrapDFUDecoder(Decoder, boolean)} instead.
-
-	this method assumes that the provided Encoder is null-safe,
-	meaning that it can handle null or empty inputs on its own.
-	if this is not the case, consider using
-	{@link #wrapDFUDecoder(Decoder, boolean, boolean)} instead.
-	*/
-	public <T_Decoded> @NotNull AutoDecoder<T_Decoded> wrapDFUDecoder(@NotNull Decoder<T_Decoded> decoder) {
-		return DFU2AutoDecoder.of(decoder);
-	}
-
-	/**
-	returns an {@link AutoDecoder} which delegates to the provided DFU {@link Decoder}.
-
-	@param allowPartial if true, partial results will be returned,
-	and errors will be logged. if false, partial results will be ignored,
-	and errors will be thrown. note that in all cases, complete successes
-	will always be returned, and complete failures will always be thrown.
-
-	this method assumes that the provided Encoder is null-safe,
-	meaning that it can handle null or empty inputs on its own.
-	if this is not the case, consider using
-	{@link #wrapDFUDecoder(Decoder, boolean, boolean)} instead.
-	*/
-	public <T_Decoded> @NotNull AutoDecoder<T_Decoded> wrapDFUDecoder(@NotNull Decoder<T_Decoded> decoder, boolean allowPartial) {
-		return DFU2AutoDecoder.of(decoder, allowPartial);
-	}
-
-	/**
-	returns an {@link AutoDecoder} which delegates to the provided DFU {@link Decoder}.
-
-	@param allowPartial if true, partial results will be returned,
-	and errors will be logged. if false, partial results will be ignored,
-	and errors will be thrown. note that in all cases, complete successes
-	will always be returned, and complete failures will always be thrown.
-
-	@param nullSafe if true, the returned AutoDecoder assumes that the
-	provided Decoder is capable of handling empty inputs sanely.
-	if false, the returned AutoDecoder short-circuits on empty inputs,
-	and returns null as its output, without passing empty into
-	the provided Decoder.
-	*/
-	public <T_Decoded> @NotNull AutoDecoder<T_Decoded> wrapDFUDecoder(@NotNull Decoder<T_Decoded> decoder, boolean allowPartial, boolean nullSafe) {
-		return DFU2AutoDecoder.of(decoder, allowPartial, nullSafe);
-	}
-
 
 
 	//////////////////////////////// factory methods ////////////////////////////////
@@ -434,10 +295,34 @@ public class AutoCodec implements ReflectContextProvider {
 		return new ReflectContext<>(this, owner);
 	}
 
+	//////////////////////////////// handler methods ////////////////////////////////
+
+	/**
+	creates an {@link AutoCoder} which can encode and decode instances of the given class.
+	if an encoder or decoder could not be created for any reason, a {@link FactoryException} is thrown.
+	*/
+	public <T_Decoded> @NotNull AutoCoder<T_Decoded> createCoder(@NotNull Class<T_Decoded> clazz) throws FactoryException {
+		return this.newFactoryContext(clazz).forceCreateCoder();
+	}
+
+	/**
+	creates an {@link AutoCoder} which can encode and decode instances of the given type.
+	if an encoder or decoder could not be created for any reason, a {@link FactoryException} is thrown.
+	*/
+	public <T_Decoded> @NotNull AutoCoder<T_Decoded> createCoder(@NotNull ReifiedType<T_Decoded> type) throws FactoryException {
+		return this.newFactoryContext(type).forceCreateCoder();
+	}
+
 	/**
 	creates an {@link AutoEncoder} which can encode instances of the provided class.
 	if such an encoder could not be created for any reason, a {@link FactoryException} is thrown.
+
+	this method is annotated with {@link TestOnly} because some factories
+	create coders directly, and are not involved in the encoder process.
+	as such, it is very possible for creating a coder to succeed,
+	while creating an encoder fails, even for the same type.
 	*/
+	@TestOnly
 	public <T_Decoded> @NotNull AutoEncoder<T_Decoded> createEncoder(@NotNull Class<T_Decoded> clazz) throws FactoryException  {
 		return this.newFactoryContext(clazz).forceCreateEncoder();
 	}
@@ -445,7 +330,13 @@ public class AutoCodec implements ReflectContextProvider {
 	/**
 	creates an {@link AutoEncoder} which can encode instances of the provided type.
 	if such an encoder could not be created for any reason, a {@link FactoryException} is thrown.
+
+	this method is annotated with {@link TestOnly} because some factories
+	create coders directly, and are not involved in the encoder process.
+	as such, it is very possible for creating a coder to succeed,
+	while creating an encoder fails, even for the same type.
 	*/
+	@TestOnly
 	public <T_Decoded> @NotNull AutoEncoder<T_Decoded> createEncoder(@NotNull ReifiedType<T_Decoded> type) throws FactoryException {
 		return this.newFactoryContext(type).forceCreateEncoder();
 	}
@@ -509,7 +400,17 @@ public class AutoCodec implements ReflectContextProvider {
 	/**
 	creates an {@link AutoDecoder} which can decode instances of the provided class.
 	if such a decoder could not be created for any reason, a {@link FactoryException} is thrown.
+
+	this method is annotated with {@link TestOnly} for 2 reasons:
+		1: some factories create coders directly and are not involved
+		in the decoder process. as such, it is perfectly normal for
+		the creation of a coder to succeed while the creation of
+		a decoder fails, even for the same type.
+
+		2. the creation of a coder will automatically attach a verifier
+		if necessary. decoders on the other hand will not do this.
 	*/
+	@TestOnly
 	public <T_Decoded> @NotNull AutoDecoder<T_Decoded> createDecoder(@NotNull Class<T_Decoded> clazz) throws FactoryException {
 		return this.newFactoryContext(clazz).forceCreateDecoder();
 	}
@@ -518,6 +419,7 @@ public class AutoCodec implements ReflectContextProvider {
 	creates an {@link AutoDecoder} which can decode instances of the provided type.
 	if such a decoder could not be created for any reason, a {@link FactoryException} is thrown.
 	*/
+	@TestOnly
 	public <T_Decoded> @NotNull AutoDecoder<T_Decoded> createDecoder(@NotNull ReifiedType<T_Decoded> type) throws FactoryException {
 		return this.newFactoryContext(type).forceCreateDecoder();
 	}
@@ -548,22 +450,6 @@ public class AutoCodec implements ReflectContextProvider {
 	@TestOnly
 	public <T_Decoded> @NotNull AutoVerifier<T_Decoded> createVerifier(@NotNull ReifiedType<T_Decoded> type) throws FactoryException {
 		return this.newFactoryContext(type).forceCreateVerifier();
-	}
-
-	/**
-	creates an {@link AutoCoder} which can encode and decode instances of the given class.
-	if an encoder or decoder could not be created for any reason, a {@link FactoryException} is thrown.
-	*/
-	public <T_Decoded> @NotNull AutoCoder<T_Decoded> createCoder(@NotNull Class<T_Decoded> clazz) throws FactoryException {
-		return this.newFactoryContext(clazz).forceCreateCoder();
-	}
-
-	/**
-	creates an {@link AutoCoder} which can encode and decode instances of the given type.
-	if an encoder or decoder could not be created for any reason, a {@link FactoryException} is thrown.
-	*/
-	public <T_Decoded> @NotNull AutoCoder<T_Decoded> createCoder(@NotNull ReifiedType<T_Decoded> type) throws FactoryException {
-		return this.newFactoryContext(type).forceCreateCoder();
 	}
 
 
@@ -724,10 +610,21 @@ public class AutoCodec implements ReflectContextProvider {
 	}
 
 	/**
+	creates the {@link CoderFactoryList} which this
+	AutoCodec uses to create {@link AutoCoder}'s.
+	anonymous subclasses of AutoCodec can override this method to
+	provide a CoderFactoryList with different factories built into it.
+	*/
+	@OverrideOnly
+	public @NotNull CoderFactoryList createCoders() {
+		return new CoderFactoryList(this);
+	}
+
+	/**
 	creates the {@link EncoderFactoryList} which this
 	AutoCodec uses to create {@link AutoEncoder}'s.
-	anonymous subclasses of AutoCodec can override this method
-	to provide an EncoderFactoryList with different factories built into it.
+	anonymous subclasses of AutoCodec can override this method to
+	provide an EncoderFactoryList with different factories built into it.
 	*/
 	@OverrideOnly
 	public @NotNull EncoderFactoryList createEncoders() {
@@ -737,8 +634,8 @@ public class AutoCodec implements ReflectContextProvider {
 	/**
 	creates the {@link ConstructorFactoryList} which this
 	AutoCodec uses to create {@link AutoConstructor}'s.
-	anonymous subclasses of AutoCodec can override this method
-	to provide a ConstructorFactoryList with different factories built into it.
+	anonymous subclasses of AutoCodec can override this method to
+	provide a ConstructorFactoryList with different factories built into it.
 	*/
 	@OverrideOnly
 	public @NotNull ConstructorFactoryList createConstructors() {
@@ -748,8 +645,8 @@ public class AutoCodec implements ReflectContextProvider {
 	/**
 	creates the {@link ImprinterFactoryList} which this
 	AutoCodec uses to create {@link AutoImprinter}'s.
-	anonymous subclasses of AutoCodec can override this method
-	to provide an ImprinterFactoryList with different factories built into it.
+	anonymous subclasses of AutoCodec can override this method to
+	provide an ImprinterFactoryList with different factories built into it.
 	*/
 	@OverrideOnly
 	public @NotNull ImprinterFactoryList createImprinters() {
@@ -759,8 +656,8 @@ public class AutoCodec implements ReflectContextProvider {
 	/**
 	creates the {@link DecoderFactoryList} which this
 	AutoCodec uses to create {@link AutoDecoder}'s.
-	anonymous subclasses of AutoCodec can override this method
-	to provide an DecoderFactoryList with different factories built into it.
+	anonymous subclasses of AutoCodec can override this method to
+	provide an DecoderFactoryList with different factories built into it.
 	*/
 	@OverrideOnly
 	public @NotNull DecoderFactoryList createDecoders() {
@@ -770,8 +667,8 @@ public class AutoCodec implements ReflectContextProvider {
 	/**
 	creates the {@link VerifierFactoryList} which this
 	AutoCodec uses to create {@link AutoVerifier}'s.
-	anonymous subclasses of AutoCodec can override this method
-	to provide an VerifierFactoryList with different factories built into it.
+	anonymous subclasses of AutoCodec can override this method to
+	provide an VerifierFactoryList with different factories built into it.
 	*/
 	@OverrideOnly
 	public @NotNull VerifierFactoryList createVerifiers() {

@@ -1,5 +1,7 @@
 package builderb0y.autocodec.imprinters;
 
+import java.util.stream.Stream;
+
 import org.jetbrains.annotations.ApiStatus.OverrideOnly;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -24,5 +26,15 @@ public class LazyImprinter<T> extends LazyHandler<AutoImprinter<T>> implements A
 	@OverrideOnly
 	public <T_Encoded> void imprint(@NotNull ImprintContext<T_Encoded, T> context) throws ImprintException {
 		context.imprintWith(this.getDelegateHandler());
+	}
+
+	@Override
+	public @Nullable Stream<String> getKeys() {
+		return this.getDelegateHandler().getKeys();
+	}
+
+	@Override
+	public boolean hasKeys() {
+		return this.getDelegateHandler().hasKeys();
 	}
 }

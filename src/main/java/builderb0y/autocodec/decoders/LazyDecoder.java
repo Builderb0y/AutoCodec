@@ -18,8 +18,8 @@ public class LazyDecoder<T> extends LazyHandler<AutoDecoder<T>> implements AutoD
 	}
 
 	@Override
-	public void setDelegateHandler(@NotNull AutoDecoder<T> constructor) {
-		this.resolution = constructor;
+	public void setDelegateHandler(@NotNull AutoDecoder<T> decoder) {
+		this.resolution = decoder;
 	}
 
 	@Override
@@ -31,5 +31,10 @@ public class LazyDecoder<T> extends LazyHandler<AutoDecoder<T>> implements AutoD
 	@Override
 	public @Nullable Stream<String> getKeys() {
 		return this.getDelegateHandler().getKeys();
+	}
+
+	@Override
+	public boolean hasKeys() {
+		return this.getDelegateHandler().hasKeys();
 	}
 }

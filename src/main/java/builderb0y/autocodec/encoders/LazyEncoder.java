@@ -32,4 +32,9 @@ public class LazyEncoder<T> extends LazyHandler<AutoEncoder<T>> implements AutoE
 	public @Nullable Stream<String> getKeys() {
 		return this.getDelegateHandler().getKeys();
 	}
+
+	@Override
+	public boolean hasKeys() {
+		return this.getDelegateHandler().hasKeys();
+	}
 }

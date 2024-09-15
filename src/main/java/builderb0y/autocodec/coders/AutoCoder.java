@@ -4,9 +4,12 @@ import java.util.stream.Stream;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
+import org.jetbrains.annotations.ApiStatus.OverrideOnly;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import builderb0y.autocodec.common.FactoryContext;
+import builderb0y.autocodec.common.FactoryException;
 import builderb0y.autocodec.decoders.AutoDecoder;
 import builderb0y.autocodec.decoders.DecodeContext;
 import builderb0y.autocodec.decoders.DecodeException;
@@ -155,6 +158,38 @@ public interface AutoCoder<T_Decoded> extends AutoEncoder<T_Decoded>, AutoDecode
 		}
 
 		public NamedCoder(@NotNull String toString) {
+			super(toString);
+		}
+	}
+
+	public static interface CoderFactory extends AutoFactory<AutoCoder<?>> {
+
+		/**
+		returns an AutoCoder which can encode and decode instances of T_HandledType,
+		or null if this factory does not know how to encode and decode instances of T_HandledType.
+		throws {@link FactoryException} if this factory knows how to encode/decode instances
+		of T_HandledType, but some other problem occurs which prevents it from doing so.
+
+		this method used to enforce that it returns AutoCoder<T_HandledType>,
+		but the problem with that is it usually just resulted
+		in a lot of unchecked casts for implementors.
+		java's generic system just wasn't designed for these kinds of things.
+
+		this method is annotated with {@link OverrideOnly}
+		because it performs no logging on its own.
+		use {@link FactoryContext#tryCreateCoder(CoderFactory)}
+		to create a coder using this factory and log it at the same time.
+		*/
+		@Override
+		@OverrideOnly
+		public abstract <T_HandledType> @Nullable AutoCoder<?> tryCreate(@NotNull FactoryContext<T_HandledType> context) throws FactoryException;
+	}
+
+	public static abstract class NamedCoderFactory extends NamedFactory<AutoCoder<?>> implements CoderFactory {
+
+		public NamedCoderFactory() {}
+
+		public NamedCoderFactory(@NotNull String toString) {
 			super(toString);
 		}
 	}
