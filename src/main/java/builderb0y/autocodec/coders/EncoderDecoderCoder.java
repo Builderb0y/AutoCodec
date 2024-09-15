@@ -80,13 +80,10 @@ public record EncoderDecoderCoder<T_Decoded>(@NotNull AutoEncoder<T_Decoded> enc
 
 	public static class Factory extends NamedCoderFactory {
 
-		public static final Factory INSTANCE = new Factory("EncoderDecoderCoder.Factory.INSTANCE");
-
-		public Factory(@NotNull String toString) {
-			super(toString);
-		}
+		public static final Factory INSTANCE = new Factory();
 
 		@Override
+		@OverrideOnly
 		public <T_HandledType> @Nullable AutoCoder<?> tryCreate(@NotNull FactoryContext<T_HandledType> context) throws FactoryException {
 			AutoDecoder<T_HandledType> decoder = context.tryCreateDecoder();
 			if (decoder == null) return null;

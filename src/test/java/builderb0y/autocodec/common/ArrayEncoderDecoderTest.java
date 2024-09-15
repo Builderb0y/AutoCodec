@@ -10,10 +10,9 @@ import org.junit.Test;
 import builderb0y.autocodec.annotations.VerifyFloatRange;
 import builderb0y.autocodec.annotations.VerifyIntRange;
 import builderb0y.autocodec.annotations.VerifySizeRange;
+import builderb0y.autocodec.coders.ArrayCoder;
 import builderb0y.autocodec.coders.CoderUnitTester;
-import builderb0y.autocodec.decoders.ArrayDecoder;
 import builderb0y.autocodec.decoders.DecodeException;
-import builderb0y.autocodec.encoders.ArrayEncoder;
 import builderb0y.autocodec.imprinters.ArrayImprinter;
 import builderb0y.autocodec.imprinters.AutoImprinter;
 import builderb0y.autocodec.imprinters.ImprintException;
@@ -40,8 +39,8 @@ public class ArrayEncoderDecoderTest {
 
 	public void testPrimitiveArray(Object array) throws DecodeException {
 		CoderUnitTester tester = new CoderUnitTester<>(TestCommon.DEFAULT_CODEC, array.getClass());
-		assertTrue(tester.encoder() instanceof ArrayEncoder<?, ?>);
-		assertTrue(tester.decoder() instanceof ArrayDecoder<?, ?>);
+		assertTrue(tester.encoder() instanceof ArrayCoder<?, ?>);
+		assertTrue(tester.decoder() instanceof ArrayCoder<?, ?>);
 		tester.test(array);
 
 		AutoImprinter<Object> imprinter = (AutoImprinter<Object>)(TestCommon.DEFAULT_CODEC.createImprinter(array.getClass()));
@@ -101,8 +100,8 @@ public class ArrayEncoderDecoderTest {
 
 	public void testVerifyingArray(Object array, ReifiedType<?> type, boolean valid, boolean arrayChecked) throws DecodeException {
 		CoderUnitTester tester = new CoderUnitTester(valid ? TestCommon.DEFAULT_CODEC : TestCommon.DISABLED_CODEC, type);
-		assertTrue(tester.encoder() instanceof ArrayEncoder<?, ?>);
-		assertTrue(tester.decoder() instanceof ArrayDecoder<?, ?>);
+		assertTrue(tester.encoder() instanceof ArrayCoder<?, ?>);
+		assertTrue(tester.decoder() instanceof ArrayCoder<?, ?>);
 		if (valid) {
 			tester.test(array);
 		}

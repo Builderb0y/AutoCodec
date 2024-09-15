@@ -26,7 +26,6 @@ public class EncoderFactoryList extends FactoryList<AutoEncoder<?>, EncoderFacto
 			new WrapperEncoderFactory()
 		);
 		this.addFactoriesToEnd(
-			ArrayEncoder.Factory.INSTANCE,
 			CollectionEncoder.Factory.INSTANCE,
 			MapEncoder.Factory.INSTANCE,
 			PatternEncoder.Factory.INSTANCE,
