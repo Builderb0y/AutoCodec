@@ -29,7 +29,6 @@ public class DecoderFactoryList extends FactoryList<AutoDecoder<?>, DecoderFacto
 		);
 		this.addFactoriesToEnd(
 			PatternDecoder.Factory.INSTANCE,
-			OptionalDecoderFactory.INSTANCE,
 			RecordDecoder.Factory.INSTANCE,
 			ConstructImprintDecoder.Factory.INSTANCE
 		);

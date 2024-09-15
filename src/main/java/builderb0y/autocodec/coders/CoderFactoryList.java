@@ -21,6 +21,7 @@ public class CoderFactoryList extends FactoryList<AutoCoder<?>, CoderFactory> im
 		this.addFactoriesToEnd(
 			ArrayCoder.Factory.INSTANCE,
 			new EnumCoder.Factory(EnumName.DEFAULT),
+			OptionalCoder.Factory.INSTANCE,
 			EncoderDecoderCoder.Factory.INSTANCE
 		);
 	}

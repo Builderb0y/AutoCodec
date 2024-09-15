@@ -29,7 +29,6 @@ public class EncoderFactoryList extends FactoryList<AutoEncoder<?>, EncoderFacto
 			CollectionEncoder.Factory.INSTANCE,
 			MapEncoder.Factory.INSTANCE,
 			PatternEncoder.Factory.INSTANCE,
-			OptionalEncoderFactory.INSTANCE,
 			MultiFieldEncoder.Factory.INSTANCE
 		);
 	}
