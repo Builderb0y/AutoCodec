@@ -5,10 +5,7 @@ import org.jetbrains.annotations.Nullable;
 
 import builderb0y.autocodec.AutoCodec;
 import builderb0y.autocodec.coders.AutoCoder.CoderFactory;
-import builderb0y.autocodec.common.FactoryContext;
-import builderb0y.autocodec.common.FactoryException;
-import builderb0y.autocodec.common.FactoryList;
-import builderb0y.autocodec.common.LazyHandler;
+import builderb0y.autocodec.common.*;
 import builderb0y.autocodec.verifiers.AutoVerifier;
 import builderb0y.autocodec.verifiers.NoopVerifier;
 
@@ -21,7 +18,10 @@ public class CoderFactoryList extends FactoryList<AutoCoder<?>, CoderFactory> im
 	@Override
 	public void setup() {
 		super.setup();
-		this.addFactoryToEnd(EncoderDecoderCoder.Factory.INSTANCE);
+		this.addFactoriesToEnd(
+			new EnumCoder.Factory(EnumName.DEFAULT),
+			EncoderDecoderCoder.Factory.INSTANCE
+		);
 	}
 
 	@Override

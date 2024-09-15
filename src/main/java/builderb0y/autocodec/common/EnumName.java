@@ -6,12 +6,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import builderb0y.autocodec.annotations.UseName;
-import builderb0y.autocodec.decoders.EnumDecoder;
-import builderb0y.autocodec.encoders.EnumEncoder;
+import builderb0y.autocodec.coders.EnumCoder;
 
 /**
-used by {@link EnumEncoder} and {@link EnumDecoder}
-when serializing/deserializing enums.
+used by {@link EnumCoder} when encoding/decoding enums.
 can be used to serialize enums as a string which
 differs from the enum's actual {@link Enum#name()}.
 for example, the enum may be named with UPPER_SNAKE_CASE

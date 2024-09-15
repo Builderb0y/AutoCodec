@@ -4,7 +4,6 @@ import org.jetbrains.annotations.ApiStatus.OverrideOnly;
 import org.jetbrains.annotations.NotNull;
 
 import builderb0y.autocodec.AutoCodec;
-import builderb0y.autocodec.common.EnumName;
 import builderb0y.autocodec.common.FactoryList;
 import builderb0y.autocodec.common.LazyHandler;
 import builderb0y.autocodec.decoders.AutoDecoder.DecoderFactory;
@@ -30,7 +29,6 @@ public class DecoderFactoryList extends FactoryList<AutoDecoder<?>, DecoderFacto
 		);
 		this.addFactoriesToEnd(
 			ArrayDecoder.Factory.INSTANCE,
-			new EnumDecoder.Factory(EnumName.DEFAULT),
 			PatternDecoder.Factory.INSTANCE,
 			OptionalDecoderFactory.INSTANCE,
 			RecordDecoder.Factory.INSTANCE,
