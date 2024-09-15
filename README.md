@@ -1,3 +1,5 @@
+This branch is for V5 of AutoCodec. For a list of things which have changed since V4, see changes.md.
+
 # Introduction
 
 AutoCodec is a high-level abstraction layer over [DataFixerUpper](https://github.com/Mojang/DataFixerUpper) (DFU). Specifically, the [serialization](https://github.com/Mojang/DataFixerUpper/tree/master/src/main/java/com/mojang/serialization) side of DFU. This library does not touch the [datafixers](https://github.com/Mojang/DataFixerUpper/tree/master/src/main/java/com/mojang/datafixers) side of DFU. If you've ever used [GSON](https://github.com/google/gson), you may be familiar with the concept of giving GSON an arbitrary java Type, and having GSON figure out how to serialize and deserialize that Type for you. AutoCodec aims to be like this.
@@ -87,21 +89,22 @@ public static final AutoCodec AUTO_CODEC = new AutoCodec() {
 				this.addFactoryAfter(LookupDecoderFactory.class, new MySpecialDecoderFactory());
 				this.addFactoryBefore(RecordDecoder.Factory.INSTANCE, new MyOtherDecoderFactory());
 			}
-		}
+		};
 	}
 };
 ```
 
 # How it works under the hood
 
-When customizing AutoCodec to fit the types you need to (de)serialize, it helps to know how AutoCodec is internally structured. AutoCodec divides the work of encoding and decoding into 5 tasks:
+When customizing AutoCodec to fit the types you need to (de)serialize, it helps to know how AutoCodec is internally structured. AutoCodec divides the work of encoding and decoding into 6 tasks:
+* Coding means encoding or decoding, or both, depending on context. A Coder can perform encoding and decoding operations.
 * Encoding is the process of taking a java object and converting it to data in some way.
 * Decoding is the process of taking some data and converting it to a java object in some way.
 * Constructing is the process of creating a java object without any data.
 * Imprinting is the process of taking a java object and some data, and applying that data to that object in some way.
 * Verifying is the process of ensuring that a java object meets some criteria. For example, ensuring that it is not null.
 
-Decoding is sometimes broken down into constructing and imprinting, and decoding almost always includes a verification step at the end. Encoding is not broken down into smaller tasks.
+Coding is sometimes broken down into encoding and decoding, meaning that some coders delegate to an encoder/decoder pair. Other coder implementations can handle encoding/decoding on their own, without delegating to anything. Likewise, decoding is sometimes broken down into constructing and imprinting. Coding almost always includes a verification step at the end. Encoding, constructing, imprinting, and verifying are not broken down into smaller tasks.
 
 ![A flowchart is worth a thousand words](https://github.com/Builderb0y/AutoCodec/blob/master/Handler%20chain.png)
 
@@ -111,7 +114,7 @@ There are a few classes associated with each task:
 * FactoryLists (EncoderFactoryList, ImprinterFactoryList, etc.) are what they say in the name: a list of Factories. They can create Handlers for a much wider range of types.
 * AutoCodec contains a FactoryList for each task.
 
-At the very end, an AutoEncoder and AutoDecoder are typically either wrapped to produce an Encoder and Decoder, which are combined to form a Codec, OR the AutoEncoder and AutoDecoder are combined into an AutoCoder, which is then wrapped to form a Codec. Regardless of whether wrapping or combining happens first, the result is the same: a Codec which can encode and decode instances of the requested type.
+At the very end, you get an AutoCoder which can encode and decode instances of the requested type.
 
 It is also worth mentioning that none of the above handlers rely on DataResult. When something goes wrong, a checked exception is thrown. The lack of reliance on DataResult also means that AutoCodec is more efficient at encoding and decoding than regular DFU is, due to the highly reduced number of lambda expressions involved.
 

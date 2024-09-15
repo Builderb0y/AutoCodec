@@ -6,6 +6,8 @@ import org.jetbrains.annotations.ApiStatus.OverrideOnly;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import builderb0y.autocodec.common.FactoryContext;
+import builderb0y.autocodec.common.FactoryException;
 import builderb0y.autocodec.decoders.AutoDecoder;
 import builderb0y.autocodec.decoders.DecodeContext;
 import builderb0y.autocodec.decoders.DecodeException;
@@ -18,11 +20,11 @@ import builderb0y.autocodec.reflection.reification.ReifiedType;
 basic implementation of {@link AutoCoder}
 which simply delegates to an {@link AutoEncoder} and an {@link AutoDecoder}.
 */
-public record Coder<T_Decoded>(@NotNull AutoEncoder<T_Decoded> encoder, @NotNull AutoDecoder<T_Decoded> decoder) implements AutoCoder<T_Decoded> {
+public record EncoderDecoderCoder<T_Decoded>(@NotNull AutoEncoder<T_Decoded> encoder, @NotNull AutoDecoder<T_Decoded> decoder) implements AutoCoder<T_Decoded> {
 
-	public Coder(@NotNull AutoEncoder<T_Decoded> encoder, @NotNull AutoDecoder<T_Decoded> decoder) {
-		this.encoder = encoder instanceof Coder<T_Decoded> both ? both.encoder() : encoder;
-		this.decoder = decoder instanceof Coder<T_Decoded> both ? both.decoder() : decoder;
+	public EncoderDecoderCoder(@NotNull AutoEncoder<T_Decoded> encoder, @NotNull AutoDecoder<T_Decoded> decoder) {
+		this.encoder = encoder instanceof EncoderDecoderCoder<T_Decoded> both ? both.encoder() : encoder;
+		this.decoder = decoder instanceof EncoderDecoderCoder<T_Decoded> both ? both.decoder() : decoder;
 	}
 
 	@Override
@@ -48,12 +50,12 @@ public record Coder<T_Decoded>(@NotNull AutoEncoder<T_Decoded> encoder, @NotNull
 
 	@Override
 	public @NotNull <T_To> AutoCoder<T_To> mapCoder(@NotNull ReifiedType<T_To> newType, @NotNull HandlerMapper<T_To, T_Decoded> encodeMapper, @NotNull HandlerMapper<T_Decoded, T_To> decodeMapper) {
-		return new Coder<>(this.encoder.mapEncoder(newType, encodeMapper), this.decoder.mapDecoder(newType, decodeMapper));
+		return new EncoderDecoderCoder<>(this.encoder.mapEncoder(newType, encodeMapper), this.decoder.mapDecoder(newType, decodeMapper));
 	}
 
 	@Override
 	public @NotNull <T_To> AutoCoder<T_To> mapCoder(@NotNull ReifiedType<T_To> newType, @NotNull String encodeMapperName, @NotNull HandlerMapper<T_To, T_Decoded> encodeMapper, @NotNull String decodeMapperName, @NotNull HandlerMapper<T_Decoded, T_To> decodeMapper) {
-		return new Coder<>(this.encoder.mapEncoder(newType, encodeMapperName, encodeMapper), this.decoder.mapDecoder(newType, decodeMapperName, decodeMapper));
+		return new EncoderDecoderCoder<>(this.encoder.mapEncoder(newType, encodeMapperName, encodeMapper), this.decoder.mapDecoder(newType, decodeMapperName, decodeMapper));
 	}
 
 	@Override
@@ -74,5 +76,23 @@ public record Coder<T_Decoded>(@NotNull AutoEncoder<T_Decoded> encoder, @NotNull
 	@Override
 	public @NotNull <T_To> AutoEncoder<T_To> mapEncoder(@NotNull ReifiedType<T_To> newType, @NotNull String mapperName, @NotNull HandlerMapper<T_To, T_Decoded> mapper) {
 		return this.encoder.mapEncoder(newType, mapperName, mapper);
+	}
+
+	public static class Factory extends NamedCoderFactory {
+
+		public static final Factory INSTANCE = new Factory("EncoderDecoderCoder.Factory.INSTANCE");
+
+		public Factory(@NotNull String toString) {
+			super(toString);
+		}
+
+		@Override
+		public <T_HandledType> @Nullable AutoCoder<?> tryCreate(@NotNull FactoryContext<T_HandledType> context) throws FactoryException {
+			AutoDecoder<T_HandledType> decoder = context.tryCreateDecoder();
+			if (decoder == null) return null;
+			AutoEncoder<T_HandledType> encoder = context.tryCreateEncoder();
+			if (encoder == null) return null;
+			return new EncoderDecoderCoder<>(encoder, decoder);
+		}
 	}
 }

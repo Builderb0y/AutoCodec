@@ -5,10 +5,9 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.jetbrains.annotations.NotNull;
 
 import builderb0y.autocodec.AutoCodec;
-import builderb0y.autocodec.coders.Coder;
+import builderb0y.autocodec.coders.EncoderDecoderCoder;
 import builderb0y.autocodec.coders.VerifyingCoder;
 import builderb0y.autocodec.decoders.AutoDecoder;
-import builderb0y.autocodec.decoders.VerifyingDecoder;
 import builderb0y.autocodec.encoders.AutoEncoder;
 import builderb0y.autocodec.imprinters.AutoImprinter;
 import builderb0y.autocodec.imprinters.VerifyingImprinter;
@@ -38,11 +37,11 @@ public class TestCommon {
 
 	public static <T_Decoded> AutoEncoder<T_Decoded> encoder(AutoEncoder<T_Decoded> encoder) {
 		while (true) {
-			if (encoder instanceof Coder<T_Decoded> coder) {
+			if (encoder instanceof EncoderDecoderCoder<T_Decoded> coder) {
 				encoder = coder.encoder();
 			}
 			else if (encoder instanceof VerifyingCoder<T_Decoded> coder) {
-				encoder = coder.encoder;
+				encoder = coder.coder;
 			}
 			else {
 				return encoder;
@@ -52,11 +51,11 @@ public class TestCommon {
 
 	public static <T_Decoded> AutoDecoder<T_Decoded> decoder(AutoDecoder<T_Decoded> decoder) {
 		while (true) {
-			if (decoder instanceof Coder<T_Decoded> coder) {
+			if (decoder instanceof EncoderDecoderCoder<T_Decoded> coder) {
 				decoder = coder.decoder();
 			}
-			else if (decoder instanceof VerifyingDecoder<T_Decoded> verifying) {
-				decoder = verifying.decoder;
+			else if (decoder instanceof VerifyingCoder<T_Decoded> verifying) {
+				decoder = verifying.coder;
 			}
 			else {
 				return decoder;

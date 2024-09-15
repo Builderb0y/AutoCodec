@@ -29,8 +29,6 @@ public interface AutoDecoder<T_Decoded> extends AutoHandler, KeyHolder {
 	for example, a {@link DecodeException} should NOT be thrown
 	if the decoded object is null, an empty array, or a negative number.
 	checks like these are to be performed by the {@link AutoVerifier} instead.
-	only one subclass of {@link AutoDecoder} is expected to perform such checks,
-	and that's {@link VerifyingDecoder}.
 
 	this method is annotated with {@link OverrideOnly}
 	because it performs no logging on its own.

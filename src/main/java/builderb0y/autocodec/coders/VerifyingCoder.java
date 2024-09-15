@@ -5,84 +5,53 @@ import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import builderb0y.autocodec.decoders.AutoDecoder;
-import builderb0y.autocodec.decoders.VerifyingDecoder;
-import builderb0y.autocodec.encoders.AutoEncoder;
+import builderb0y.autocodec.coders.AutoCoder.NamedCoder;
+import builderb0y.autocodec.decoders.DecodeContext;
+import builderb0y.autocodec.decoders.DecodeException;
 import builderb0y.autocodec.encoders.EncodeContext;
 import builderb0y.autocodec.encoders.EncodeException;
 import builderb0y.autocodec.reflection.reification.ReifiedType;
 import builderb0y.autocodec.verifiers.AutoVerifier;
 
-public class VerifyingCoder<T_Decoded> extends VerifyingDecoder<T_Decoded> implements AutoCoder<T_Decoded> {
+public class VerifyingCoder<T_Decoded> extends NamedCoder<T_Decoded> {
 
-	public final @NotNull AutoEncoder<T_Decoded> encoder;
-
-	public VerifyingCoder(
-		@NotNull ReifiedType<T_Decoded> type,
-		@NotNull AutoEncoder<T_Decoded> encoder,
-		@NotNull AutoDecoder<T_Decoded> decoder,
-		@NotNull AutoVerifier<T_Decoded> verifier
-	) {
-		super(type, decoder, verifier);
-		this.encoder = encoder;
-	}
+	public final @NotNull AutoCoder<T_Decoded> coder;
+	public final @NotNull AutoVerifier<T_Decoded> verifier;
 
 	public VerifyingCoder(
-		@NotNull ReifiedType<T_Decoded> type,
+		@NotNull ReifiedType<T_Decoded> handledType,
 		@NotNull AutoCoder<T_Decoded> coder,
 		@NotNull AutoVerifier<T_Decoded> verifier
 	) {
-		this(type, coder, coder, verifier);
+		super(handledType);
+		this.coder = coder;
+		this.verifier = verifier;
 	}
 
 	@Override
 	public @Nullable Stream<String> getKeys() {
-		Stream<String> encoderKeys = this.encoder.getKeys();
-		if (encoderKeys == null) return null;
-		Stream<String> decoderKeys = this.decoder.getKeys();
-		if (decoderKeys == null) { encoderKeys.close(); return null; }
-		return Stream.concat(encoderKeys, decoderKeys);
+		return this.coder.getKeys();
+	}
+
+	@Override
+	public boolean hasKeys() {
+		return this.coder.hasKeys();
 	}
 
 	@Override
 	public <T_Encoded> @NotNull T_Encoded encode(@NotNull EncodeContext<T_Encoded, T_Decoded> context) throws EncodeException {
-		return context.encodeWith(this.encoder);
+		return context.encodeWith(this.coder);
 	}
 
 	@Override
-	public @NotNull <T_To> AutoCoder<T_To> mapCoder(@NotNull ReifiedType<T_To> newType, @NotNull HandlerMapper<T_To, T_Decoded> encodeMapper, @NotNull HandlerMapper<T_Decoded, T_To> decodeMapper) {
-		AutoVerifier<T_To> newVerifier = this.verifier.mapVerifier(newType, encodeMapper);
-		if (this.encoder == this.decoder) {
-			AutoCoder<T_To> newCoder = ((AutoCoder<T_Decoded>)(this.encoder)).mapCoder(newType, encodeMapper, decodeMapper);
-			return new VerifyingCoder<>(newType, newCoder, newVerifier);
-		}
-		else {
-			AutoEncoder<T_To> newEncoder = this.encoder.mapEncoder(newType, encodeMapper);
-			AutoDecoder<T_To> newDecoder = this.decoder.mapDecoder(newType, decodeMapper);
-			return new VerifyingCoder<>(newType, newEncoder, newDecoder, newVerifier);
-		}
-	}
-
-	@Override
-	public @NotNull <T_To> AutoCoder<T_To> mapCoder(@NotNull ReifiedType<T_To> newType, @NotNull String encodeMapperName, @NotNull HandlerMapper<T_To, T_Decoded> encodeMapper, @NotNull String decodeMapperName, @NotNull HandlerMapper<T_Decoded, T_To> decodeMapper) {
-		AutoVerifier<T_To> newVerifier = this.verifier.mapVerifier(newType, encodeMapperName, encodeMapper);
-		if (this.encoder == this.decoder) {
-			AutoCoder<T_To> newCoder = ((AutoCoder<T_Decoded>)(this.encoder)).mapCoder(newType, encodeMapperName, encodeMapper, decodeMapperName, decodeMapper);
-			return new VerifyingCoder<>(newType, newCoder, newVerifier);
-		}
-		else {
-			AutoEncoder<T_To> newEncoder = this.encoder.mapEncoder(newType, encodeMapperName, encodeMapper);
-			AutoDecoder<T_To> newDecoder = this.decoder.mapDecoder(newType, decodeMapperName, decodeMapper);
-			return new VerifyingCoder<>(newType, newEncoder, newDecoder, newVerifier);
-		}
+	public <T_Encoded> @Nullable T_Decoded decode(@NotNull DecodeContext<T_Encoded> context) throws DecodeException {
+		T_Decoded result = context.decodeWith(this.coder);
+		context.verifyWith(this.verifier, result);
+		return result;
 	}
 
 	@Override
 	public String toString() {
-		return (
-			this.encoder == this.decoder
-			? this.toString + ": { coder: " + this.encoder + ", verifier: " + this.verifier + " }"
-			: this.toString + ": { encoder: " + this.encoder + ", decoder: " + this.decoder + ", verifier: " + this.verifier + " }"
-		);
+		return this.toString + ": { coder: " + this.coder + ", verifier: " + this.verifier + " }";
 	}
 }

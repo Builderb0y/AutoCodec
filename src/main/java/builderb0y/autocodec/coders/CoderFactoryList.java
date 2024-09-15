@@ -21,6 +21,7 @@ public class CoderFactoryList extends FactoryList<AutoCoder<?>, CoderFactory> im
 	@Override
 	public void setup() {
 		super.setup();
+		this.addFactoryToEnd(EncoderDecoderCoder.Factory.INSTANCE);
 	}
 
 	@Override

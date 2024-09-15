@@ -22,7 +22,7 @@ import builderb0y.autocodec.util.ObjectArrayFactory;
 /**
 analogous to {@link Codec}; this class acts as a convenience
 combo of {@link AutoEncoder} and {@link AutoDecoder}.
-the simplest implementation is {@link Coder},
+the simplest implementation is {@link EncoderDecoderCoder},
 which simply delegates to an {@link AutoEncoder} and an {@link AutoDecoder}.
 */
 public interface AutoCoder<T_Decoded> extends AutoEncoder<T_Decoded>, AutoDecoder<T_Decoded> {
@@ -30,7 +30,7 @@ public interface AutoCoder<T_Decoded> extends AutoEncoder<T_Decoded>, AutoDecode
 	public static final @NotNull ObjectArrayFactory<AutoCoder<?>> ARRAY_FACTORY = new ObjectArrayFactory<>(AutoCoder.class).generic();
 
 	public static <T_Decoded> @NotNull AutoCoder<T_Decoded> of(@NotNull AutoEncoder<T_Decoded> encoder, @NotNull AutoDecoder<T_Decoded> decoder) {
-		return new Coder<>(encoder, decoder);
+		return new EncoderDecoderCoder<>(encoder, decoder);
 	}
 
 	/**
