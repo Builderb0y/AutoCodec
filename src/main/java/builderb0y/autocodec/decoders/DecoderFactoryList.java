@@ -27,8 +27,7 @@ public class DecoderFactoryList extends FactoryList<AutoDecoder<?>, DecoderFacto
 			MultiLineStringDecoder.Factory.INSTANCE,
 			new WrapperDecoderFactory()
 		);
-		this.addFactoriesToEnd(
-			RecordDecoder.Factory.INSTANCE,
+		this.addFactoryToEnd(
 			ConstructImprintDecoder.Factory.INSTANCE
 		);
 	}

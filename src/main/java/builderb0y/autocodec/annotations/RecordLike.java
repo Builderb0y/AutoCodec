@@ -52,6 +52,9 @@ public @interface RecordLike {
 	the same class which this annotation is applied to.
 	note that at the time of writing this, constructors of
 	subclasses cannot be targeted by setting in() to that subclass.
+	in this case, it is recommended to create another factory method
+	elsewhere which declares that it returns the annotated type,
+	but actually returns a subclass of the annotated type.
 	*/
 	public Class<?> in() default void.class;
 }

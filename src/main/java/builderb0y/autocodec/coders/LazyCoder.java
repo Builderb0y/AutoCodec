@@ -42,9 +42,4 @@ public class LazyCoder<T> extends LazyHandler<AutoCoder<T>> implements AutoCoder
 	public @Nullable Stream<String> getKeys() {
 		return this.getDelegateHandler().getKeys();
 	}
-
-	@Override
-	public boolean hasKeys() {
-		return this.getDelegateHandler().hasKeys();
-	}
 }

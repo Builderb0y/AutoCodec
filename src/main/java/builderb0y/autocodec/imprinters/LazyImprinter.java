@@ -32,9 +32,4 @@ public class LazyImprinter<T> extends LazyHandler<AutoImprinter<T>> implements A
 	public @Nullable Stream<String> getKeys() {
 		return this.getDelegateHandler().getKeys();
 	}
-
-	@Override
-	public boolean hasKeys() {
-		return this.getDelegateHandler().hasKeys();
-	}
 }

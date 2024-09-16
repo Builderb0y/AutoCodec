@@ -6,9 +6,9 @@ import builderb0y.autocodec.annotations.AddPseudoField;
 import builderb0y.autocodec.annotations.Hidden;
 import builderb0y.autocodec.annotations.VerifyNullable;
 import builderb0y.autocodec.coders.CoderUnitTester;
+import builderb0y.autocodec.coders.RecordCoder;
 import builderb0y.autocodec.common.FactoryException;
 import builderb0y.autocodec.common.TestCommon;
-import builderb0y.autocodec.encoders.MultiFieldEncoder;
 
 import static org.junit.Assert.*;
 
@@ -17,8 +17,8 @@ public class RecordDecoderTest {
 	@Test
 	public void testEmptyRecord() throws DecodeException {
 		CoderUnitTester<EmptyRecord> tester = new CoderUnitTester<>(TestCommon.DEFAULT_CODEC, EmptyRecord.class);
-		assertTrue(tester.encoder() instanceof MultiFieldEncoder<?>);
-		assertTrue(tester.decoder() instanceof RecordDecoder<?>);
+		assertTrue(tester.encoder() instanceof RecordCoder<EmptyRecord>);
+		assertTrue(tester.decoder() instanceof RecordCoder<EmptyRecord>);
 		tester.test(new EmptyRecord());
 	}
 
@@ -30,8 +30,8 @@ public class RecordDecoderTest {
 	@Test
 	public void testPoint() throws DecodeException {
 		CoderUnitTester<PointXY> tester = new CoderUnitTester<>(TestCommon.DEFAULT_CODEC, PointXY.class);
-		assertTrue(tester.encoder() instanceof MultiFieldEncoder<?>);
-		assertTrue(tester.decoder() instanceof RecordDecoder<?>);
+		assertTrue(tester.encoder() instanceof RecordCoder<PointXY>);
+		assertTrue(tester.decoder() instanceof RecordCoder<PointXY>);
 		tester.test(new PointXY(3, 4));
 	}
 

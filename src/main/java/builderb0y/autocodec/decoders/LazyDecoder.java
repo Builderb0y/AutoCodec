@@ -32,9 +32,4 @@ public class LazyDecoder<T> extends LazyHandler<AutoDecoder<T>> implements AutoD
 	public @Nullable Stream<String> getKeys() {
 		return this.getDelegateHandler().getKeys();
 	}
-
-	@Override
-	public boolean hasKeys() {
-		return this.getDelegateHandler().hasKeys();
-	}
 }

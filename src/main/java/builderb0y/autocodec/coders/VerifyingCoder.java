@@ -34,11 +34,6 @@ public class VerifyingCoder<T_Decoded> extends NamedCoder<T_Decoded> {
 	}
 
 	@Override
-	public boolean hasKeys() {
-		return this.coder.hasKeys();
-	}
-
-	@Override
 	public <T_Encoded> @NotNull T_Encoded encode(@NotNull EncodeContext<T_Encoded, T_Decoded> context) throws EncodeException {
 		return context.encodeWith(this.coder);
 	}

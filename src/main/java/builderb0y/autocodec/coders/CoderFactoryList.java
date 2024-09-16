@@ -24,6 +24,7 @@ public class CoderFactoryList extends FactoryList<AutoCoder<?>, CoderFactory> im
 			new EnumCoder.Factory(EnumName.DEFAULT),
 			OptionalCoder.Factory.INSTANCE,
 			PatternCoder.Factory.INSTANCE,
+			RecordCoder.Factory.INSTANCE,
 			EncoderDecoderCoder.Factory.INSTANCE
 		);
 	}
