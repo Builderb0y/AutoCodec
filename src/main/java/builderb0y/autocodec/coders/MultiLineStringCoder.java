@@ -83,7 +83,7 @@ public class MultiLineStringCoder extends NamedCoder<@MultiLine String> {
 				MultiLine annotation = context.type.getAnnotations().getFirst(MultiLine.class);
 				if (annotation != null) {
 					return new MultiLineStringCoder(
-						(ReifiedType<@MultiLine String>)(context.type),
+						context.type.uncheckedCast(),
 						annotation.value(),
 						(AutoCoder<String>)(context.forceCreateFallbackCoder(this))
 					);

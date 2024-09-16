@@ -14,7 +14,6 @@ import builderb0y.autocodec.decoders.DecodeException;
 import builderb0y.autocodec.encoders.AutoEncoder;
 import builderb0y.autocodec.encoders.EncodeContext;
 import builderb0y.autocodec.encoders.EncodeException;
-import builderb0y.autocodec.reflection.reification.ReifiedType;
 
 /**
 basic implementation of {@link AutoCoder}
@@ -46,36 +45,6 @@ public record EncoderDecoderCoder<T_Decoded>(@NotNull AutoEncoder<T_Decoded> enc
 	@OverrideOnly
 	public <T_Encoded> @Nullable T_Decoded decode(@NotNull DecodeContext<T_Encoded> context) throws DecodeException {
 		return context.decodeWith(this.decoder);
-	}
-
-	@Override
-	public @NotNull <T_To> AutoCoder<T_To> mapCoder(@NotNull ReifiedType<T_To> newType, @NotNull HandlerMapper<T_To, T_Decoded> encodeMapper, @NotNull HandlerMapper<T_Decoded, T_To> decodeMapper) {
-		return new EncoderDecoderCoder<>(this.encoder.mapEncoder(newType, encodeMapper), this.decoder.mapDecoder(newType, decodeMapper));
-	}
-
-	@Override
-	public @NotNull <T_To> AutoCoder<T_To> mapCoder(@NotNull ReifiedType<T_To> newType, @NotNull String encodeMapperName, @NotNull HandlerMapper<T_To, T_Decoded> encodeMapper, @NotNull String decodeMapperName, @NotNull HandlerMapper<T_Decoded, T_To> decodeMapper) {
-		return new EncoderDecoderCoder<>(this.encoder.mapEncoder(newType, encodeMapperName, encodeMapper), this.decoder.mapDecoder(newType, decodeMapperName, decodeMapper));
-	}
-
-	@Override
-	public @NotNull <T_To> AutoDecoder<T_To> mapDecoder(@NotNull ReifiedType<T_To> newType, @NotNull HandlerMapper<T_Decoded, T_To> mapper) {
-		return this.decoder.mapDecoder(newType, mapper);
-	}
-
-	@Override
-	public @NotNull <T_To> AutoDecoder<T_To> mapDecoder(@NotNull ReifiedType<T_To> newType, @NotNull String mapperName, @NotNull HandlerMapper<T_Decoded, T_To> mapper) {
-		return this.decoder.mapDecoder(newType, mapperName, mapper);
-	}
-
-	@Override
-	public @NotNull <T_To> AutoEncoder<T_To> mapEncoder(@NotNull ReifiedType<T_To> newType, @NotNull HandlerMapper<T_To, T_Decoded> mapper) {
-		return this.encoder.mapEncoder(newType, mapper);
-	}
-
-	@Override
-	public @NotNull <T_To> AutoEncoder<T_To> mapEncoder(@NotNull ReifiedType<T_To> newType, @NotNull String mapperName, @NotNull HandlerMapper<T_To, T_Decoded> mapper) {
-		return this.encoder.mapEncoder(newType, mapperName, mapper);
 	}
 
 	public static class Factory extends NamedCoderFactory {

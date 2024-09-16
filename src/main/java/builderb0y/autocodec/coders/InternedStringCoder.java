@@ -45,7 +45,7 @@ public class InternedStringCoder extends NamedCoder<String> {
 		@SuppressWarnings("unchecked")
 		public <T_HandledType> @Nullable AutoCoder<?> tryCreate(@NotNull FactoryContext<T_HandledType> context) throws FactoryException {
 			if (context.type.getRawClass() == String.class && context.type.getAnnotations().has(Internal.class)) {
-				return new InternedStringCoder((ReifiedType<String>)(context.type), (AutoCoder<String>)(context.forceCreateCoder()));
+				return new InternedStringCoder(context.type.uncheckedCast(), (AutoCoder<String>)(context.forceCreateCoder()));
 			}
 			return null;
 		}

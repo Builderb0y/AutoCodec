@@ -1,8 +1,5 @@
 package builderb0y.autocodec.common;
 
-import java.lang.invoke.*;
-import java.util.function.Function;
-
 import org.jetbrains.annotations.ApiStatus.OverrideOnly;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -37,54 +34,6 @@ public interface AutoHandler {
 	*/
 	@Override
 	public abstract String toString();
-
-	/**
-	basically a {@link Function} which can throw exceptions.
-	used for adapting a handler to operate on a different type.
-	*/
-	@FunctionalInterface
-	public static interface HandlerMapper<T_From, T_To> {
-
-		/**
-		converts the object to something the old handler can use.
-		this method throws {@link Throwable} because it is expected that
-		some implementations of HandlerMapper may use a {@link MethodHandle}
-		as part of the conversion process.
-		*/
-		public abstract T_To apply(T_From from) throws Throwable;
-
-		/** creates a HandlerMapper from the provided handle. */
-		@SuppressWarnings({ "unchecked", "rawtypes" })
-		public static <T_From, T_To> @NotNull HandlerMapper<T_From, T_To> createLambda(@NotNull MethodHandle handle) {
-			try {
-				return (HandlerMapper<T_From, T_To>)(
-					LambdaMetafactory.metafactory(
-						MethodHandles.lookup(),
-						"apply",
-						MethodType.methodType(HandlerMapper.class),
-						MethodType.methodType(Object.class, Object.class),
-						handle,
-						handle.type()
-					)
-					.getTarget()
-					.invokeExact()
-				);
-			}
-			catch (Throwable throwable) {
-				return (HandlerMapper)(handle.asType(MethodType.methodType(Object.class, Object.class))::invokeExact);
-			}
-		}
-
-		/**
-		returns a null-safe version of the provided mapper.
-		in other words, one which outputs null when its input is null,
-		without throwing a NullPointerException.
-		the provided mapper will never need to handle null.
-		*/
-		public static <T_From, T_To> @NotNull HandlerMapper<@Nullable T_From, @Nullable T_To> nullSafe(@NotNull HandlerMapper<@NotNull T_From, T_To> mapper) {
-			return (@Nullable T_From object) -> object == null ? null : mapper.apply(object);
-		}
-	}
 
 	/**
 	bare bones implementation of AutoHandler which overrides {@link #toString()}
