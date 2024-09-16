@@ -22,7 +22,6 @@ public class EncoderFactoryList extends FactoryList<AutoEncoder<?>, EncoderFacto
 			UseEncoderFactory.INSTANCE,
 			DefaultEncoder.Factory.INSTANCE,
 			DefaultEmptyEncoder.Factory.INSTANCE,
-			MultiLineStringEncoder.Factory.INSTANCE,
 			new WrapperEncoderFactory()
 		);
 		this.addFactoriesToEnd(

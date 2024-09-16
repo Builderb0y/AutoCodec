@@ -23,8 +23,6 @@ public class DecoderFactoryList extends FactoryList<AutoDecoder<?>, DecoderFacto
 			DefaultDecoder.Factory.INSTANCE,
 			DefaultEmptyDecoder.Factory.INSTANCE,
 			ConstructOnlyDecoder.Factory.INSTANCE,
-			InternedStringDecoder.Factory.INSTANCE, //interned must come before multiline to stack with it.
-			MultiLineStringDecoder.Factory.INSTANCE,
 			new WrapperDecoderFactory()
 		);
 		this.addFactoryToEnd(

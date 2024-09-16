@@ -1,6 +1,7 @@
 package builderb0y.autocodec.decoders;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import com.mojang.datafixers.util.Pair;
@@ -177,8 +178,32 @@ public class DecodeContext<T_Encoded> extends DynamicOpsContext<T_Encoded> {
 	}
 
 	public @NotNull List<@NotNull DecodeContext<T_Encoded>> forceAsList(boolean allowSingleton) throws DecodeException {
-		List<@NotNull DecodeContext<T_Encoded>> list = this.tryAsList(allowSingleton);
+		List<DecodeContext<T_Encoded>> list = this.tryAsList(allowSingleton);
 		if (list != null) return list;
+		else throw this.notA("list");
+	}
+
+	public @Nullable Stream<@NotNull DecodeContext<T_Encoded>> tryAsStream(boolean allowSingleton) {
+		Stream<T_Encoded> stream = DFUVersions.getResult(this.ops.getStream(this.input));
+		if (stream != null) {
+			return stream.sequential().map(new Function<>() {
+
+				public int index;
+
+				@Override
+				public @NotNull DecodeContext<T_Encoded> apply(@NotNull T_Encoded encoded) {
+					return DecodeContext.this.input(encoded, new ArrayDecodePath(this.index++));
+				}
+			});
+		}
+		else {
+			return allowSingleton ? Stream.of(this) : null;
+		}
+	}
+
+	public @NotNull Stream<@NotNull DecodeContext<T_Encoded>> forceAsStream(boolean allowSingleton) throws DecodeException {
+		Stream<DecodeContext<T_Encoded>> stream = this.tryAsStream(allowSingleton);
+		if (stream != null) return stream;
 		else throw this.notA("list");
 	}
 

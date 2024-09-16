@@ -20,6 +20,8 @@ public class CoderFactoryList extends FactoryList<AutoCoder<?>, CoderFactory> im
 		super.setup();
 		this.addFactoryToStart(UseCoderFactory.INSTANCE);
 		this.addFactoriesToEnd(
+			InternedStringCoder.Factory.INSTANCE,
+			MultiLineStringCoder.Factory.INSTANCE,
 			ArrayCoder.Factory.INSTANCE,
 			new EnumCoder.Factory(EnumName.DEFAULT),
 			OptionalCoder.Factory.INSTANCE,
