@@ -26,9 +26,9 @@ public class CollectionEncoder<T_Element, T_Collection extends Collection<T_Elem
 	@Override
 	@OverrideOnly
 	public <T_Encoded> @NotNull T_Encoded encode(@NotNull EncodeContext<T_Encoded, T_Collection> context) throws EncodeException {
-		if (context.input == null) return context.empty();
+		if (context.object == null) return context.empty();
 		AutoEncoder<T_Element> encoder = this.elementEncoder;
-		return context.createList(context.input.stream().map((T_Element element) -> context.input(element).encodeWith(encoder)));
+		return context.createList(context.object.stream().map((T_Element element) -> context.object(element).encodeWith(encoder)));
 	}
 
 	public static class Factory extends NamedEncoderFactory {
@@ -38,7 +38,7 @@ public class CollectionEncoder<T_Element, T_Collection extends Collection<T_Elem
 		@Override
 		@OverrideOnly
 		public <T_HandledType> @Nullable AutoEncoder<?> tryCreate(@NotNull FactoryContext<T_HandledType> context) throws FactoryException {
-			ReifiedType<?> elementType = context.type.getUpperBoundOrSelf().resolveParameter(Collection.class);
+			ReifiedType<?> elementType = context.type.resolveParameter(Collection.class);
 			if (elementType != null) {
 				AutoEncoder<?> elementEncoder = context.type(elementType).forceCreateEncoder();
 				boolean singleton = context.type.getAnnotations().has(SingletonArray.class);

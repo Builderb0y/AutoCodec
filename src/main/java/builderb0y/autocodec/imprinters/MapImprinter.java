@@ -50,7 +50,7 @@ public class MapImprinter<T_Key, T_Value, T_Map extends Map<T_Key, T_Value>> ext
 		@Override
 		@OverrideOnly
 		public <T_HandledType> @Nullable AutoImprinter<?> tryCreate(@NotNull FactoryContext<T_HandledType> context) throws FactoryException {
-			ReifiedType<?>[] keyValueTypes = context.type.getUpperBoundOrSelf().resolveParameters(Map.class);
+			ReifiedType<?>[] keyValueTypes = context.type.resolveParameters(Map.class);
 			if (keyValueTypes != null) {
 				AutoDecoder<?>   keyDecoder = context.type(keyValueTypes[0]).forceCreateDecoder();
 				AutoDecoder<?> valueDecoder = context.type(keyValueTypes[1]).forceCreateDecoder();

@@ -6,6 +6,7 @@ import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Field;
 import java.util.function.UnaryOperator;
 
+import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
 
 import builderb0y.autocodec.annotations.UseGetter;
@@ -152,8 +153,8 @@ public class FieldView<T_Owner, T_Member> extends FieldLikeMemberView<T_Owner, T
 	}
 
 	@Override
-	@Deprecated
-	protected @NotNull AnnotatedType _getAnnotatedType() {
+	@Internal
+	public @NotNull AnnotatedType getAnnotatedType() {
 		return this.field.getAnnotatedType();
 	}
 }

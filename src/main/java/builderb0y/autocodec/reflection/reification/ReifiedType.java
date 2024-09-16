@@ -1127,7 +1127,8 @@ public class ReifiedType<T> implements TypeFormatterAppendable {
 				this.appendWildcard(formatter, annotations, "super");
 			}
 			case UNRESOLVABLE_VARIABLE -> {
-				if (EVIL_TO_STRING_INFINITE_RECURSION_BLOCKER.get().add(this)) try {
+				Set<ReifiedType<?>> infiniteRecursionBlocker = EVIL_TO_STRING_INFINITE_RECURSION_BLOCKER.get();
+				if (infiniteRecursionBlocker.add(this)) try {
 					formatter.append("unresolvable ");
 					TypeVariable<?> variable = this.unresolvableVariable;
 					if (variable != null) formatter.append(variable);
@@ -1138,7 +1139,7 @@ public class ReifiedType<T> implements TypeFormatterAppendable {
 					else formatter.append("null bound");
 				}
 				finally {
-					EVIL_TO_STRING_INFINITE_RECURSION_BLOCKER.get().remove(this);
+					infiniteRecursionBlocker.remove(this);
 				}
 				else {
 					TypeVariable<?> variable = this.unresolvableVariable;

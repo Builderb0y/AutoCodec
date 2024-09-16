@@ -68,7 +68,7 @@ public interface AutoCoder<T_Decoded> extends AutoEncoder<T_Decoded>, AutoDecode
 			@Override
 			public <T_Encoded> @NotNull T_Encoded encode(@NotNull EncodeContext<T_Encoded, T_To> context) throws EncodeException {
 				try {
-					return context.input(encodeMapper.apply(context.input)).encodeWith(AutoCoder.this);
+					return context.object(encodeMapper.apply(context.object)).encodeWith(AutoCoder.this);
 				}
 				catch (EncodeException | Error exception) {
 					throw exception;
@@ -121,7 +121,7 @@ public interface AutoCoder<T_Decoded> extends AutoEncoder<T_Decoded>, AutoDecode
 			@Override
 			public <T_Encoded> @NotNull T_Encoded encode(@NotNull EncodeContext<T_Encoded, T_To> context) throws EncodeException {
 				try {
-					return context.input(encodeMapper.apply(context.input)).encodeWith(AutoCoder.this);
+					return context.object(encodeMapper.apply(context.object)).encodeWith(AutoCoder.this);
 				}
 				catch (EncodeException | Error exception) {
 					throw exception;

@@ -74,14 +74,14 @@ public abstract class KeyDispatchCoder<T_Key, T_Decoded> extends NamedCoder<T_De
 
 	@Override
 	public <T_Encoded> @NotNull T_Encoded encode(@NotNull EncodeContext<T_Encoded, T_Decoded> context) throws EncodeException {
-		T_Decoded object = context.input;
+		T_Decoded object = context.object;
 		if (object == null) return context.empty();
 		T_Key key = this.getKey(object);
 		if (key == null) throw new EncodeException(() -> "No such key for " + object);
 		@SuppressWarnings("unchecked")
 		AutoCoder<T_Decoded> coder = (AutoCoder<T_Decoded>)(this.getCoder(key));
 		if (coder == null) throw new EncodeException(() -> "No such coder for key " + key);
-		return context.addToStringMap(context.encodeWith(coder), this.keyName, context.input(key).encodeWith(this.keyCoder));
+		return context.addToStringMap(context.encodeWith(coder), this.keyName, context.object(key).encodeWith(this.keyCoder));
 	}
 
 	/**

@@ -21,7 +21,7 @@ public interface AutoEncoder<T_Decoded> extends AutoHandler, KeyHolder {
 	public static final @NotNull ObjectArrayFactory<AutoEncoder<?>> ARRAY_FACTORY = new ObjectArrayFactory<>(AutoEncoder.class).generic();
 
 	/**
-	takes an instance of {@link T_Decoded} stored on {@link EncodeContext#input},
+	takes an instance of {@link T_Decoded} stored on {@link EncodeContext#object},
 	and encodes it into data. throws {@link EncodeException} if some
 	abnormal conditions prevent the object from being serialized.
 
@@ -68,7 +68,7 @@ public interface AutoEncoder<T_Decoded> extends AutoHandler, KeyHolder {
 			@Override
 			public <T_Encoded> @NotNull T_Encoded encode(@NotNull EncodeContext<T_Encoded, T_To> context) throws EncodeException {
 				try {
-					return context.input(mapper.apply(context.input)).encodeWith(AutoEncoder.this);
+					return context.object(mapper.apply(context.object)).encodeWith(AutoEncoder.this);
 				}
 				catch (EncodeException | Error exception) {
 					throw exception;
@@ -106,7 +106,7 @@ public interface AutoEncoder<T_Decoded> extends AutoHandler, KeyHolder {
 			@Override
 			public <T_Encoded> @NotNull T_Encoded encode(@NotNull EncodeContext<T_Encoded, T_To> context) throws EncodeException {
 				try {
-					return context.input(mapper.apply(context.input)).encodeWith(AutoEncoder.this);
+					return context.object(mapper.apply(context.object)).encodeWith(AutoEncoder.this);
 				}
 				catch (EncodeException | Error exception) {
 					throw exception;

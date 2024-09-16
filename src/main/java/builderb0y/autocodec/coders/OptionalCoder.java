@@ -33,9 +33,9 @@ public class OptionalCoder<T> extends NamedCoder<Optional<T>> {
 	@Override
 	@OverrideOnly
 	public <T_Encoded> @NotNull T_Encoded encode(@NotNull EncodeContext<T_Encoded, Optional<T>> context) throws EncodeException {
-		Optional<T> optional = context.input;
+		Optional<T> optional = context.object;
 		if (optional == null || optional.isEmpty()) return context.empty();
-		return context.input(optional.get()).encodeWith(this.coder);
+		return context.object(optional.get()).encodeWith(this.coder);
 	}
 
 	public static class Factory extends NamedCoderFactory {

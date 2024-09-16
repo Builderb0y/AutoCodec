@@ -56,17 +56,17 @@ public class ArrayCoder<T_DecodedElement, T_DecodedArray> extends NamedCoder<T_D
 	@OverrideOnly
 	@SuppressWarnings("unchecked")
 	public <T_Encoded> @NotNull T_Encoded encode(@NotNull EncodeContext<T_Encoded, T_DecodedArray> context) throws EncodeException {
-		T_DecodedArray from = context.input;
+		T_DecodedArray from = context.object;
 		if (from == null) return context.empty();
 		int length = Array.getLength(from);
 		if (this.singleton && length == 1) {
 			T_DecodedElement decodedElement = (T_DecodedElement)(Array.get(from, 0));
-			return context.input(decodedElement).encodeWith(this.elementCoder);
+			return context.object(decodedElement).encodeWith(this.elementCoder);
 		}
 		List<T_Encoded> to = new ArrayList<>(length);
 		for (int index = 0; index < length; index++) {
 			T_DecodedElement decodedElement = (T_DecodedElement)(Array.get(from, index));
-			to.add(context.input(decodedElement).encodeWith(this.elementCoder));
+			to.add(context.object(decodedElement).encodeWith(this.elementCoder));
 		}
 		return context.createList(to);
 	}
@@ -85,7 +85,7 @@ public class ArrayCoder<T_DecodedElement, T_DecodedArray> extends NamedCoder<T_D
 		public <T_HandledType> @Nullable AutoCoder<?> tryCreate(@NotNull FactoryContext<T_HandledType> context) throws FactoryException {
 			ReifiedType<?> componentType = context.type.getArrayComponentType();
 			if (componentType != null) {
-				Class<?> componentClass = componentType.getBoundOrSelf().getRawClass();
+				Class<?> componentClass = componentType.getRawClass();
 				if (componentClass == null) {
 					throw new FactoryException("Failed to get array component class of " + componentType + " (array type: " + context.type + ')');
 				}

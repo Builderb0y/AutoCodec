@@ -82,7 +82,7 @@ public class IntRangeVerifier implements AutoVerifier<Number> {
 		@Override
 		@OverrideOnly
 		public <T_HandledType> @Nullable AutoVerifier<?> tryCreate(@NotNull FactoryContext<T_HandledType> context) throws FactoryException {
-			Class<? super T_HandledType> clazz = context.type.getUpperBoundOrSelf().getRawClass();
+			Class<? super T_HandledType> clazz = context.type.getRawClass();
 			if (clazz != null && (PRIMITIVE_NUMBER_CLASSES.contains(clazz) || Number.class.isAssignableFrom(clazz))) {
 				VerifyIntRange range = context.type.getAnnotations().getFirst(VerifyIntRange.class);
 				if (range != null) {

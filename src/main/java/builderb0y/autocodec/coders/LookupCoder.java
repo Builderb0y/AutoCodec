@@ -84,11 +84,11 @@ public class LookupCoder<T_Key, T_Value> extends NamedCoder<T_Value> {
 
 	@Override
 	public <T_Encoded> @NotNull T_Encoded encode(@NotNull EncodeContext<T_Encoded, T_Value> context) throws EncodeException {
-		T_Value input = context.input;
-		if (input == null) return context.empty();
-		T_Key key = this.encode.get(input);
-		if (key == null) throw new EncodeException(() -> "Unknown value: " + input);
-		return context.input(key).encodeWith(this.keyCoder);
+		T_Value object = context.object;
+		if (object == null) return context.empty();
+		T_Key key = this.encode.get(object);
+		if (key == null) throw new EncodeException(() -> "Unknown value: " + object);
+		return context.object(key).encodeWith(this.keyCoder);
 	}
 
 	@Override

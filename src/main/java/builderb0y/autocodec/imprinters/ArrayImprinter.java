@@ -109,7 +109,7 @@ public abstract class ArrayImprinter<T_DecodedElement, T_DecodedArray> extends N
 		public <T_HandledType> @Nullable AutoImprinter<?> tryCreate(@NotNull FactoryContext<T_HandledType> context) throws FactoryException {
 			ReifiedType<?> componentType = context.type.getArrayComponentType();
 			if (componentType != null) {
-				Class<?> componentClass = componentType.getBoundOrSelf().getRawClass();
+				Class<?> componentClass = componentType.getRawClass();
 				if (componentClass != null) {
 					AutoDecoder<?> componentDecoder = context.type(componentType).forceCreateDecoder();
 					boolean singleton = context.type.getAnnotations().has(SingletonArray.class);

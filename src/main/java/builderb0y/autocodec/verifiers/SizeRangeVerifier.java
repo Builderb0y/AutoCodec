@@ -135,7 +135,7 @@ public class SizeRangeVerifier<T_Collection> implements AutoVerifier<T_Collectio
 				sizeGetter = SizeGetter.ARRAY;
 			}
 			else {
-				Class<? super T_HandledType> clazz = context.type.getUpperBoundOrSelf().getRawClass();
+				Class<? super T_HandledType> clazz = context.type.getRawClass();
 				if (clazz == null) return null;
 
 				if (CharSequence.class.isAssignableFrom(clazz)) {

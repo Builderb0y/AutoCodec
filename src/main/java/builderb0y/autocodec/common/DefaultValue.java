@@ -302,7 +302,7 @@ public interface DefaultValue {
 			catch (Throwable throwable) {
 				throw new EncodeException(throwable);
 			}
-			T_Encoded defaultValue = context.input(defaultObject).encodeWith(encoder);
+			T_Encoded defaultValue = context.object(defaultObject).encodeWith(encoder);
 			if (actualValue.equals(defaultValue)) return context.empty();
 			return actualValue;
 		}

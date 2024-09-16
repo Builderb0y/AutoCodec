@@ -8,6 +8,7 @@ import java.lang.reflect.RecordComponent;
 
 import com.google.common.collect.ObjectArrays;
 import it.unimi.dsi.fastutil.Hash;
+import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -129,15 +130,14 @@ public abstract class FieldLikeMemberView<T_Owner, T_Member> extends MemberView<
 	this method exists solely to avoid duplicated code when reifying the member type.
 	{@link #getType()} should always be used instead of this method.
 	*/
-	@Deprecated
-	@SuppressWarnings("DeprecatedIsStillUsed")
-	protected abstract @NotNull AnnotatedType _getAnnotatedType();
+	@Internal
+	public abstract @NotNull AnnotatedType getAnnotatedType();
 
-	@SuppressWarnings({ "unchecked", "deprecation" })
+	@SuppressWarnings("unchecked")
 	public @NotNull ReifiedType<T_Member> getType() {
 		ReifiedType<T_Member> type = this.type;
 		if (type == null) {
-			this.type = type = (ReifiedType<T_Member>)(this.getDeclaringType().resolveDeclaration(this._getAnnotatedType()));
+			this.type = type = (ReifiedType<T_Member>)(this.getDeclaringType().resolveDeclaration(this.getAnnotatedType()));
 		}
 		return type;
 	}

@@ -26,11 +26,11 @@ public class MapEncoder<T_Key, T_Value, T_Map extends Map<T_Key, T_Value>> exten
 	@Override
 	@OverrideOnly
 	public <T_Encoded> @NotNull T_Encoded encode(@NotNull EncodeContext<T_Encoded, T_Map> context) throws EncodeException {
-		if (context.input == null) return context.empty();
+		if (context.object == null) return context.empty();
 		return context.createGenericMap(
-			context.input.entrySet().stream().map((Map.Entry<T_Key, T_Value> entry) -> Pair.of(
-				context.input(entry.getKey  ()).encodeWith(this.  keyEncoder),
-				context.input(entry.getValue()).encodeWith(this.valueEncoder)
+			context.object.entrySet().stream().map((Map.Entry<T_Key, T_Value> entry) -> Pair.of(
+				context.object(entry.getKey  ()).encodeWith(this.  keyEncoder),
+				context.object(entry.getValue()).encodeWith(this.valueEncoder)
 			))
 		);
 	}
@@ -42,7 +42,7 @@ public class MapEncoder<T_Key, T_Value, T_Map extends Map<T_Key, T_Value>> exten
 		@Override
 		@OverrideOnly
 		public <T_HandledType> @Nullable AutoEncoder<?> tryCreate(@NotNull FactoryContext<T_HandledType> context) throws FactoryException {
-			ReifiedType<?>[] keyValueTypes = context.type.getUpperBoundOrSelf().resolveParameters(Map.class);
+			ReifiedType<?>[] keyValueTypes = context.type.resolveParameters(Map.class);
 			if (keyValueTypes != null) {
 				AutoEncoder<?>   keyEncoder = context.type(keyValueTypes[0]).forceCreateEncoder();
 				AutoEncoder<?> valueEncoder = context.type(keyValueTypes[1]).forceCreateEncoder();

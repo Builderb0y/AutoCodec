@@ -63,11 +63,11 @@ public class EnumCoder<T_DecodedEnum extends Enum<T_DecodedEnum>> extends NamedC
 
 	@Override
 	public <T_Encoded> @NotNull T_Encoded encode(@NotNull EncodeContext<T_Encoded, T_DecodedEnum> context) throws EncodeException {
-		if (context.input == null) return context.empty();
+		if (context.object == null) return context.empty();
 		return (
 			context.isCompressed()
-			? context.createInt(context.input.ordinal())
-			: context.createString(this.enumName.getEnumName(context.input))
+			? context.createInt(context.object.ordinal())
+			: context.createString(this.enumName.getEnumName(context.object))
 		);
 	}
 
@@ -88,7 +88,7 @@ public class EnumCoder<T_DecodedEnum extends Enum<T_DecodedEnum>> extends NamedC
 		@OverrideOnly
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		public <T_HandledType> @Nullable AutoCoder<?> tryCreate(@NotNull FactoryContext<T_HandledType> context) throws FactoryException {
-			Class<?> rawClass = context.type.getBoundOrSelf().getRawClass();
+			Class<?> rawClass = context.type.getRawClass();
 			if (rawClass != null && rawClass.isEnum()) {
 				return new EnumCoder(rawClass, this.nameGetter);
 			}

@@ -13,15 +13,15 @@ public class EncodeContext<T_Encoded, T_Decoded> extends DynamicOpsContext<T_Enc
 
 	public static final @NotNull ObjectArrayFactory<EncodeContext<?, ?>> ARRAY_FACTORY = new ObjectArrayFactory<>(EncodeContext.class).generic();
 
-	public final @Nullable T_Decoded input;
+	public final @Nullable T_Decoded object;
 
 	public EncodeContext(
 		@NotNull AutoCodec codec,
-		@Nullable T_Decoded input,
+		@Nullable T_Decoded object,
 		@NotNull DynamicOps<T_Encoded> ops
 	) {
 		super(codec, ops);
-		this.input = input;
+		this.object = object;
 	}
 
 	@Override
@@ -30,9 +30,9 @@ public class EncodeContext<T_Encoded, T_Decoded> extends DynamicOpsContext<T_Enc
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T_NewDecoded> EncodeContext<T_Encoded, T_NewDecoded> input(@Nullable T_NewDecoded newInput) {
-		if (this.input == newInput) return (EncodeContext<T_Encoded, T_NewDecoded>)(this);
-		return new EncodeContext<>(this.autoCodec, newInput, this.ops);
+	public <T_NewDecoded> EncodeContext<T_Encoded, T_NewDecoded> object(@Nullable T_NewDecoded newObject) {
+		if (this.object == newObject) return (EncodeContext<T_Encoded, T_NewDecoded>)(this);
+		return new EncodeContext<>(this.autoCodec, newObject, this.ops);
 	}
 
 	//////////////// other ////////////////
@@ -43,6 +43,6 @@ public class EncodeContext<T_Encoded, T_Decoded> extends DynamicOpsContext<T_Enc
 
 	@Override
 	public String toString() {
-		return this.getClass().getSimpleName() + ": { input: " + this.input + ", ops: " + this.ops + " }";
+		return this.getClass().getSimpleName() + ": { object: " + this.object + ", ops: " + this.ops + " }";
 	}
 }

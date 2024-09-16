@@ -281,7 +281,7 @@ public class MultiFieldImprinter<T_Decoded> extends NamedImprinter<T_Decoded> {
 		public <T_HandledType> @Nullable AutoImprinter<T_HandledType> tryCreate(@NotNull FactoryContext<T_HandledType> context) throws FactoryException {
 			FieldLikeMemberView<T_HandledType, ?>[] fields = (
 				context
-				.reflect(context.type.getLowerBoundOrSelf())
+				.reflect(context.type)
 				.searchFields(
 					true,
 					new FieldPredicate().notStatic(),

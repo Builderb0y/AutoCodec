@@ -38,7 +38,7 @@ public class MultiFieldEncoder<T_Decoded> extends NamedEncoder<T_Decoded> {
 	@Override
 	@OverrideOnly
 	public <T_Encoded> @NotNull T_Encoded encode(@NotNull EncodeContext<T_Encoded, T_Decoded> context) throws EncodeException {
-		if (context.input == null) return context.empty();
+		if (context.object == null) return context.empty();
 		Map<T_Encoded, T_Encoded> map = new LinkedHashMap<>(this.fields.length);
 		for (FieldStrategy<T_Decoded, ?> field : this.fields) {
 			field.encodeOnto(context, map);
@@ -107,9 +107,9 @@ public class MultiFieldEncoder<T_Decoded> extends NamedEncoder<T_Decoded> {
 			@NotNull Map<@NotNull T_Encoded, @NotNull T_Encoded> map
 		)
 			throws EncodeException {
-			T_Member member = this.getter.get(context.input);
+			T_Member member = this.getter.get(context.object);
 			if (member == null) return;
-			EncodeContext<T_Encoded, T_Member> memberContext = context.input(member);
+			EncodeContext<T_Encoded, T_Member> memberContext = context.object(member);
 			T_Encoded encodedMember = memberContext.encodeWith(this.coder);
 			if (!Objects.equals(encodedMember, context.ops.empty())) {
 				if (this.inline) {

@@ -3,6 +3,7 @@ package builderb0y.autocodec.reflection.memberViews;
 import java.lang.invoke.MethodHandle;
 import java.lang.reflect.AnnotatedType;
 
+import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
 
 import builderb0y.autocodec.common.ReflectContextProvider;
@@ -51,8 +52,8 @@ public class PseudoFieldView<T_Owner, T_Member> extends FieldLikeMemberView<T_Ow
 	}
 
 	@Override
-	@Deprecated
-	protected @NotNull AnnotatedType _getAnnotatedType() {
+	@Internal
+	public @NotNull AnnotatedType getAnnotatedType() {
 		return this.field.annotatedType;
 	}
 }

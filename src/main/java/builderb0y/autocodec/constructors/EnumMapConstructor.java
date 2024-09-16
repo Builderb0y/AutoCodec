@@ -35,7 +35,7 @@ public class EnumMapConstructor<K extends Enum<K>, V> extends NamedConstructor<E
 		@Override
 		@OverrideOnly
 		public <T_HandledType> @Nullable AutoConstructor<?> tryCreate(@NotNull FactoryContext<T_HandledType> context) throws FactoryException {
-			ReifiedType<?> keyType = context.type.getLowerBoundOrSelf().resolveParameter(EnumMap.class);
+			ReifiedType<?> keyType = context.type.resolveParameter(EnumMap.class);
 			if (keyType != null) {
 				Class<?> keyClass;
 				if ((keyClass = keyType.getRawClass()) == null || !keyClass.isEnum()) {

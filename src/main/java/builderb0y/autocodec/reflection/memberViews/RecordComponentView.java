@@ -5,6 +5,7 @@ import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.RecordComponent;
 
+import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
 
 import builderb0y.autocodec.annotations.UseGetter;
@@ -70,8 +71,8 @@ public class RecordComponentView<T_Owner, T_Member> extends FieldLikeMemberView<
 	}
 
 	@Override
-	@Deprecated
-	protected @NotNull AnnotatedType _getAnnotatedType() {
+	@Internal
+	public @NotNull AnnotatedType getAnnotatedType() {
 		/**
 		workaround for a bug in javac:
 		if the record component's type is an annotated *inner* class,

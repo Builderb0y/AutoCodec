@@ -55,19 +55,19 @@ public class PatternCoder extends NamedCoder<Pattern> {
 	@Override
 	@OverrideOnly
 	public <T_Encoded> @NotNull T_Encoded encode(@NotNull EncodeContext<T_Encoded, Pattern> context) throws EncodeException {
-		if (context.input == null) return context.empty();
-		if (context.input.flags() == 0) return context.createString(context.input.pattern());
+		if (context.object == null) return context.empty();
+		if (context.object.flags() == 0) return context.createString(context.object.pattern());
 		Map<T_Encoded, T_Encoded> map = new Object2ObjectArrayMap<>(2);
-		map.put(context.createString("pattern"), context.createString(context.input.pattern()));
+		map.put(context.createString("pattern"), context.createString(context.object.pattern()));
 		if (context.isCompressed()) {
-			map.put(context.createString("flags"), context.createInt(context.input.flags()));
+			map.put(context.createString("flags"), context.createInt(context.object.flags()));
 		}
 		else {
-			int flags = context.input.flags();
+			int flags = context.object.flags();
 			List<T_Encoded> list = new ArrayList<>(Integer.bitCount(flags));
 			for (PatternFlags flag : PatternFlags.VALUES) {
 				if ((flags & flag.flag) != 0) {
-					list.add(context.input(flag).encodeWith(this.flagsCoder));
+					list.add(context.object(flag).encodeWith(this.flagsCoder));
 				}
 			}
 			map.put(context.createString("flags"), context.createList(list));

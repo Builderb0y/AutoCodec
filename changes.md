@@ -28,3 +28,5 @@ Only AutoCoder's support verification now. Or at least, this is now the default 
 * Removed MultiLine.INSTANCE, because MultiLine now allows you to configure the line endings, so there's not just one possible MultiLine instance anymore.
 
 ## Other changes
+
+* Renamed the "input" field on EncodeContext to "object" for consistency, as AutoVerifier names the T_Decoded field "object" too, and DecodeContext uses the name "input" for encoded data, not decoded objects.

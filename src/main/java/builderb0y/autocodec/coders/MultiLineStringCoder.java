@@ -51,7 +51,7 @@ public class MultiLineStringCoder extends NamedCoder<@MultiLine String> {
 
 	@Override
 	public <T_Encoded> @NotNull T_Encoded encode(@NotNull EncodeContext<T_Encoded, @MultiLine String> context) throws EncodeException {
-		String string = context.input;
+		String string = context.object;
 		if (string == null) return context.empty();
 		int index = string.indexOf(this.lineSeparator);
 		if (index < 0) return context.createString(string);
@@ -68,7 +68,7 @@ public class MultiLineStringCoder extends NamedCoder<@MultiLine String> {
 				break;
 			}
 		}
-		return context.createList(lines.build().map((String line) -> context.input(line).encodeWith(this.fallback)));
+		return context.createList(lines.build().map((String line) -> context.object(line).encodeWith(this.fallback)));
 	}
 
 	public static class Factory extends NamedCoderFactory {

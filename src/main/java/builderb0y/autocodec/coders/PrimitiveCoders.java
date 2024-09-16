@@ -37,7 +37,7 @@ public class PrimitiveCoders {
 		@Override
 		@OverrideOnly
 		public <T_Encoded> @NotNull T_Encoded encode(@NotNull EncodeContext<T_Encoded, Byte> context) throws EncodeException {
-			return context.input == null ? context.empty() : context.createByte(context.input.byteValue());
+			return context.object == null ? context.empty() : context.createByte(context.object.byteValue());
 		}
 	};
 
@@ -55,7 +55,7 @@ public class PrimitiveCoders {
 		@Override
 		@OverrideOnly
 		public <T_Encoded> @NotNull T_Encoded encode(@NotNull EncodeContext<T_Encoded, Short> context) throws EncodeException {
-			return context.input == null ? context.empty() : context.createShort(context.input.shortValue());
+			return context.object == null ? context.empty() : context.createShort(context.object.shortValue());
 		}
 	};
 
@@ -73,7 +73,7 @@ public class PrimitiveCoders {
 		@Override
 		@OverrideOnly
 		public <T_Encoded> @NotNull T_Encoded encode(@NotNull EncodeContext<T_Encoded, Integer> context) throws EncodeException {
-			return context.input == null ? context.empty() : context.createInt(context.input.intValue());
+			return context.object == null ? context.empty() : context.createInt(context.object.intValue());
 		}
 	};
 
@@ -91,7 +91,7 @@ public class PrimitiveCoders {
 		@Override
 		@OverrideOnly
 		public <T_Encoded> @NotNull T_Encoded encode(@NotNull EncodeContext<T_Encoded, Long> context) throws EncodeException {
-			return context.input == null ? context.empty() : context.createLong(context.input.longValue());
+			return context.object == null ? context.empty() : context.createLong(context.object.longValue());
 		}
 	};
 
@@ -109,7 +109,7 @@ public class PrimitiveCoders {
 		@Override
 		@OverrideOnly
 		public <T_Encoded> @NotNull T_Encoded encode(@NotNull EncodeContext<T_Encoded, Float> context) throws EncodeException {
-			return context.input == null ? context.empty() : context.createFloat(context.input.floatValue());
+			return context.object == null ? context.empty() : context.createFloat(context.object.floatValue());
 		}
 	};
 
@@ -127,7 +127,7 @@ public class PrimitiveCoders {
 		@Override
 		@OverrideOnly
 		public <T_Encoded> @NotNull T_Encoded encode(@NotNull EncodeContext<T_Encoded, Double> context) throws EncodeException {
-			return context.input == null ? context.empty() : context.createDouble(context.input.doubleValue());
+			return context.object == null ? context.empty() : context.createDouble(context.object.doubleValue());
 		}
 	};
 
@@ -143,7 +143,7 @@ public class PrimitiveCoders {
 		@Override
 		@OverrideOnly
 		public <T_Encoded> @NotNull T_Encoded encode(@NotNull EncodeContext<T_Encoded, Number> context) throws EncodeException {
-			return context.input == null ? context.empty() : context.createNumber(context.input);
+			return context.object == null ? context.empty() : context.createNumber(context.object);
 		}
 	};
 
@@ -163,10 +163,10 @@ public class PrimitiveCoders {
 		@Override
 		@OverrideOnly
 		public <T_Encoded> @NotNull T_Encoded encode(@NotNull EncodeContext<T_Encoded, Character> context) throws EncodeException {
-			return context.input == null ? context.empty() : (
+			return context.object == null ? context.empty() : (
 			context.isCompressed()
-				? context.createShort((short)(context.input.charValue()))
-				: context.createString(String.valueOf(context.input.charValue()))
+				? context.createShort((short)(context.object.charValue()))
+				: context.createString(String.valueOf(context.object.charValue()))
 			);
 		}
 	};
@@ -183,7 +183,7 @@ public class PrimitiveCoders {
 		@Override
 		@OverrideOnly
 		public <T_Encoded> @NotNull T_Encoded encode(@NotNull EncodeContext<T_Encoded, String> context) throws EncodeException {
-			return context.input == null ? context.empty() : context.createString(context.input);
+			return context.object == null ? context.empty() : context.createString(context.object);
 		}
 	};
 
@@ -199,7 +199,7 @@ public class PrimitiveCoders {
 		@Override
 		@OverrideOnly
 		public <T_Encoded> @NotNull T_Encoded encode(@NotNull EncodeContext<T_Encoded, Boolean> context) throws EncodeException {
-			return context.input == null ? context.empty() : context.createBoolean(context.input.booleanValue());
+			return context.object == null ? context.empty() : context.createBoolean(context.object.booleanValue());
 		}
 	};
 

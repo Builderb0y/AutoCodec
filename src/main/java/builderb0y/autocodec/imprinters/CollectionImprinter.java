@@ -55,7 +55,7 @@ public class CollectionImprinter<T_Element, T_Collection extends Collection<T_El
 		@Override
 		@OverrideOnly
 		public <T_HandledType> @Nullable AutoImprinter<?> tryCreate(@NotNull FactoryContext<T_HandledType> context) throws FactoryException {
-			ReifiedType<?> elementType = context.type.getUpperBoundOrSelf().resolveParameter(Collection.class);
+			ReifiedType<?> elementType = context.type.resolveParameter(Collection.class);
 			if (elementType != null) {
 				AutoDecoder<?> elementDecoder = context.type(elementType).forceCreateDecoder();
 				boolean singleton = context.type.getAnnotations().has(SingletonArray.class);

@@ -35,7 +35,7 @@ public class EnumSetConstructor<E extends Enum<E>> extends NamedConstructor<Enum
 		@Override
 		@OverrideOnly
 		public <T_HandledType> @Nullable AutoConstructor<?> tryCreate(@NotNull FactoryContext<T_HandledType> context) throws FactoryException {
-			ReifiedType<?> elementType = context.type.getLowerBoundOrSelf().resolveParameter(EnumSet.class);
+			ReifiedType<?> elementType = context.type.resolveParameter(EnumSet.class);
 			if (elementType != null) {
 				Class<?> elementClass;
 				if ((elementClass = elementType.getRawClass()) == null || !elementClass.isEnum()) {
