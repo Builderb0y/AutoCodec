@@ -28,7 +28,6 @@ public class EncoderFactoryList extends FactoryList<AutoEncoder<?>, EncoderFacto
 		this.addFactoriesToEnd(
 			CollectionEncoder.Factory.INSTANCE,
 			MapEncoder.Factory.INSTANCE,
-			PatternEncoder.Factory.INSTANCE,
 			MultiFieldEncoder.Factory.INSTANCE
 		);
 	}
