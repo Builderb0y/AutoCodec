@@ -1,8 +1,5 @@
 package builderb0y.autocodec.common;
 
-import java.lang.invoke.LambdaMetafactory;
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodType;
 import java.util.function.Predicate;
 
 import org.jetbrains.annotations.ApiStatus.OverrideOnly;
@@ -20,7 +17,18 @@ import builderb0y.autocodec.reflection.reification.ReifiedType;
 import builderb0y.autocodec.util.NamedPredicate;
 import builderb0y.autocodec.util.TypeFormatter;
 
-public abstract class UseHandlerFactory<T_Handler extends AutoHandler> extends NamedFactory<T_Handler> {
+public abstract class UseHandlerFactory0<T_Handler extends AutoHandler> extends NamedFactory<T_Handler> {
+
+	public final Class<? super T_Handler> handlerClass;
+	public final Class<? extends AutoFactory<T_Handler>> factoryClass;
+
+	public UseHandlerFactory0(
+		Class<? super T_Handler> handlerClass,
+		Class<? extends AutoFactory<T_Handler>> factoryClass
+	) {
+		this.handlerClass = handlerClass;
+		this.factoryClass = factoryClass;
+	}
 
 	@Override
 	@OverrideOnly
@@ -36,12 +44,12 @@ public abstract class UseHandlerFactory<T_Handler extends AutoHandler> extends N
 		try {
 			context.logger().logMessage(spec);
 			return switch (spec.usage()) {
-				case FIELD_CONTAINS_HANDLER -> this.createFieldContainingHandler(context, this.findFieldContainingHandler(context, spec));
-				case FIELD_CONTAINS_FACTORY -> this.createFieldContainingFactory(context, this.findFieldContainingFactory(context, spec));
-				case METHOD_RETURNS_HANDLER -> this.createMethodReturningHandler(context, this.findMethodReturningHandler(context, spec));
-				case METHOD_RETURNS_FACTORY -> this.createMethodReturningFactory(context, this.findMethodReturningFactory(context, spec));
-				case METHOD_IS_HANDLER      -> this.createMethodBeingHandler    (context, this.findMethodBeingHandler    (context, spec));
-				case METHOD_IS_FACTORY      -> this.createMethodBeingFactory    (context, this.findMethodBeingFactory    (context, spec));
+				case FIELD_CONTAINS_HANDLER -> this.createFieldContainingHandler(context, spec);
+				case FIELD_CONTAINS_FACTORY -> this.createFieldContainingFactory(context, spec);
+				case METHOD_RETURNS_HANDLER -> this.createMethodReturningHandler(context, spec);
+				case METHOD_RETURNS_FACTORY -> this.createMethodReturningFactory(context, spec);
+				case METHOD_IS_HANDLER      -> this.createMethodBeingHandler    (context, spec);
+				case METHOD_IS_FACTORY      -> this.createMethodBeingFactory    (context, spec);
 			};
 		}
 		catch (FactoryException | Error exception) {
@@ -54,19 +62,8 @@ public abstract class UseHandlerFactory<T_Handler extends AutoHandler> extends N
 
 	public abstract <T_HandledType> @Nullable UseSpec getSpec(@NotNull FactoryContext<T_HandledType> context);
 
-	public static record Classes<T_Handler extends AutoHandler>(
-		Class<? super T_Handler> handler,
-		Class<? extends AutoFactory<T_Handler>> factory,
-		@SuppressWarnings("rawtypes") //B<X> extends A<X> -/> Class<B> is assignable to Class<? extends A<?>>.
-		Class<? extends DynamicOpsContext> context,
-		Class<?> handlerResult,
-		String implementedMethod
-	) {}
-
-	public abstract @NotNull Classes<T_Handler> classes();
-
 	public @NotNull Predicate<ReifiedType<?>> matchHandler(@NotNull ReifiedType<?> handledType, boolean strict) {
-		Class<? super T_Handler> handlerClass = this.classes().handler;
+		Class<? super T_Handler> handlerClass = this.handlerClass;
 		return (
 			strict
 			? new NamedPredicate<>(
@@ -81,7 +78,7 @@ public abstract class UseHandlerFactory<T_Handler extends AutoHandler> extends N
 	}
 
 	public @NotNull Predicate<ReifiedType<?>> matchFactory() {
-		Class<? super T_Handler> handlerClass = this.classes().handler;
+		Class<? super T_Handler> handlerClass = this.handlerClass;
 		return new NamedPredicate<>(
 			(ReifiedType<?> type) -> {
 				ReifiedType<?> resolution = type.resolveParameter(AutoFactory.class);
@@ -147,8 +144,6 @@ public abstract class UseHandlerFactory<T_Handler extends AutoHandler> extends N
 		);
 	}
 
-	public abstract @NotNull MethodLikeMemberView<?, ?> findMethodBeingHandler(@NotNull FactoryContext<?> context, @NotNull UseSpec spec);
-
 	public @NotNull MethodLikeMemberView<?, ?> findMethodBeingFactory(@NotNull FactoryContext<?> context, @NotNull UseSpec spec) {
 		return context.reflect(spec.in()).searchMethods(
 			false,
@@ -162,53 +157,43 @@ public abstract class UseHandlerFactory<T_Handler extends AutoHandler> extends N
 		);
 	}
 
-	public @NotNull T_Handler createFieldContainingHandler(@NotNull FactoryContext<?> context, @NotNull FieldLikeMemberView<?, ?> field) throws Throwable {
+	public @NotNull T_Handler createFieldContainingHandler(@NotNull FactoryContext<?> context, @NotNull UseSpec spec) throws Throwable {
+		FieldLikeMemberView<?, ?> field = this.findFieldContainingHandler(context, spec);
 		@SuppressWarnings("unchecked")
 		T_Handler handler = (T_Handler)(field.createStaticReader(context).get());
 		if (handler == null) throw new FactoryException(field + " was null.");
 		return handler;
 	}
 
-	public @NotNull T_Handler createFieldContainingFactory(@NotNull FactoryContext<?> context, @NotNull FieldLikeMemberView<?, ?> field) throws Throwable {
+	public @NotNull T_Handler createFieldContainingFactory(@NotNull FactoryContext<?> context, @NotNull UseSpec spec) throws Throwable {
+		FieldLikeMemberView<?, ?> field = this.findFieldContainingFactory(context, spec);
 		@SuppressWarnings("unchecked")
 		AutoFactory<T_Handler> factory = (AutoFactory<T_Handler>)(field.createStaticReader(context).get());
 		if (factory == null) throw new FactoryException(field + " was null.");
 		return factory.forceCreate(context);
 	}
 
-	public @NotNull T_Handler createMethodReturningHandler(@NotNull FactoryContext<?> context, @NotNull MethodLikeMemberView<?, ?> method) throws Throwable {
+	public @NotNull T_Handler createMethodReturningHandler(@NotNull FactoryContext<?> context, @NotNull UseSpec spec) throws Throwable {
+		MethodLikeMemberView<?, ?> method = this.findMethodReturningHandler(context, spec);
 		@SuppressWarnings("unchecked")
 		T_Handler handler = (T_Handler)(method.createMethodHandle(context).invoke());
 		if (handler == null) throw new FactoryException(method + " returned null.");
 		return handler;
 	}
 
-	public @NotNull T_Handler createMethodReturningFactory(@NotNull FactoryContext<?> context, @NotNull MethodLikeMemberView<?, ?> method) throws Throwable {
+	public @NotNull T_Handler createMethodReturningFactory(@NotNull FactoryContext<?> context, @NotNull UseSpec spec) throws Throwable {
+		MethodLikeMemberView<?, ?> method = this.findMethodReturningFactory(context, spec);
 		@SuppressWarnings("unchecked")
 		AutoFactory<T_Handler> factory = (AutoFactory<T_Handler>)(method.createMethodHandle(context).invoke());
 		if (factory == null) throw new FactoryException(method + " returned null.");
 		return factory.forceCreate(context);
 	}
 
-	@SuppressWarnings("unchecked")
-	public @NotNull T_Handler createMethodBeingHandler(@NotNull FactoryContext<?> context, @NotNull MethodLikeMemberView<?, ?> method) throws Throwable {
-		MethodHandle handle = method.createMethodHandle(context);
-		return (T_Handler)(
-			LambdaMetafactory.metafactory(
-				context.reflect(method.getDeclaringType()).lookup(),
-				this.classes().implementedMethod,
-				MethodType.methodType(this.classes().handler),
-				MethodType.methodType(this.classes().handlerResult, this.classes().context),
-				handle,
-				handle.type()
-			)
-			.getTarget()
-			.invoke()
-		);
-	}
+	public abstract @NotNull T_Handler createMethodBeingHandler(@NotNull FactoryContext<?> context, @NotNull UseSpec spec) throws Throwable;
 
 	@SuppressWarnings("unchecked")
-	public @NotNull T_Handler createMethodBeingFactory(@NotNull FactoryContext<?> context, @NotNull MethodLikeMemberView<?, ?> method) throws Throwable {
+	public @NotNull T_Handler createMethodBeingFactory(@NotNull FactoryContext<?> context, @NotNull UseSpec spec) throws Throwable {
+		MethodLikeMemberView<?, ?> method = this.findMethodBeingFactory(context, spec);
 		T_Handler handler = (T_Handler)(method.createMethodHandle(context).invoke(context));
 		if (handler == null) throw new FactoryException(method + " returned null.");
 		return handler;

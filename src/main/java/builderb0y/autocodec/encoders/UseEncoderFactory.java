@@ -7,7 +7,7 @@ import org.jetbrains.annotations.Nullable;
 
 import builderb0y.autocodec.common.FactoryContext;
 import builderb0y.autocodec.common.UseSpec;
-import builderb0y.autocodec.common.UseHandlerFactory;
+import builderb0y.autocodec.common.UseHandlerFactory1;
 import builderb0y.autocodec.encoders.AutoEncoder.EncoderFactory;
 import builderb0y.autocodec.reflection.MemberCollector;
 import builderb0y.autocodec.reflection.MethodPredicate;
@@ -15,10 +15,13 @@ import builderb0y.autocodec.reflection.memberViews.MethodLikeMemberView;
 import builderb0y.autocodec.reflection.reification.ReifiedType;
 import builderb0y.autocodec.util.NamedPredicate;
 
-public class UseEncoderFactory extends UseHandlerFactory<AutoEncoder<?>> implements EncoderFactory {
+public class UseEncoderFactory extends UseHandlerFactory1<AutoEncoder<?>> implements EncoderFactory {
 
-	public static final @NotNull Classes<AutoEncoder<?>> CLASSES = new Classes<>(AutoEncoder.class, EncoderFactory.class, EncodeContext.class, Object.class, "encode");
 	public static final @NotNull UseEncoderFactory INSTANCE = new UseEncoderFactory();
+
+	public UseEncoderFactory() {
+		super(AutoEncoder.class, EncoderFactory.class, EncodeContext.class, Object.class, "encode");
+	}
 
 	@Override
 	public <T_HandledType> @Nullable UseSpec getSpec(@NotNull FactoryContext<T_HandledType> context) {
@@ -26,12 +29,11 @@ public class UseEncoderFactory extends UseHandlerFactory<AutoEncoder<?>> impleme
 	}
 
 	@Override
-	public @NotNull Classes<AutoEncoder<?>> classes() {
-		return CLASSES;
+	public @NotNull MethodLikeMemberView<?, ?> findMethodBeingHandler(@NotNull FactoryContext<?> context, @NotNull UseSpec spec) {
+		return findMethodBeingEncoder(context, spec);
 	}
 
-	@Override
-	public @NotNull MethodLikeMemberView<?, ?> findMethodBeingHandler(@NotNull FactoryContext<?> context, @NotNull UseSpec spec) {
+	public static @NotNull MethodLikeMemberView<?, ?> findMethodBeingEncoder(@NotNull FactoryContext<?> context, @NotNull UseSpec spec) {
 		return context.reflect(spec.in()).searchMethods(
 			false,
 			new MethodPredicate()

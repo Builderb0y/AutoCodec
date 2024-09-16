@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import builderb0y.autocodec.common.FactoryContext;
-import builderb0y.autocodec.common.UseHandlerFactory;
+import builderb0y.autocodec.common.UseHandlerFactory1;
 import builderb0y.autocodec.common.UseSpec;
 import builderb0y.autocodec.imprinters.AutoImprinter.ImprinterFactory;
 import builderb0y.autocodec.reflection.MemberCollector;
@@ -15,19 +15,17 @@ import builderb0y.autocodec.reflection.memberViews.MethodLikeMemberView;
 import builderb0y.autocodec.reflection.reification.ReifiedType;
 import builderb0y.autocodec.util.NamedPredicate;
 
-public class UseImprinterFactory extends UseHandlerFactory<AutoImprinter<?>> implements ImprinterFactory {
+public class UseImprinterFactory extends UseHandlerFactory1<AutoImprinter<?>> implements ImprinterFactory {
 
-	public static final @NotNull Classes<AutoImprinter<?>> CLASSES = new Classes<>(AutoImprinter.class, ImprinterFactory.class, ImprintContext.class, void.class, "imprint");
 	public static final @NotNull UseImprinterFactory INSTANCE = new UseImprinterFactory();
+
+	public UseImprinterFactory() {
+		super(AutoImprinter.class, ImprinterFactory.class, ImprintContext.class, void.class, "imprint");
+	}
 
 	@Override
 	public <T_HandledType> @Nullable UseSpec getSpec(@NotNull FactoryContext<T_HandledType> context) {
 		return UseSpec.fromUseImprinter(context.type);
-	}
-
-	@Override
-	public @NotNull Classes<AutoImprinter<?>> classes() {
-		return CLASSES;
 	}
 
 	@Override

@@ -6,8 +6,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import builderb0y.autocodec.common.FactoryContext;
+import builderb0y.autocodec.common.UseHandlerFactory1;
 import builderb0y.autocodec.common.UseSpec;
-import builderb0y.autocodec.common.UseHandlerFactory;
 import builderb0y.autocodec.decoders.AutoDecoder.DecoderFactory;
 import builderb0y.autocodec.reflection.MemberCollector;
 import builderb0y.autocodec.reflection.MethodPredicate;
@@ -15,10 +15,13 @@ import builderb0y.autocodec.reflection.memberViews.MethodLikeMemberView;
 import builderb0y.autocodec.reflection.reification.ReifiedType;
 import builderb0y.autocodec.util.NamedPredicate;
 
-public class UseDecoderFactory extends UseHandlerFactory<AutoDecoder<?>> implements DecoderFactory {
+public class UseDecoderFactory extends UseHandlerFactory1<AutoDecoder<?>> implements DecoderFactory {
 
-	public static final @NotNull Classes<AutoDecoder<?>> CLASSES = new Classes<>(AutoDecoder.class, DecoderFactory.class, DecodeContext.class, Object.class, "decode");
 	public static final @NotNull UseDecoderFactory INSTANCE = new UseDecoderFactory();
+
+	public UseDecoderFactory() {
+		super(AutoDecoder.class, DecoderFactory.class, DecodeContext.class, Object.class, "decode");
+	}
 
 	@Override
 	public <T_HandledType> @Nullable UseSpec getSpec(@NotNull FactoryContext<T_HandledType> context) {
@@ -26,12 +29,11 @@ public class UseDecoderFactory extends UseHandlerFactory<AutoDecoder<?>> impleme
 	}
 
 	@Override
-	public @NotNull Classes<AutoDecoder<?>> classes() {
-		return CLASSES;
+	public @NotNull MethodLikeMemberView<?, ?> findMethodBeingHandler(@NotNull FactoryContext<?> context, @NotNull UseSpec spec) {
+		return findMethodBeingDecoder(context, spec);
 	}
 
-	@Override
-	public @NotNull MethodLikeMemberView<?, ?> findMethodBeingHandler(@NotNull FactoryContext<?> context, @NotNull UseSpec spec) {
+	public static @NotNull MethodLikeMemberView<?, ?> findMethodBeingDecoder(@NotNull FactoryContext<?> context, @NotNull UseSpec spec) {
 		return context.reflect(spec.in()).searchMethods(
 			false,
 			new MethodPredicate()

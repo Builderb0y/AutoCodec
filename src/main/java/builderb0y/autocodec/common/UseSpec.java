@@ -1,7 +1,5 @@
 package builderb0y.autocodec.common;
 
-import java.lang.annotation.Annotation;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,29 +25,18 @@ public record UseSpec(
 	}
 
 	public static @Nullable UseSpec fromUseEncoder(@NotNull ReifiedType<?> type) {
-		Annotation annotation = type.getAnnotations().getFirst(UseEncoder.class, UseCoder.class);
-		if (annotation instanceof UseEncoder encoder) {
-			return new UseSpec(encoder.name(), inType(encoder.in(), type), encoder.usage(), encoder.strict());
-		}
-		else if (annotation instanceof UseCoder coder) {
-			return new UseSpec(coder.name(), inType(coder.in(), type), coder.usage(), coder.strict());
-		}
-		else {
-			return null;
-		}
+		UseEncoder annotation = type.getAnnotations().getFirst(UseEncoder.class);
+		return annotation == null ? null : new UseSpec(annotation.name(), inType(annotation.in(), type), annotation.usage(), annotation.strict());
 	}
 
 	public static @Nullable UseSpec fromUseDecoder(@NotNull ReifiedType<?> type) {
-		Annotation annotation = type.getAnnotations().getFirst(UseDecoder.class, UseCoder.class);
-		if (annotation instanceof UseDecoder decoder) {
-			return new UseSpec(decoder.name(), inType(decoder.in(), type), decoder.usage(), decoder.strict());
-		}
-		else if (annotation instanceof UseCoder coder) {
-			return new UseSpec(coder.name(), inType(coder.in(), type), coder.usage(), coder.strict());
-		}
-		else {
-			return null;
-		}
+		UseDecoder annotation = type.getAnnotations().getFirst(UseDecoder.class);
+		return annotation == null ? null : new UseSpec(annotation.name(), inType(annotation.in(), type), annotation.usage(), annotation.strict());
+	}
+
+	public static @Nullable UseSpec fromUseCoder(@NotNull ReifiedType<?> type) {
+		UseCoder annotation = type.getAnnotations().getFirst(UseCoder.class);
+		return annotation == null ? null : new UseSpec(annotation.name(), inType(annotation.in(), type), annotation.usage(), annotation.strict());
 	}
 
 	public static @Nullable UseSpec fromUseConstructor(@NotNull ReifiedType<?> type) {

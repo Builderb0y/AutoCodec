@@ -7,7 +7,7 @@ import org.jetbrains.annotations.Nullable;
 
 import builderb0y.autocodec.common.FactoryContext;
 import builderb0y.autocodec.common.UseSpec;
-import builderb0y.autocodec.common.UseHandlerFactory;
+import builderb0y.autocodec.common.UseHandlerFactory1;
 import builderb0y.autocodec.constructors.AutoConstructor.ConstructorFactory;
 import builderb0y.autocodec.reflection.MemberCollector;
 import builderb0y.autocodec.reflection.MethodPredicate;
@@ -15,19 +15,17 @@ import builderb0y.autocodec.reflection.memberViews.MethodLikeMemberView;
 import builderb0y.autocodec.reflection.reification.ReifiedType;
 import builderb0y.autocodec.util.NamedPredicate;
 
-public class UseConstructorFactory extends UseHandlerFactory<AutoConstructor<?>> implements ConstructorFactory {
+public class UseConstructorFactory extends UseHandlerFactory1<AutoConstructor<?>> implements ConstructorFactory {
 
-	public static final @NotNull Classes<AutoConstructor<?>> CLASSES = new Classes<>(AutoConstructor.class, ConstructorFactory.class, ConstructContext.class, Object.class, "construct");
 	public static final @NotNull UseConstructorFactory INSTANCE = new UseConstructorFactory();
+
+	public UseConstructorFactory() {
+		super(AutoConstructor.class, ConstructorFactory.class, ConstructContext.class, Object.class, "construct");
+	}
 
 	@Override
 	public <T_HandledType> @Nullable UseSpec getSpec(@NotNull FactoryContext<T_HandledType> context) {
 		return UseSpec.fromUseConstructor(context.type);
-	}
-
-	@Override
-	public @NotNull Classes<AutoConstructor<?>> classes() {
-		return CLASSES;
 	}
 
 	@Override

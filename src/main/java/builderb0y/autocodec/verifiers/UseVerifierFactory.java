@@ -9,7 +9,7 @@ import org.jetbrains.annotations.Nullable;
 import builderb0y.autocodec.common.FactoryContext;
 import builderb0y.autocodec.common.FactoryException;
 import builderb0y.autocodec.common.UseSpec;
-import builderb0y.autocodec.common.UseHandlerFactory;
+import builderb0y.autocodec.common.UseHandlerFactory1;
 import builderb0y.autocodec.reflection.MemberCollector;
 import builderb0y.autocodec.reflection.MethodPredicate;
 import builderb0y.autocodec.reflection.memberViews.MethodLikeMemberView;
@@ -17,10 +17,13 @@ import builderb0y.autocodec.reflection.reification.ReifiedType;
 import builderb0y.autocodec.util.NamedPredicate;
 import builderb0y.autocodec.verifiers.AutoVerifier.VerifierFactory;
 
-public class UseVerifierFactory extends UseHandlerFactory<AutoVerifier<?>> implements InheritedVerifierFactory {
+public class UseVerifierFactory extends UseHandlerFactory1<AutoVerifier<?>> implements InheritedVerifierFactory {
 
-	public static final @NotNull Classes<AutoVerifier<?>> CLASSES = new Classes<>(AutoVerifier.class, VerifierFactory.class, VerifyContext.class, void.class, "verify");
 	public static final @NotNull UseVerifierFactory INSTANCE = new UseVerifierFactory();
+
+	public UseVerifierFactory() {
+		super(AutoVerifier.class, VerifierFactory.class, VerifyContext.class, void.class, "verify");
+	}
 
 	@Override
 	@OverrideOnly
@@ -50,11 +53,6 @@ public class UseVerifierFactory extends UseHandlerFactory<AutoVerifier<?>> imple
 	@Deprecated //only returns one annotation, not all of them.
 	public <T_HandledType> @Nullable UseSpec getSpec(@NotNull FactoryContext<T_HandledType> context) {
 		return UseSpec.fromUseVerifier(context.type);
-	}
-
-	@Override
-	public @NotNull Classes<AutoVerifier<?>> classes() {
-		return CLASSES;
 	}
 
 	@Override
