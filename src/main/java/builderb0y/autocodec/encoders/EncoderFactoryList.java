@@ -21,8 +21,7 @@ public class EncoderFactoryList extends FactoryList<AutoEncoder<?>, EncoderFacto
 		this.addFactoriesToStart(
 			UseEncoderFactory.INSTANCE,
 			DefaultEncoder.Factory.INSTANCE,
-			DefaultEmptyEncoder.Factory.INSTANCE,
-			new WrapperEncoderFactory()
+			DefaultEmptyEncoder.Factory.INSTANCE
 		);
 		this.addFactoriesToEnd(
 			CollectionEncoder.Factory.INSTANCE,

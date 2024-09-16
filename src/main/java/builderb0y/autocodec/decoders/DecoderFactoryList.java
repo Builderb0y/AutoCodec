@@ -22,8 +22,7 @@ public class DecoderFactoryList extends FactoryList<AutoDecoder<?>, DecoderFacto
 			UseDecoderFactory.INSTANCE,
 			DefaultDecoder.Factory.INSTANCE,
 			DefaultEmptyDecoder.Factory.INSTANCE,
-			ConstructOnlyDecoder.Factory.INSTANCE,
-			new WrapperDecoderFactory()
+			ConstructOnlyDecoder.Factory.INSTANCE
 		);
 		this.addFactoryToEnd(
 			ConstructImprintDecoder.Factory.INSTANCE

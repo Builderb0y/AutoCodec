@@ -1,16 +1,9 @@
 package builderb0y.autocodec.common;
 
-import java.lang.annotation.Annotation;
-import java.util.List;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import builderb0y.autocodec.annotations.Wrapper;
-import builderb0y.autocodec.coders.AutoCoder;
-import builderb0y.autocodec.common.AutoHandler.HandlerMapper;
-import builderb0y.autocodec.decoders.AutoDecoder;
-import builderb0y.autocodec.encoders.AutoEncoder;
 import builderb0y.autocodec.reflection.FieldPredicate;
 import builderb0y.autocodec.reflection.MemberCollector;
 import builderb0y.autocodec.reflection.MethodPredicate;
@@ -19,27 +12,24 @@ import builderb0y.autocodec.reflection.memberViews.MethodLikeMemberView;
 import builderb0y.autocodec.reflection.memberViews.ParameterView;
 import builderb0y.autocodec.reflection.reification.ReifiedType;
 import builderb0y.autocodec.util.NamedPredicate;
-import builderb0y.autocodec.util.TypeFormatter;
 
 /** intermediate parsing data from {@link Wrapper} */
 public record WrapperSpec<T_Wrapper, T_Wrapped>(
 	@NotNull FieldLikeMemberView<T_Wrapper, T_Wrapped> field,
 	@NotNull MethodLikeMemberView<T_Wrapper, T_Wrapper> constructor,
-	@NotNull ReifiedType<T_Wrapped> wrappedType,
 	boolean wrapNull
 ) {
 
-	public WrapperSpec(
-		@NotNull FieldLikeMemberView<T_Wrapper, T_Wrapped> field,
-		@NotNull MethodLikeMemberView<T_Wrapper, T_Wrapper> constructor,
-		@NotNull List<@NotNull Annotation> annotations,
-		boolean wrapNull
-	) {
-		this(field, constructor, field.getType().addAnnotations(annotations), wrapNull);
+	public ReifiedType<T_Wrapper> wrapperType() {
+		return this.field.getDeclaringType();
+	}
+
+	public ReifiedType<T_Wrapped> wrappedType() {
+		return this.field.getType();
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public static <T_Owner> @Nullable WrapperSpec<T_Owner, ?> find(@NotNull FactoryContext<T_Owner> context, @NotNull List<@NotNull Annotation> annotations) {
+	public static <T_Owner> @Nullable WrapperSpec<T_Owner, ?> find(@NotNull FactoryContext<T_Owner> context) {
 		Wrapper annotation = context.type.getAnnotations().getFirst(Wrapper.class);
 		if (annotation != null) {
 			String fieldName = annotation.value();
@@ -85,56 +75,8 @@ public record WrapperSpec<T_Wrapper, T_Wrapped>(
 					MemberCollector.forceUnique()
 				);
 			}
-			return new WrapperSpec(field, constructor, annotations, annotation.wrapNull());
+			return new WrapperSpec(field, constructor, annotation.wrapNull());
 		}
 		return null;
-	}
-
-	public @NotNull String encodeMapperName() {
-		return new TypeFormatter(128).annotations(true).simplify(true).append(this.field).toString();
-	}
-
-	public @NotNull HandlerMapper<@Nullable T_Wrapper, @Nullable T_Wrapped> encodeMapper(ReflectContextProvider provider) {
-		try {
-			return HandlerMapper.nullSafe(HandlerMapper.createLambda(this.field.createInstanceReaderHandle(provider)));
-		}
-		catch (IllegalAccessException exception) {
-			throw new FactoryException(exception);
-		}
-	}
-
-	public @NotNull String decodeMapperName() {
-		return new TypeFormatter(128).annotations(true).simplify(true).append(this.constructor).toString();
-	}
-
-	public @NotNull HandlerMapper<@Nullable T_Wrapped, @Nullable T_Wrapper> decodeMapper(ReflectContextProvider provider) {
-		try {
-			HandlerMapper<T_Wrapped, T_Wrapper> mapper = HandlerMapper.createLambda(this.constructor.createMethodHandle(provider));
-			if (!this.wrapNull) mapper = HandlerMapper.nullSafe(mapper);
-			return mapper;
-		}
-		catch (IllegalAccessException exception) {
-			throw new FactoryException(exception);
-		}
-	}
-
-	public @NotNull AutoEncoder<T_Wrapper> createEncoder(@NotNull FactoryContext<?> context) {
-		AutoEncoder<T_Wrapped> encoder = context.type(this.wrappedType).forceCreateEncoder();
-		if (encoder instanceof AutoCoder<T_Wrapped> coder) {
-			return coder.mapCoder(this.field.getDeclaringType(), this.encodeMapperName(), this.encodeMapper(context), this.decodeMapperName(), this.decodeMapper(context));
-		}
-		else {
-			return encoder.mapEncoder(this.field.getDeclaringType(), this.encodeMapperName(), this.encodeMapper(context));
-		}
-	}
-
-	public @NotNull AutoDecoder<T_Wrapper> createDecoder(@NotNull FactoryContext<?> context) {
-		AutoDecoder<T_Wrapped> decoder = context.type(this.wrappedType).forceCreateDecoder();
-		if (decoder instanceof AutoCoder<T_Wrapped> coder) {
-			return coder.mapCoder(this.field.getDeclaringType(), this.encodeMapperName(), this.encodeMapper(context), this.decodeMapperName(), this.decodeMapper(context));
-		}
-		else {
-			return decoder.mapDecoder(this.field.getDeclaringType(), this.decodeMapperName(), this.decodeMapper(context));
-		}
 	}
 }
