@@ -17,6 +17,7 @@ import builderb0y.autocodec.reflection.reification.ReifiedType;
 import builderb0y.autocodec.util.NamedPredicate;
 import builderb0y.autocodec.util.TypeFormatter;
 
+/** I apologize for the bad name this class has. */
 public abstract class UseHandlerFactory0<T_Handler extends AutoHandler> extends NamedFactory<T_Handler> {
 
 	public final Class<? super T_Handler> handlerClass;

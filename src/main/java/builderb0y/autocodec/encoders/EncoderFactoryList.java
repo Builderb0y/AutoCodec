@@ -18,9 +18,8 @@ public class EncoderFactoryList extends FactoryList<AutoEncoder<?>, EncoderFacto
 	@OverrideOnly
 	public void setup() {
 		super.setup();
-		this.addFactoriesToStart(
-			UseEncoderFactory.INSTANCE,
-			DefaultEmptyEncoder.Factory.INSTANCE
+		this.addFactoryToStart(
+			UseEncoderFactory.INSTANCE
 		);
 		this.addFactoriesToEnd(
 			CollectionEncoder.Factory.INSTANCE,

@@ -1,6 +1,6 @@
 # Changes compared to V4:
 
-This list is a very brief look at the changes made in V5 and some information was omitted for simplicity.
+This list is a very brief overview of the changes made in V5 and some information was omitted for simplicity. Many classes have been renamed, moved around, merged with other classes, or simply removed. V5 has a lot of structural changes compared to V4, and not all the details of these changes are listed here.
 
 ## Re-structured how coders and codecs are created
 

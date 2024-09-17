@@ -20,7 +20,6 @@ public class DecoderFactoryList extends FactoryList<AutoDecoder<?>, DecoderFacto
 		super.setup();
 		this.addFactoriesToStart(
 			UseDecoderFactory.INSTANCE,
-			DefaultEmptyDecoder.Factory.INSTANCE,
 			ConstructOnlyDecoder.Factory.INSTANCE
 		);
 		this.addFactoryToEnd(

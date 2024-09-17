@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import builderb0y.autocodec.common.AutoHandler.AutoFactory;
 import builderb0y.autocodec.reflection.memberViews.MethodLikeMemberView;
 
+/** I apologize for the bad name this class has. */
 public abstract class UseHandlerFactory1<T_Handler extends AutoHandler> extends UseHandlerFactory0<T_Handler> {
 
 	@SuppressWarnings("rawtypes") //B<X> extends A<X> -/> Class<B> is assignable to Class<? extends A<?>>.
