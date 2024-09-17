@@ -38,7 +38,7 @@ public class DefaultEmptyEncoder<T_Decoded> extends NamedEncoder<T_Decoded> {
 	}
 
 	@Override
-	public @Nullable Stream<String> getKeys() {
+	public @Nullable Stream<@NotNull String> getKeys() {
 		return this.fallbackEncoder.getKeys();
 	}
 

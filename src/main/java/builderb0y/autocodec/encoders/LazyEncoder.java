@@ -29,7 +29,7 @@ public class LazyEncoder<T> extends LazyHandler<AutoEncoder<T>> implements AutoE
 	}
 
 	@Override
-	public @Nullable Stream<String> getKeys() {
+	public @Nullable Stream<@NotNull String> getKeys() {
 		return this.getDelegateHandler().getKeys();
 	}
 }

@@ -1,5 +1,7 @@
 package builderb0y.autocodec.decoders;
 
+import java.util.Map;
+
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.mojang.serialization.JsonOps;
@@ -50,19 +52,15 @@ public class DefaultDecoderTest {
 
 	@Test
 	public void testObject() throws DecodeException {
-		new CoderUnitTester<>(TestCommon.DEFAULT_CODEC, new ReifiedType<Box<@DefaultObject(name = "DEFAULT",    mode = DefaultObjectMode.FIELD                 ) Box<String>>> () {}).test(new Box<>(Box.DEFAULT), new JsonObject(), JsonOps.INSTANCE);
-		new CoderUnitTester<>(TestCommon.DEFAULT_CODEC, new ReifiedType<Box<@DefaultObject(name = "getDefault", mode = DefaultObjectMode.METHOD_WITH_CONTEXT   ) Box<String>>> () {}).test(new Box<>(Box.DEFAULT), new JsonObject(), JsonOps.INSTANCE);
-		new CoderUnitTester<>(TestCommon.DEFAULT_CODEC, new ReifiedType<Box<@DefaultObject(name = "getDefault", mode = DefaultObjectMode.METHOD_WITHOUT_CONTEXT) Box<String>>> () {}).test(new Box<>(Box.DEFAULT), new JsonObject(), JsonOps.INSTANCE);
-		new CoderUnitTester<>(TestCommon.DEFAULT_CODEC, new ReifiedType<Box<@DefaultObject(name = "DEFAULT",    mode = DefaultObjectMode.FIELD                 ) Box<String>>> () {}).test(new Box<>(Box.DEFAULT), new JsonObject(), JsonOps.INSTANCE);
-		new CoderUnitTester<>(TestCommon.DEFAULT_CODEC, new ReifiedType<Box<@DefaultObject(name = "getDefault", mode = DefaultObjectMode.METHOD_WITH_CONTEXT   ) Box<String>>> () {}).test(new Box<>(Box.DEFAULT), new JsonObject(), JsonOps.INSTANCE);
-		new CoderUnitTester<>(TestCommon.DEFAULT_CODEC, new ReifiedType<Box<@DefaultObject(name = "getDefault", mode = DefaultObjectMode.METHOD_WITHOUT_CONTEXT) Box<String>>> () {}).test(new Box<>(Box.DEFAULT), new JsonObject(), JsonOps.INSTANCE);
+		new CoderUnitTester<>(TestCommon.DEFAULT_CODEC, new ReifiedType<Box<@DefaultObject(name = "DEFAULT",              mode = DefaultObjectMode.FIELD                                      ) Box<String>>> () {}).test(new Box<>(Box.DEFAULT), new JsonObject(), JsonOps.INSTANCE);
+		new CoderUnitTester<>(TestCommon.DEFAULT_CODEC, new ReifiedType<Box<@DefaultObject(name = "getDefaultEncoded",    mode = DefaultObjectMode.METHOD_WITH_CONTEXT_ENCODED                ) Box<String>>> () {}).test(new Box<>(Box.DEFAULT), new JsonObject(), JsonOps.INSTANCE);
+		new CoderUnitTester<>(TestCommon.DEFAULT_CODEC, new ReifiedType<Box<@DefaultObject(name = "getDefaultDecoded",    mode = DefaultObjectMode.METHOD_WITH_CONTEXT_DECODED                ) Box<String>>> () {}).test(new Box<>(Box.DEFAULT), new JsonObject(), JsonOps.INSTANCE);
+		new CoderUnitTester<>(TestCommon.DEFAULT_CODEC, new ReifiedType<Box<@DefaultObject(name = "getDefault",           mode = DefaultObjectMode.METHOD_WITHOUT_CONTEXT                     ) Box<String>>> () {}).test(new Box<>(Box.DEFAULT), new JsonObject(), JsonOps.INSTANCE);
 
-		new CoderUnitTester<>(TestCommon.DEFAULT_CODEC, new ReifiedType<Box<@DefaultObject(name = "OBJ_DEFAULT",   mode = DefaultObjectMode.FIELD,                  strict = false) Box<String>>> () {}).test(new Box<>(Box.DEFAULT), new JsonObject(), JsonOps.INSTANCE);
-		new CoderUnitTester<>(TestCommon.DEFAULT_CODEC, new ReifiedType<Box<@DefaultObject(name = "getObjDefault", mode = DefaultObjectMode.METHOD_WITH_CONTEXT,    strict = false) Box<String>>> () {}).test(new Box<>(Box.DEFAULT), new JsonObject(), JsonOps.INSTANCE);
-		new CoderUnitTester<>(TestCommon.DEFAULT_CODEC, new ReifiedType<Box<@DefaultObject(name = "getObjDefault", mode = DefaultObjectMode.METHOD_WITHOUT_CONTEXT, strict = false) Box<String>>> () {}).test(new Box<>(Box.DEFAULT), new JsonObject(), JsonOps.INSTANCE);
-		new CoderUnitTester<>(TestCommon.DEFAULT_CODEC, new ReifiedType<Box<@DefaultObject(name = "OBJ_DEFAULT",   mode = DefaultObjectMode.FIELD,                  strict = false) Box<String>>> () {}).test(new Box<>(Box.DEFAULT), new JsonObject(), JsonOps.INSTANCE);
-		new CoderUnitTester<>(TestCommon.DEFAULT_CODEC, new ReifiedType<Box<@DefaultObject(name = "getObjDefault", mode = DefaultObjectMode.METHOD_WITH_CONTEXT,    strict = false) Box<String>>> () {}).test(new Box<>(Box.DEFAULT), new JsonObject(), JsonOps.INSTANCE);
-		new CoderUnitTester<>(TestCommon.DEFAULT_CODEC, new ReifiedType<Box<@DefaultObject(name = "getObjDefault", mode = DefaultObjectMode.METHOD_WITHOUT_CONTEXT, strict = false) Box<String>>> () {}).test(new Box<>(Box.DEFAULT), new JsonObject(), JsonOps.INSTANCE);
+		new CoderUnitTester<>(TestCommon.DEFAULT_CODEC, new ReifiedType<Box<@DefaultObject(name = "OBJ_DEFAULT",          mode = DefaultObjectMode.FIELD,                       strict = false) Box<String>>> () {}).test(new Box<>(Box.DEFAULT), new JsonObject(), JsonOps.INSTANCE);
+		new CoderUnitTester<>(TestCommon.DEFAULT_CODEC, new ReifiedType<Box<@DefaultObject(name = "getObjDefaultEncoded", mode = DefaultObjectMode.METHOD_WITH_CONTEXT_ENCODED, strict = false) Box<String>>> () {}).test(new Box<>(Box.DEFAULT), new JsonObject(), JsonOps.INSTANCE);
+		new CoderUnitTester<>(TestCommon.DEFAULT_CODEC, new ReifiedType<Box<@DefaultObject(name = "getObjDefaultEncoded", mode = DefaultObjectMode.METHOD_WITH_CONTEXT_DECODED, strict = false) Box<String>>> () {}).test(new Box<>(Box.DEFAULT), new JsonObject(), JsonOps.INSTANCE);
+		new CoderUnitTester<>(TestCommon.DEFAULT_CODEC, new ReifiedType<Box<@DefaultObject(name = "getObjDefault",        mode = DefaultObjectMode.METHOD_WITHOUT_CONTEXT,      strict = false) Box<String>>> () {}).test(new Box<>(Box.DEFAULT), new JsonObject(), JsonOps.INSTANCE);
 
 		new CoderUnitTester<>(TestCommon.DEFAULT_CODEC, new ReifiedType<@DefaultObject(name = "new", mode = DefaultObjectMode.METHOD_WITHOUT_CONTEXT) Category>() {}).testEncoded(JsonNull.INSTANCE, JsonOps.INSTANCE);
 	}
@@ -75,8 +73,12 @@ public class DefaultDecoderTest {
 			return DEFAULT;
 		}
 
-		public static <T_Encoded> Box<String> getDefault(DynamicOpsContext<T_Encoded> context) {
+		public static <T_Encoded> Box<String> getDefaultDecoded(DynamicOpsContext<T_Encoded> context) {
 			return DEFAULT;
+		}
+
+		public static <T_Encoded> T_Encoded getDefaultEncoded(DynamicOpsContext<T_Encoded> context) {
+			return context.createStringMap(Map.of("value", context.createString("")));
 		}
 
 		public static Object OBJ_DEFAULT = new Box<>("");
@@ -85,8 +87,13 @@ public class DefaultDecoderTest {
 			return DEFAULT;
 		}
 
-		public static Object getObjDefault(DynamicOpsContext<?> context) {
+		public static Object getObjDefaultDecoded(DynamicOpsContext<?> context) {
 			return DEFAULT;
+		}
+
+		@SuppressWarnings({ "unchecked", "rawtypes" })
+		public static Object getObjDefaultEncoded(DynamicOpsContext context) {
+			return context.createStringMap(Map.of("value", context.createString("")));
 		}
 	}
 

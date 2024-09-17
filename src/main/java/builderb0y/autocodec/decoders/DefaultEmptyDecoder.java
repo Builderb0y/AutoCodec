@@ -37,7 +37,7 @@ public abstract class DefaultEmptyDecoder<T_Decoded> extends NamedDecoder<T_Deco
 	}
 
 	@Override
-	public @Nullable Stream<String> getKeys() {
+	public @Nullable Stream<@NotNull String> getKeys() {
 		return this.nonEmptyDecoder.getKeys();
 	}
 

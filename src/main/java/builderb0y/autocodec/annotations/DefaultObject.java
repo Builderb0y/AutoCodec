@@ -1,9 +1,6 @@
 package builderb0y.autocodec.annotations;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 import builderb0y.autocodec.common.DynamicOpsContext;
 import builderb0y.autocodec.decoders.DecodeContext;
@@ -16,31 +13,33 @@ specifies the default value to use when the encoded value is not present.
 the default value can be obtained from a field or a method.
 this annotation can be applied to any type.
 example usage: {@code
-	public record IntBox(int value) {
+	public class Example {
 
-		public static final IntBox DEFAULT = new IntBox(-1);
+		public static final Example DEFAULT = new Example();
 	}
-	public record Example(@DefaultObject(name = "DEFAULT", mode = DefaultObjectMode.FIELD) IntBox box) {}
+	public record ExampleBox(
+		@DefaultObject(
+			name = "DEFAULT",
+			in = Example.class,
+			mode = DefaultObjectMode.FIELD
+		)
+		Example example
+	)
 
 	//decoding
 	json = {}
-	Example example = AutoCodec.DECODE(decoder, json, JsonPos.INSTANCE);
-	assert example,box == IntBox.DEFAULT
+	ExampleBox box = AutoCodec.decode(decoder, json, JsonPos.INSTANCE);
+	assert box.example == Example.DEFAULT
 
 	//encoding
-	Example example = new Example(IntBox.DEFAULT)
+	ExampleBox box = new ExampleBox(Example.DEFAULT)
 	JsonObject json = AUTO_CODEC.encode(encoder, example, JsonOps.INSTANCE).getAsJsonObject()
-	assert json.size() == 0 //box is default, so it is not serialized.
+	assert json.size() == 0 //example is default, so it is not serialized.
 
-	example = new Example(new IntBox(42))
+	box = new ExampleBox(new Example(...)) //anything not DEFAULT.
 	json = AUTO_CODEC.encode(encoder, example, JsonOps.INSTANCE).getAsJsonObject();
 	assert json.has("box")
-	assert json.getAsJsonObject("box").value() == 42
 }
-It is also worth noting that while the other Default<thing>
-annotations modify the data input before decoding it,
-DefaultObject skips this step and uses the default
-object directly, without decoding it from anywhere.
 */
 @Target(ElementType.TYPE_USE)
 @Retention(RetentionPolicy.RUNTIME)
@@ -75,7 +74,26 @@ public @interface DefaultObject {
 	matches the type of the element that this annotation is applied to.
 	the value in the field will be obtained every time the default value is needed.
 
-	for {@link DefaultObjectMode#METHOD_WITH_CONTEXT}, the target must be a
+	for {@link DefaultObjectMode#METHOD_WITH_CONTEXT_ENCODED}, the target
+	must be a static method named {@link #name()} declared in {@link #in()}
+	which takes a single parameter of type {@link DynamicOpsContext}<T>,
+	and returns type T, where T is a type variable declared on the method. the
+	type parameter T's name does not matter, only that it is the only type parameter
+	on the method, and that it is used to parameterize the {@link DynamicOpsContext}.
+	in other words, the method should look something like this: {@code
+		public static <T_Encoded> T_Encoded getDefaultValue(DynamicOpsContext<T_Encoded> context)
+	}
+	the method may throw any exceptions, which will be caught and wrapped in
+	either an {@link EncodeException} or {@link DecodeException} as applicable.
+	if the method throws an {@link Error}, then it will be re-thrown as-is.
+	the method will be invoked every time the default value is needed.
+	in practice, the provided DynamicOpsContext will be either an {@link EncodeContext} or a
+	{@link DecodeContext}, depending on what action is being taken which requires the default value.
+
+	note that this mode cannot target a constructor, as there is no guarantee
+	that the declaring class of the constructor will extend T_Encoded.
+
+	for {@link DefaultObjectMode#METHOD_WITH_CONTEXT_DECODED}, the target must be a
 	static method named {@link #name()} declared in {@link #in()} which returns
 	the type of the element that this annotation is applied to,
 	and takes a single parameter of type {@link DynamicOpsContext}<T>,
@@ -109,7 +127,8 @@ public @interface DefaultObject {
 	for {@link DefaultObjectMode#FIELD}, the target must be a static
 	field named {@link #name()} declared in {@link #in()}, with any type.
 
-	for {@link DefaultObjectMode#METHOD_WITH_CONTEXT}, the target must be a
+	for {@link DefaultObjectMode#METHOD_WITH_CONTEXT_ENCODED} and
+	{@link DefaultObjectMode#METHOD_WITH_CONTEXT_DECODED}, the target must be a
 	static method named {@link #name()} declared in {@link #in()} which returns
 	a non-void value, and which takes a single parameter of
 	type {@link DynamicOpsContext}<any parameterization>.
@@ -131,13 +150,20 @@ public @interface DefaultObject {
 	/**
 	if alwaysEncode is set to false and the encoded value equals the encoded *default* value,
 	then the encoded value is skipped (meaning that {@link EncodeContext#empty()}
-	is returned by the AutoEncoder}.
+	is returned by the AutoCoder).
 	*/
 	public boolean alwaysEncode() default false;
 
 	public static enum DefaultObjectMode {
-		FIELD,
-		METHOD_WITH_CONTEXT,
-		METHOD_WITHOUT_CONTEXT;
+		FIELD(DefaultMode.DECODED),
+		METHOD_WITH_CONTEXT_ENCODED(DefaultMode.ENCODED),
+		METHOD_WITH_CONTEXT_DECODED(DefaultMode.DECODED),
+		METHOD_WITHOUT_CONTEXT(DefaultMode.DECODED);
+
+		public final DefaultMode defaultMode;
+
+		DefaultObjectMode(DefaultMode defaultMode) {
+			this.defaultMode = defaultMode;
+		}
 	}
 }

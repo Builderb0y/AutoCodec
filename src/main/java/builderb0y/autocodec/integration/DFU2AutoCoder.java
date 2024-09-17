@@ -25,6 +25,8 @@ public record DFU2AutoCoder<T_Decoded>(
 
 	if false, partial results will throw an {@link EncodeException}
 	or {@link DecodeException}.
+
+	the default value of this component is false.
 	*/
 	boolean allowPartial,
 
@@ -38,6 +40,8 @@ public record DFU2AutoCoder<T_Decoded>(
 	and will return an error data result
 	when a null or empty input is encountered.
 	such inputs will NOT be passed to the coder.
+
+	the default value of this component is false.
 	*/
 	boolean nullSafe
 )
@@ -91,7 +95,7 @@ implements AutoCoder<T_Decoded> {
 	}
 
 	@Override
-	public @Nullable Stream<String> getKeys() {
+	public @Nullable Stream<@NotNull String> getKeys() {
 		return this.codec instanceof MapCodec.MapCodecCodec<T_Decoded> codec ? codec.codec().keys(ObjectOps.INSTANCE).map((Object object) -> {
 			if (object instanceof String string) return string;
 			else throw new IllegalArgumentException(codec + " has a key that is not a String: " + object);

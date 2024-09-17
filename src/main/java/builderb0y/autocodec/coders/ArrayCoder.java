@@ -73,7 +73,7 @@ public class ArrayCoder<T_DecodedElement, T_DecodedArray> extends NamedCoder<T_D
 
 	@Override
 	public String toString() {
-		return this.toString + ": { elementCoder: " + this.elementCoder + " }";
+		return super.toString() + ": { elementCoder: " + this.elementCoder + " }";
 	}
 
 	public static class Factory extends NamedCoderFactory {

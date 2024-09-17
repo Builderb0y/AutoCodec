@@ -29,7 +29,7 @@ public class LazyImprinter<T> extends LazyHandler<AutoImprinter<T>> implements A
 	}
 
 	@Override
-	public @Nullable Stream<String> getKeys() {
+	public @Nullable Stream<@NotNull String> getKeys() {
 		return this.getDelegateHandler().getKeys();
 	}
 }

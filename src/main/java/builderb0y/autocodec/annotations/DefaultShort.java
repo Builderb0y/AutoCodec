@@ -43,4 +43,10 @@ public @interface DefaultShort {
 	then it will only actually be encoded if this attribute returns true.
 	*/
 	public boolean alwaysEncode() default false;
+
+	/**
+	how this value should be interpreted.
+	defaults to {@link DefaultMode#DECODED}.
+	*/
+	public abstract DefaultMode mode() default DefaultMode.DECODED;
 }

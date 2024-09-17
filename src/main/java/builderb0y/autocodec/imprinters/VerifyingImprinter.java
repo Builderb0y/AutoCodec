@@ -33,6 +33,6 @@ public class VerifyingImprinter<T_Decoded> extends NamedImprinter<T_Decoded> {
 
 	@Override
 	public String toString() {
-		return this.toString + ": { imprinter: " + this.imprinter + ", verifier: " + this.verifier + " }";
+		return super.toString() + ": { imprinter: " + this.imprinter + ", verifier: " + this.verifier + " }";
 	}
 }

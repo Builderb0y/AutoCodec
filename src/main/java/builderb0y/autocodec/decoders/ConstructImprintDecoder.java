@@ -34,13 +34,13 @@ public class ConstructImprintDecoder<T_Decoded> extends NamedDecoder<T_Decoded> 
 	}
 
 	@Override
-	public @Nullable Stream<String> getKeys() {
+	public @Nullable Stream<@NotNull String> getKeys() {
 		return this.imprinter.getKeys();
 	}
 
 	@Override
 	public String toString() {
-		return this.toString + ": { constructor: " + this.constructor + ", imprinter: " + this.imprinter + " }";
+		return super.toString() + ": { constructor: " + this.constructor + ", imprinter: " + this.imprinter + " }";
 	}
 
 	public static class Factory extends NamedDecoderFactory {

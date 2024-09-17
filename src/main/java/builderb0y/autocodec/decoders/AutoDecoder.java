@@ -49,7 +49,7 @@ public interface AutoDecoder<T_Decoded> extends AutoHandler, KeyHolder {
 	which are sometimes desired over regular {@link Decoder}'s.
 	*/
 	@Override
-	public default @Nullable Stream<String> getKeys() {
+	public default @Nullable Stream<@NotNull String> getKeys() {
 		return null;
 	}
 

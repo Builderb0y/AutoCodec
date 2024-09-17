@@ -10,14 +10,17 @@ import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
 import com.mojang.datafixers.util.Pair;
-import com.mojang.datafixers.util.Unit;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.DynamicOps;
+import com.mojang.serialization.JavaOps;
 import com.mojang.serialization.MapLike;
 import org.jetbrains.annotations.NotNull;
 
-//java already has objects that correspond to all the things
-//DynamicOps typically deals with, so why not use them?
+/**
+a DynamicOps implementation that uses
+ordinary java objects to represent data.
+note: this class pre-dates {@link JavaOps}.
+*/
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class ObjectOps implements DynamicOps<Object> {
 
@@ -42,19 +45,27 @@ public class ObjectOps implements DynamicOps<Object> {
 
 	@Override
 	public Object empty() {
-		return Unit.INSTANCE;
+		return null;
 	}
 
 	@Override
 	public <U> U convertTo(DynamicOps<U> outOps, Object input) {
-		if (input == Unit.INSTANCE) return outOps.empty();
-		if (input instanceof Number number) return outOps.createNumeric(number);
-		if (input instanceof String string) return outOps.createString(string);
-		if (input instanceof List<?>  list) return outOps.createList(list.stream().map(element -> this.convertTo(outOps, element)));
-		if (input instanceof Map<?, ?> map) return outOps.createMap(map.entrySet().stream().map(entry -> Pair.of(this.convertTo(outOps, entry.getKey()), this.convertTo(outOps, entry.getValue()))));
-		if (input instanceof Boolean  bool) return outOps.createBoolean(bool.booleanValue());
+		if (input == null) return outOps.empty();
+		if (input instanceof Number number) {
+			if (number instanceof Byte    b) return outOps.createByte  (b);
+			if (number instanceof Short   s) return outOps.createShort (s);
+			if (number instanceof Integer i) return outOps.createInt   (i);
+			if (number instanceof Long    l) return outOps.createLong  (l);
+			if (number instanceof Float   f) return outOps.createFloat (f);
+			if (number instanceof Double  d) return outOps.createDouble(d);
+			return outOps.createNumeric(number);
+		}
+		if (input instanceof String string) return outOps.createString  (string);
+		if (input instanceof List<?>  list) return outOps.createList    (list.stream().map(element -> this.convertTo(outOps, element)));
+		if (input instanceof Map<?, ?> map) return outOps.createMap     (map.entrySet().stream().map(entry -> Pair.of(this.convertTo(outOps, entry.getKey()), this.convertTo(outOps, entry.getValue()))));
+		if (input instanceof Boolean  bool) return outOps.createBoolean (bool.booleanValue());
 		if (input instanceof byte[]  bytes) return outOps.createByteList(ByteBuffer.wrap(bytes));
-		if (input instanceof int[]    ints) return outOps.createIntList(Arrays.stream(ints));
+		if (input instanceof int[]    ints) return outOps.createIntList (Arrays.stream(ints));
 		if (input instanceof long[]  longs) return outOps.createLongList(Arrays.stream(longs));
 		throw new IllegalArgumentException("Not any kind of recognized object: " + input);
 	}

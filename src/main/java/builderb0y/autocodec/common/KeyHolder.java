@@ -5,6 +5,7 @@ import java.util.stream.Stream;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.MapDecoder;
 import com.mojang.serialization.MapEncoder;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import builderb0y.autocodec.constructors.AutoConstructor;
@@ -29,7 +30,7 @@ and {@link MapCodec}'s, by providing the keys used for their compression logic.
 */
 public interface KeyHolder {
 
-	public default @Nullable Stream<String> getKeys() {
+	public default @Nullable Stream<@NotNull String> getKeys() {
 		return null;
 	}
 

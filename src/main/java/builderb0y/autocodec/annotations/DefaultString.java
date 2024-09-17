@@ -30,6 +30,14 @@ example usage: {@code
 	json = AUTO_CODEC.encode(coder, example, JsonOps.INSTANCE).getAsJsonObject();
 	assert json.has("value");
 	assert json.has("fallback"); //fallback is "universe", which is not the default value, so it is serialized.
+
+	//enums:
+	public enum PrimaryColor { RED, GREEN, BLUE; }
+	public record ColorBox(@DefaultString("RED") PrimaryColor color)
+
+	json = {}
+	ColorBox box = AUTO_CODEC.decode(coder, json, JsonOps.INSTANCE); //will succeed.
+	assert box.color == PrimaryColor.RED;
 }
 */
 @Target(ElementType.TYPE_USE)
@@ -44,4 +52,12 @@ public @interface DefaultString {
 	then it will only actually be encoded if this attribute returns true.
 	*/
 	public abstract boolean alwaysEncode() default false;
+
+	/**
+	how this value should be interpreted.
+	unlike most default annotations in this package,
+	this one defaults to {@link DefaultMode#ENCODED}.
+	this is intended for convenience for encoding enums as String's.
+	*/
+	public abstract DefaultMode mode() default DefaultMode.ENCODED;
 }

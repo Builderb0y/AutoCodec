@@ -29,7 +29,7 @@ public class VerifyingCoder<T_Decoded> extends NamedCoder<T_Decoded> {
 	}
 
 	@Override
-	public @Nullable Stream<String> getKeys() {
+	public @Nullable Stream<@NotNull String> getKeys() {
 		return this.coder.getKeys();
 	}
 
@@ -47,6 +47,6 @@ public class VerifyingCoder<T_Decoded> extends NamedCoder<T_Decoded> {
 
 	@Override
 	public String toString() {
-		return this.toString + ": { coder: " + this.coder + ", verifier: " + this.verifier + " }";
+		return super.toString() + ": { coder: " + this.coder + ", verifier: " + this.verifier + " }";
 	}
 }

@@ -29,7 +29,7 @@ public class LazyDecoder<T> extends LazyHandler<AutoDecoder<T>> implements AutoD
 	}
 
 	@Override
-	public @Nullable Stream<String> getKeys() {
+	public @Nullable Stream<@NotNull String> getKeys() {
 		return this.getDelegateHandler().getKeys();
 	}
 }

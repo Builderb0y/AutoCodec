@@ -46,7 +46,7 @@ public class MultiFieldImprinter<T_Decoded> extends NamedImprinter<T_Decoded> {
 	}
 
 	@Override
-	public @Nullable Stream<String> getKeys() {
+	public @Nullable Stream<@NotNull String> getKeys() {
 		//requirements:
 		//	1: if any of our fields lack keys, then we lack keys too.
 		//	2: since the only way to check if a field has keys is
@@ -76,7 +76,7 @@ public class MultiFieldImprinter<T_Decoded> extends NamedImprinter<T_Decoded> {
 
 	@Override
 	public String toString() {
-		return this.toString + ": { " + this.fields.length + " fields: " + Arrays.stream(this.fields).map((FieldStrategy<T_Decoded, ?> field) -> field.field.getSerializedName()).collect(Collectors.joining(", ")) + " }";
+		return super.toString() + ": { " + this.fields.length + " fields: " + Arrays.stream(this.fields).map((FieldStrategy<T_Decoded, ?> field) -> field.field.getSerializedName()).collect(Collectors.joining(", ")) + " }";
 	}
 
 	public static abstract class FieldStrategy<T_Owner, T_Member> extends NamedImprinter<T_Owner> {
@@ -127,7 +127,7 @@ public class MultiFieldImprinter<T_Decoded> extends NamedImprinter<T_Decoded> {
 		}
 
 		@Override
-		public abstract @Nullable Stream<String> getKeys();
+		public abstract @Nullable Stream<@NotNull String> getKeys();
 	}
 
 	public static abstract class DecodingFieldStrategy<T_Owner, T_Member> extends FieldStrategy<T_Owner, T_Member> {
@@ -174,7 +174,7 @@ public class MultiFieldImprinter<T_Decoded> extends NamedImprinter<T_Decoded> {
 		}
 
 		@Override
-		public @Nullable Stream<String> getKeys() {
+		public @Nullable Stream<@NotNull String> getKeys() {
 			return Arrays.stream(this.field.getAliases());
 		}
 	}
@@ -202,7 +202,7 @@ public class MultiFieldImprinter<T_Decoded> extends NamedImprinter<T_Decoded> {
 		}
 
 		@Override
-		public @Nullable Stream<String> getKeys() {
+		public @Nullable Stream<@NotNull String> getKeys() {
 			return this.decoder.getKeys();
 		}
 	}
@@ -243,7 +243,7 @@ public class MultiFieldImprinter<T_Decoded> extends NamedImprinter<T_Decoded> {
 		}
 
 		@Override
-		public @Nullable Stream<String> getKeys() {
+		public @Nullable Stream<@NotNull String> getKeys() {
 			return Arrays.stream(this.field.getAliases());
 		}
 	}
@@ -266,7 +266,7 @@ public class MultiFieldImprinter<T_Decoded> extends NamedImprinter<T_Decoded> {
 		}
 
 		@Override
-		public @Nullable Stream<String> getKeys() {
+		public @Nullable Stream<@NotNull String> getKeys() {
 			return this.imprinter.getKeys();
 		}
 	}

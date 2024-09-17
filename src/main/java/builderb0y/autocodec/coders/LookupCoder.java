@@ -14,10 +14,8 @@ import builderb0y.autocodec.encoders.EncodeException;
 import builderb0y.autocodec.reflection.reification.ReifiedType;
 
 /**
-an AutoCoder which maps the input and output of another AutoCoder, similar to how
-{@link AutoCoder#mapCoder(ReifiedType, HandlerMapper, HandlerMapper)} works.
-this class offers a more transparent view of the backing map than
-mapCoder(type, encode::get, decode::get) would.
+adapts another AutoCoder to a different type by
+mapping its inputs and outputs via a 2-way Map lookup.
 */
 public class LookupCoder<T_Key, T_Value> extends NamedCoder<T_Value> {
 
@@ -89,10 +87,5 @@ public class LookupCoder<T_Key, T_Value> extends NamedCoder<T_Value> {
 		T_Key key = this.encode.get(object);
 		if (key == null) throw new EncodeException(() -> "Unknown value: " + object);
 		return context.object(key).encodeWith(this.keyCoder);
-	}
-
-	@Override
-	public String toString() {
-		return this.toString + " -> " + this.decode;
 	}
 }

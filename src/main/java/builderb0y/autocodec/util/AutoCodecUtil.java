@@ -1,5 +1,6 @@
 package builderb0y.autocodec.util;
 
+import java.lang.invoke.*;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 
@@ -66,5 +67,55 @@ public class AutoCodecUtil {
 			if (object instanceof boolean[] array) return Arrays.toString(array);
 		}
 		return object.toString();
+	}
+
+	/**
+	attempts to create a lambda normally, and if that fails,
+	converts implementation::invokeExact to a lambda.
+	surprisingly, this works.
+	*/
+	@Internal
+	@SuppressWarnings("unchecked")
+	public static <F> F forceLambda(
+		MethodHandles.Lookup caller,
+		String interfaceMethodName,
+		Class<F> interfaceClass,
+		MethodType interfaceMethodType,
+		MethodHandle implementation
+	) {
+		try {
+			return (F)(
+				LambdaMetafactory.metafactory(
+					caller,
+					interfaceMethodName,
+					MethodType.methodType(interfaceClass),
+					interfaceMethodType,
+					implementation,
+					interfaceMethodType
+				)
+				.getTarget()
+				.invoke()
+			);
+		}
+		catch (Throwable first) {
+			try {
+				return (F)(
+					LambdaMetafactory.metafactory(
+						caller,
+						interfaceMethodName,
+						MethodType.methodType(interfaceClass, MethodHandle.class),
+						interfaceMethodType,
+						MethodHandles.exactInvoker(implementation.type()),
+						interfaceMethodType
+					)
+					.getTarget()
+					.invoke(implementation)
+				);
+			}
+			catch (Throwable second) {
+				second.addSuppressed(first);
+				throw rethrow(second);
+			}
+		}
 	}
 }

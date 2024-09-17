@@ -73,7 +73,7 @@ public class EnumCoder<T_DecodedEnum extends Enum<T_DecodedEnum>> extends NamedC
 
 	@Override
 	public String toString() {
-		return this.toString + ": { enumName: " + this.enumName + " }";
+		return super.toString() + ": { enumName: " + this.enumName + " }";
 	}
 
 	public static class Factory extends NamedCoderFactory {

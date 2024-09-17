@@ -47,7 +47,7 @@ public class MultiFieldEncoder<T_Decoded> extends NamedEncoder<T_Decoded> {
 	}
 
 	@Override
-	public @Nullable Stream<String> getKeys() {
+	public @Nullable Stream<@NotNull String> getKeys() {
 		//requirements:
 		//	1: if any of our fields lack keys, then we lack keys too.
 		//	2: since the only way to check if a field has keys is
@@ -128,7 +128,7 @@ public class MultiFieldEncoder<T_Decoded> extends NamedEncoder<T_Decoded> {
 		}
 
 		@Override
-		public @Nullable Stream<String> getKeys() {
+		public @Nullable Stream<@NotNull String> getKeys() {
 			return this.inline ? this.coder.getKeys() : Arrays.stream(this.field.getAliases());
 		}
 	}

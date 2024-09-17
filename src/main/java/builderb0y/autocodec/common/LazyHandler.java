@@ -15,7 +15,7 @@ public abstract class LazyHandler<T_Handler> {
 	public @NotNull T_Handler getDelegateHandler() {
 		T_Handler handler = this.getNullableDelegateHandler();
 		if (handler != null) return handler;
-		else throw new IllegalStateException();
+		else throw new IllegalStateException("Delegate not yet set.");
 	}
 
 	public abstract void setDelegateHandler(@NotNull T_Handler handler);

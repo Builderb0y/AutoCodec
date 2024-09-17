@@ -40,7 +40,7 @@ public interface AutoCoder<T_Decoded> extends AutoEncoder<T_Decoded>, AutoDecode
 	which are sometimes desired over regular {@link Codec}'s.
 	*/
 	@Override
-	public default @Nullable Stream<String> getKeys() {
+	public default @Nullable Stream<@NotNull String> getKeys() {
 		return null;
 	}
 

@@ -38,7 +38,7 @@ public class ConstructOnlyDecoder<T_Decoded> extends NamedDecoder<T_Decoded> {
 	}
 
 	@Override
-	public @Nullable Stream<String> getKeys() {
+	public @Nullable Stream<@NotNull String> getKeys() {
 		return this.fallback != null ? this.fallback.getKeys() : null;
 	}
 

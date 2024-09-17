@@ -27,7 +27,7 @@ public record EncoderDecoderCoder<T_Decoded>(@NotNull AutoEncoder<T_Decoded> enc
 	}
 
 	@Override
-	public @Nullable Stream<String> getKeys() {
+	public @Nullable Stream<@NotNull String> getKeys() {
 		Stream<String> encoderKeys = this.encoder.getKeys();
 		if (encoderKeys == null) return null;
 		Stream<String> decoderKeys = this.decoder.getKeys();

@@ -35,6 +35,7 @@ import builderb0y.autocodec.imprinters.ImprintException;
 import builderb0y.autocodec.imprinters.ImprinterFactoryList;
 import builderb0y.autocodec.integration.Auto2DFUCodec;
 import builderb0y.autocodec.integration.Auto2DFUMapCodec;
+import builderb0y.autocodec.integration.DFU2AutoCoder;
 import builderb0y.autocodec.logging.Printer;
 import builderb0y.autocodec.logging.StackContextLogger;
 import builderb0y.autocodec.logging.TaskLogger;
@@ -103,6 +104,17 @@ public class AutoCodec implements ReflectContextProvider {
 	/** creates a DFU {@link Codec} which delegates to the provided {@link AutoCoder}. */
 	public <T_Decoded> @NotNull Codec<T_Decoded> createDFUCodec(@NotNull AutoCoder<T_Decoded> both) {
 		return new Auto2DFUCodec<>(this, both);
+	}
+
+	/**
+	creates an {@link AutoCoder} which delegates to the provided {@link Codec}.
+
+	note that there are a couple different ways
+	to tweak the behavior of the provided AutoCoder.
+	see the methods in {@link DFU2AutoCoder} for more info.
+	*/
+	public <T_Decoded> @NotNull DFU2AutoCoder<T_Decoded> wrapDFUCodec(@NotNull Codec<T_Decoded> codec) {
+		return new DFU2AutoCoder<>(codec);
 	}
 
 	//////////////// map codecs ////////////////
