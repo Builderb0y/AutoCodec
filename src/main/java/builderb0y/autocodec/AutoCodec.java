@@ -3,7 +3,9 @@ package builderb0y.autocodec;
 import java.lang.invoke.MethodHandles;
 import java.util.concurrent.locks.ReentrantLock;
 
-import com.mojang.serialization.*;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DynamicOps;
+import com.mojang.serialization.MapCodec;
 import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.ApiStatus.OverrideOnly;
 import org.jetbrains.annotations.NotNull;
@@ -31,7 +33,8 @@ import builderb0y.autocodec.encoders.EncoderFactoryList;
 import builderb0y.autocodec.imprinters.AutoImprinter;
 import builderb0y.autocodec.imprinters.ImprintException;
 import builderb0y.autocodec.imprinters.ImprinterFactoryList;
-import builderb0y.autocodec.integration.*;
+import builderb0y.autocodec.integration.Auto2DFUCodec;
+import builderb0y.autocodec.integration.Auto2DFUMapCodec;
 import builderb0y.autocodec.logging.Printer;
 import builderb0y.autocodec.logging.StackContextLogger;
 import builderb0y.autocodec.logging.TaskLogger;
@@ -89,153 +92,34 @@ public class AutoCodec implements ReflectContextProvider {
 
 	/** creates a DFU {@link Codec} which can encode and decode instances of the given class. */
 	public <T_Decoded> @NotNull Codec<T_Decoded> createDFUCodec(@NotNull Class<T_Decoded> clazz) {
-		return Auto2DFUCodec.of(this, this.createCoder(clazz));
+		return new Auto2DFUCodec<>(this, this.createCoder(clazz));
 	}
 
 	/** creates a DFU {@link Codec} which can encode and decode instances of the given type. */
 	public <T_Decoded> @NotNull Codec<T_Decoded> createDFUCodec(@NotNull ReifiedType<T_Decoded> type) {
-		return Auto2DFUCodec.of(this, this.createCoder(type));
-	}
-
-	/** creates a DFU {@link Codec} which delegates to the provided {@link AutoEncoder} and {@link AutoDecoder}. */
-	public <T_Decoded> @NotNull Codec<T_Decoded> createDFUCodec(@NotNull AutoEncoder<T_Decoded> encoder, @NotNull AutoDecoder<T_Decoded> decoder) {
-		return Auto2DFUCodec.of(this, encoder, decoder);
+		return new Auto2DFUCodec<>(this, this.createCoder(type));
 	}
 
 	/** creates a DFU {@link Codec} which delegates to the provided {@link AutoCoder}. */
 	public <T_Decoded> @NotNull Codec<T_Decoded> createDFUCodec(@NotNull AutoCoder<T_Decoded> both) {
-		return Auto2DFUCodec.of(this, both);
-	}
-
-	/**
-	returns an {@link AutoCoder} which delegates to the provided DFU {@link Encoder} and {@link Decoder}.
-
-	this method does not allow partial results.
-	any DataResult's returned by the provided
-	Encoder or Decoder which have a message
-	will be thrown as checked exceptions.
-	only complete successes will be returned normally.
-	if partial results should be accepted (but still logged),
-	consider using {@link #wrapDFUCodec(Encoder, Decoder, boolean)} instead.
-
-	this method assumes that the provided Encoder and Decoder are null-safe,
-	meaning that they can handle null or empty inputs on their own.
-	if this is not the case, consider using
-	{@link #wrapDFUCodec(Encoder, Decoder, boolean, boolean)} instead.
-	*/
-	public <T_Decoded> @NotNull AutoCoder<T_Decoded> wrapDFUCodec(@NotNull Encoder<T_Decoded> encoder, @NotNull Decoder<T_Decoded> decoder) {
-		return DFU2AutoCodec.of(encoder, decoder);
-	}
-
-	/**
-	returns an {@link AutoCoder} which delegates to the provided DFU {@link Encoder} and {@link Decoder}.
-
-	@param allowPartial if true, partial results will be returned,
-	and errors will be logged. if false, partial results will be ignored,
-	and errors will be thrown. note that in all cases, complete successes
-	will always be returned, and complete failures will always be thrown.
-
-	this method assumes that the provided Encoder and Decoder are null-safe,
-	meaning that they can handle null or empty inputs on their own.
-	if this is not the case, consider using
-	{@link #wrapDFUCodec(Encoder, Decoder, boolean, boolean)} instead.
-	*/
-	public <T_Decoded> @NotNull AutoCoder<T_Decoded> wrapDFUCodec(@NotNull Encoder<T_Decoded> encoder, @NotNull Decoder<T_Decoded> decoder, boolean allowPartial) {
-		return DFU2AutoCodec.of(encoder, decoder, allowPartial);
-	}
-
-	/**
-	returns an {@link AutoCoder} which delegates to the provided DFU {@link Codec}.
-
-	this method does not allow partial results.
-	any DataResult's returned by the provided Codec which
-	have a message will be thrown as checked exceptions.
-	only complete successes will be returned normally.
-	if partial results should be accepted (but still logged),
-	consider using {@link #wrapDFUCodec(Codec, boolean)} instead.
-
-	this method assumes that the provided Codec is null-safe,
-	meaning that it can handle null or empty inputs on its own.
-	if this is not the case, consider using
-	{@link #wrapDFUCodec(Codec, boolean, boolean)} instead.
-	*/
-	public <T_Decoded> @NotNull AutoCoder<T_Decoded> wrapDFUCodec(@NotNull Codec<T_Decoded> codec) {
-		return DFU2AutoCodec.of(codec);
-	}
-
-	/**
-	returns an {@link AutoCoder} which delegates to the provided DFU {@link Codec}.
-
-	@param allowPartial if true, partial results will be returned,
-	and errors will be logged. if false, partial results will be ignored,
-	and errors will be thrown. note that in all cases, complete successes
-	will always be returned, and complete failures will always be thrown.
-
-	this method assumes that the provided Codec is null-safe,
-	meaning that it can handle null or empty inputs on its own.
-	if this is not the case, consider using
-	{@link #wrapDFUCodec(Codec, boolean, boolean)} instead.
-	*/
-	public <T_Decoded> @NotNull AutoCoder<T_Decoded> wrapDFUCodec(@NotNull Codec<T_Decoded> codec, boolean allowPartial) {
-		return DFU2AutoCodec.of(codec, allowPartial);
-	}
-
-	/**
-	returns an {@link AutoCoder} which delegates to the provided DFU {@link Encoder} and {@link Decoder{.
-
-	@param allowPartial if true, partial results will be returned,
-	and errors will be logged. if false, partial results will be ignored,
-	and errors will be thrown. note that in all cases, complete successes
-	will always be returned, and complete failures will always be thrown.
-
-	@param nullSafe if true, the returned AutoCoder assumes that the provided
-	Encoder and Decoder are capable of handling null or empty inputs sanely.
-	if false, the returned AutoCoder short-circuits on null/empty inputs,
-	and returns null/empty as its output, without passing null/empty into
-	the provided Encoder or Decoder.
-	*/
-	public <T_Decoded> @NotNull AutoCoder<T_Decoded> wrapDFUCodec(@NotNull Encoder<T_Decoded> encoder, @NotNull Decoder<T_Decoded> decoder, boolean allowPartial, boolean nullSafe) {
-		return DFU2AutoCodec.of(encoder, decoder, allowPartial, nullSafe);
-	}
-
-	/**
-	returns an {@link AutoCoder} which delegates to the provided DFU {@link Codec}.
-
-	@param allowPartial if true, partial results will be returned,
-	and errors will be logged. if false, partial results will be ignored,
-	and errors will be thrown. note that in all cases, complete successes
-	will always be returned, and complete failures will always be thrown.
-
-	@param nullSafe if true, the returned AutoCoder assumes that the
-	provided Codec is capable of handling null or empty inputs sanely.
-	if false, the returned AutoCoder short-circuits on null/empty inputs,
-	and returns null/empty as its output, without passing null/empty into
-	the provided Codec.
-	*/
-	public <T_Decoded> @NotNull AutoCoder<T_Decoded> wrapDFUCodec(@NotNull Codec<T_Decoded> codec, boolean allowPartial, boolean nullSafe) {
-		return DFU2AutoCodec.of(codec, allowPartial, nullSafe);
+		return new Auto2DFUCodec<>(this, both);
 	}
 
 	//////////////// map codecs ////////////////
 
 	/** creates a DFU {@link MapCodec} which can encode and decode instances of the given class. */
 	public <T_Decoded> @NotNull MapCodec<T_Decoded> createDFUMapCodec(@NotNull Class<T_Decoded> clazz) {
-		return Auto2DFUMapCodec.of(this, this.createCoder(clazz));
+		return new Auto2DFUMapCodec<>(this, this.createCoder(clazz));
 	}
 
 	/** creates a DFU {@link MapCodec} which can encode and decode instances of the given type. */
 	public <T_Decoded> @NotNull MapCodec<T_Decoded> createDFUMapCodec(@NotNull ReifiedType<T_Decoded> type) {
-		return Auto2DFUMapCodec.of(this, this.createCoder(type));
-	}
-
-	/** creates a DFU {@link MapCodec} which delegates to the provided {@link AutoEncoder} and {@link AutoDecoder}. */
-	public <T_Decoded> @NotNull MapCodec<T_Decoded> createDFUMapCodec(@NotNull AutoEncoder<T_Decoded> encoder, @NotNull AutoDecoder<T_Decoded> decoder) {
-		return Auto2DFUMapCodec.of(this, encoder, decoder);
+		return new Auto2DFUMapCodec<>(this, this.createCoder(type));
 	}
 
 	/** creates a DFU {@link MapCodec} which delegates to the provided {@link AutoCoder}. */
 	public <T_Decoded> @NotNull MapCodec<T_Decoded> createDFUMapCodec(@NotNull AutoCoder<T_Decoded> both) {
-		return Auto2DFUMapCodec.of(this, both);
+		return new Auto2DFUMapCodec<>(this, both);
 	}
 
 

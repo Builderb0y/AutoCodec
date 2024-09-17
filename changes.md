@@ -21,9 +21,10 @@ Only AutoCoder's support verification now. Or at least, this is now the default 
 * DecodeContext.tryAsStream()/forceAsStream(): like try/forceAsList(), but returns a Stream. Also does not allocate a List as an intermediate operation.
 * MultiLine.value(): the line separator to use for encoding and decoding.
 
-## Removals and deprecations
+## Deprecations and removals
 
 * Methods on AutoCodec to create AutoEncoder's and AutoDecoder's are now annotated as TestOnly. AutoCoder extends both AutoEncoder and AutoDecoder, and can therefore be used as a substitute for both.
+* Methods on AutoCodec to create Codec's and MapCodec's from AutoEncoder's and AutoDecoder's have been removed. The methods to create them from AutoCoder's are still there.
 * Removed the ability to create DFU Encoder's and Decoder's directly. Codec extends both Encoder and Decoder, and can therefore be used as a substitute for both.
 * Removed MultiLine.INSTANCE, because MultiLine now allows you to configure the line endings, so there's not just one possible MultiLine instance anymore.
 * Removed the ability to "map" handlers to other types, because it's easy to mess up null checks this way; for example, by forgetting to call HandlerMapper.nullSafe().

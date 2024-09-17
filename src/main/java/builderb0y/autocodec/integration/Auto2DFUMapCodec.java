@@ -2,69 +2,64 @@ package builderb0y.autocodec.integration;
 
 import java.util.stream.Stream;
 
-import com.mojang.serialization.DynamicOps;
-import com.mojang.serialization.MapCodec;
-import org.jetbrains.annotations.NotNull;
+import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.*;
 
 import builderb0y.autocodec.AutoCodec;
 import builderb0y.autocodec.coders.AutoCoder;
-import builderb0y.autocodec.common.FactoryException;
-import builderb0y.autocodec.decoders.AutoDecoder;
-import builderb0y.autocodec.encoders.AutoEncoder;
+import builderb0y.autocodec.decoders.DecodeException;
+import builderb0y.autocodec.encoders.EncodeException;
+import builderb0y.autocodec.util.DFUVersions;
 
-public abstract class Auto2DFUMapCodec<T_Decoded> extends MapCodec<T_Decoded> implements Auto2DFUMapEncoder<T_Decoded>, Auto2DFUMapDecoder<T_Decoded> {
+public class Auto2DFUMapCodec<T_Decoded> extends MapCodec<T_Decoded> {
 
-	public static <T_Decoded> @NotNull Auto2DFUMapCodec<T_Decoded> of(@NotNull AutoCodec autoCodec, @NotNull AutoEncoder<T_Decoded> encoder, @NotNull AutoDecoder<T_Decoded> decoder) {
-		if (!encoder.hasKeys()) {
-			throw new FactoryException(encoder + " has no keys.");
+	public final AutoCodec autoCodec;
+	public final AutoCoder<T_Decoded> coder;
+
+	public Auto2DFUMapCodec(AutoCodec autoCodec, AutoCoder<T_Decoded> coder) {
+		if (!coder.hasKeys()) {
+			throw new IllegalArgumentException("Coder must have keys");
 		}
-		if (decoder != encoder && !decoder.hasKeys()) {
-			throw new FactoryException(decoder + " has no keys.");
-		}
-		return new Auto2DFUMapCodec<>() {
-
-			@Override
-			public @NotNull AutoCodec autoCodec() {
-				return autoCodec;
-			}
-
-			@Override
-			public @NotNull AutoDecoder<T_Decoded> autoDecoder() {
-				return decoder;
-			}
-
-			@Override
-			public @NotNull AutoEncoder<T_Decoded> autoEncoder() {
-				return encoder;
-			}
-		};
-	}
-
-	public static <T_Decoded> @NotNull Auto2DFUMapCodec<T_Decoded> of(@NotNull AutoCodec autoCodec, @NotNull AutoCoder<T_Decoded> coder) {
-		return of(autoCodec, coder, coder);
+		this.autoCodec = autoCodec;
+		this.coder = coder;
 	}
 
 	@Override
-	public <T> Stream<T> keys(DynamicOps<T> ops) {
-		Stream<String> stream;
-		if (this.autoEncoder() == this.autoDecoder()) {
-			stream = this.autoEncoder().getKeys();
-			if (stream == null) {
-				throw new IllegalStateException(this.autoEncoder() + " used to have keys, but now it doesn't?");
-			}
+	public <T_Encoded> DataResult<T_Decoded> decode(DynamicOps<T_Encoded> ops, MapLike<T_Encoded> input) {
+		try {
+			return DFUVersions.createSuccessDataResult(this.autoCodec.decode(this.coder, ops.createMap(input.entries()), ops));
 		}
-		else {
-			Stream<String> encoderKeys = this.autoEncoder().getKeys();
-			if (encoderKeys == null) {
-				throw new IllegalStateException(this.autoEncoder() + " used to have keys, but now it doesn't?");
-			}
-			Stream<String> decoderKeys = this.autoDecoder().getKeys();
-			if (decoderKeys == null) {
-				encoderKeys.close();
-				throw new IllegalStateException(this.autoDecoder() + " used to have keys, but now it doesn't?");
-			}
-			stream = Stream.concat(encoderKeys, decoderKeys);
+		catch (DecodeException exception) {
+			return DFUVersions.createErrorDataResult(exception::toString);
 		}
-		return stream.map(ops::createString);
+	}
+
+	@Override
+	public <T_Encoded> RecordBuilder<T_Encoded> encode(T_Decoded input, DynamicOps<T_Encoded> ops, RecordBuilder<T_Encoded> prefix) {
+		try {
+			T_Encoded result = this.autoCodec.encode(this.coder, input, ops);
+			DataResult<Stream<Pair<T_Encoded, T_Encoded>>> stream = ops.getMapValues(result);
+			Stream<Pair<T_Encoded, T_Encoded>> actualStream = DFUVersions.getResult(stream);
+			if (actualStream == null) {
+				throw new EncodeException(() -> input + " encoded into a value which was not an object. Error was: " + DFUVersions.getMessage(stream));
+			}
+			actualStream.forEachOrdered((Pair<T_Encoded, T_Encoded> pair) -> prefix.add(pair.getFirst(), pair.getSecond()));
+			return prefix;
+		}
+		catch (EncodeException exception) {
+			return prefix.withErrorsFrom(DFUVersions.createErrorDataResult(exception::toString));
+		}
+	}
+
+	@Override
+	public <T_Encoded> KeyCompressor<T_Encoded> compressor(DynamicOps<T_Encoded> ops) {
+		return new KeyCompressor<>(ops, this.keys(ops));
+	}
+
+	@Override
+	public <T_Encoded> Stream<T_Encoded> keys(DynamicOps<T_Encoded> ops) {
+		Stream<String> keys = this.coder.getKeys();
+		if (keys == null) throw new IllegalStateException(this.coder + " had keys, but now it doesn't?");
+		return keys.map(ops::createString);
 	}
 }
