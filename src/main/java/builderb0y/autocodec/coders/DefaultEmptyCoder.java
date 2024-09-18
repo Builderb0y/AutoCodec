@@ -3,6 +3,7 @@ package builderb0y.autocodec.coders;
 import java.lang.reflect.Array;
 import java.util.stream.Stream;
 
+import com.mojang.datafixers.util.Unit;
 import org.jetbrains.annotations.ApiStatus.OverrideOnly;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -136,7 +137,7 @@ public class DefaultEmptyCoder<T_Decoded> extends NamedCoder<T_Decoded> {
 				}
 				if (annotation.shared()) try {
 					@SuppressWarnings("TestOnlyProblems") //one of the rare cases where construction is useful without imprinting.
-					T_HandledType object = context.autoCodec.construct(constructor, null, ObjectOps.INSTANCE);
+					T_HandledType object = context.autoCodec.construct(constructor, Unit.INSTANCE, ObjectOps.INSTANCE);
 					constructor = new SharedConstructor<>(context.type, object);
 				}
 				catch (ConstructException exception) {

@@ -6,6 +6,7 @@ import org.junit.Test;
 
 import builderb0y.autocodec.annotations.Intern;
 import builderb0y.autocodec.annotations.MultiLine;
+import builderb0y.autocodec.coders.AutoCoder;
 import builderb0y.autocodec.common.TestCommon;
 import builderb0y.autocodec.reflection.reification.ReifiedType;
 import builderb0y.autocodec.util.ObjectOps;
@@ -20,7 +21,7 @@ public class InternedStringDecoderTest {
 		String expected = "test";
 		String from = new String(expected);
 		String to = TestCommon.DEFAULT_CODEC.decode(
-			TestCommon.DEFAULT_CODEC.createDecoder(
+			TestCommon.DEFAULT_CODEC.createCoder(
 				new ReifiedType<@Intern String>() {}
 			),
 			from,
@@ -32,12 +33,13 @@ public class InternedStringDecoderTest {
 
 	@Test
 	public void testMultiLine() throws DecodeException {
-		String expected = ("hello" + System.lineSeparator() + "world").intern();
+		String expected = "hello\nworld";
 		List<String> from = List.of(new String("hello"), new String("world"));
+		AutoCoder<@Intern @MultiLine String> coder = TestCommon.DEFAULT_CODEC.createCoder(
+			new ReifiedType<@Intern @MultiLine String>() {}
+		);
 		String to = TestCommon.DEFAULT_CODEC.decode(
-			TestCommon.DEFAULT_CODEC.createDecoder(
-				new ReifiedType<@Intern @MultiLine String>() {}
-			),
+			coder,
 			from,
 			ObjectOps.INSTANCE
 		);

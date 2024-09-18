@@ -8,9 +8,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import builderb0y.autocodec.annotations.SingletonArray;
+import builderb0y.autocodec.coders.AutoCoder;
 import builderb0y.autocodec.common.FactoryContext;
 import builderb0y.autocodec.common.FactoryException;
-import builderb0y.autocodec.decoders.AutoDecoder;
 import builderb0y.autocodec.decoders.DecodeContext;
 import builderb0y.autocodec.decoders.DecodeException;
 import builderb0y.autocodec.imprinters.AutoImprinter.NamedImprinter;
@@ -18,12 +18,12 @@ import builderb0y.autocodec.reflection.reification.ReifiedType;
 
 public class CollectionImprinter<T_Element, T_Collection extends Collection<T_Element>> extends NamedImprinter<T_Collection> {
 
-	public final @NotNull AutoDecoder<T_Element> elementDecoder;
+	public final @NotNull AutoCoder<T_Element> elementDecoder;
 	public final boolean singleton;
 
 	public CollectionImprinter(
 		@NotNull ReifiedType<T_Collection> type,
-		@NotNull AutoDecoder<T_Element> elementDecoder,
+		@NotNull AutoCoder<T_Element> elementDecoder,
 		boolean singleton
 	) {
 		super(type);
@@ -57,7 +57,7 @@ public class CollectionImprinter<T_Element, T_Collection extends Collection<T_El
 		public <T_HandledType> @Nullable AutoImprinter<?> tryCreate(@NotNull FactoryContext<T_HandledType> context) throws FactoryException {
 			ReifiedType<?> elementType = context.type.resolveParameter(Collection.class);
 			if (elementType != null) {
-				AutoDecoder<?> elementDecoder = context.type(elementType).forceCreateDecoder();
+				AutoCoder<?> elementDecoder = context.type(elementType).forceCreateCoder();
 				boolean singleton = context.type.getAnnotations().has(SingletonArray.class);
 				return new CollectionImprinter<>(context.type.uncheckedCast(), elementDecoder, singleton);
 			}

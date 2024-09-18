@@ -8,6 +8,10 @@ import builderb0y.autocodec.reflection.reification.ReifiedType;
 import builderb0y.autocodec.verifiers.AutoVerifier;
 import builderb0y.autocodec.verifiers.VerifyException;
 
+/**
+used to work around some weird rules for how
+imprinting works in {@link MultiFieldImprinter}.
+*/
 public class VerifyingImprinter<T_Decoded> extends NamedImprinter<T_Decoded> {
 
 	public final @NotNull AutoImprinter<T_Decoded> imprinter;

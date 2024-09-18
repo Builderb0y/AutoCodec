@@ -60,7 +60,7 @@ public class RecordDecoderTest {
 	@Test
 	public void testEncodedPoints() throws DecodeException {
 		try {
-			TestCommon.DISABLED_CODEC.createDecoder(BadEncodedPoint.class);
+			TestCommon.DISABLED_CODEC.createCoder(BadEncodedPoint.class);
 			fail();
 		}
 		catch (FactoryException expected) {}

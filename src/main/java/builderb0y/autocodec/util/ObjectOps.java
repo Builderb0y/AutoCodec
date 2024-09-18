@@ -10,6 +10,7 @@ import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
 import com.mojang.datafixers.util.Pair;
+import com.mojang.datafixers.util.Unit;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.JavaOps;
@@ -45,12 +46,12 @@ public class ObjectOps implements DynamicOps<Object> {
 
 	@Override
 	public Object empty() {
-		return null;
+		return Unit.INSTANCE;
 	}
 
 	@Override
 	public <U> U convertTo(DynamicOps<U> outOps, Object input) {
-		if (input == null) return outOps.empty();
+		if (input == Unit.INSTANCE) return outOps.empty();
 		if (input instanceof Number number) {
 			if (number instanceof Byte    b) return outOps.createByte  (b);
 			if (number instanceof Short   s) return outOps.createShort (s);

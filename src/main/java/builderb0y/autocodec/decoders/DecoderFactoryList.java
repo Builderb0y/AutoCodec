@@ -18,13 +18,8 @@ public class DecoderFactoryList extends FactoryList<AutoDecoder<?>, DecoderFacto
 	@OverrideOnly
 	public void setup() {
 		super.setup();
-		this.addFactoriesToStart(
-			UseDecoderFactory.INSTANCE,
-			ConstructOnlyDecoder.Factory.INSTANCE
-		);
-		this.addFactoryToEnd(
-			ConstructImprintDecoder.Factory.INSTANCE
-		);
+		this.addFactoryToStart(UseDecoderFactory.INSTANCE);
+		this.addFactoryToEnd(ConstructImprintDecoder.Factory.INSTANCE);
 	}
 
 	@Override

@@ -5,6 +5,7 @@ import com.mojang.serialization.JsonOps;
 import org.junit.Test;
 
 import builderb0y.autocodec.annotations.*;
+import builderb0y.autocodec.coders.AutoCoder;
 import builderb0y.autocodec.common.JsonBuilder.JsonObjectBuilder;
 import builderb0y.autocodec.common.TestCommon;
 
@@ -14,53 +15,64 @@ public class DefaultEncoderTest {
 
 	@Test
 	public void test() {
-		AutoEncoder<DefaultsNotAlways> notAlways = TestCommon.DEFAULT_CODEC.createEncoder(DefaultsNotAlways.class);
-		AutoEncoder<DefaultsAlways> always = TestCommon.DEFAULT_CODEC.createEncoder(DefaultsAlways.class);
+		AutoCoder<DefaultsNotAlways> notAlways = TestCommon.DEFAULT_CODEC.createCoder(DefaultsNotAlways.class);
+		AutoCoder<DefaultsAlways> always = TestCommon.DEFAULT_CODEC.createCoder(DefaultsAlways.class);
 		assertEquals(
+			new JsonObject(),
 			TestCommon.DEFAULT_CODEC.encode(
 				notAlways,
 				new DefaultsNotAlways((byte)(42), (short)(42), 42, 42, 42, 42, "a", 'b', Color.RED, true),
 				JsonOps.INSTANCE
-			),
-			new JsonObject()
+			)
 		);
 		assertEquals(
-			TestCommon.DEFAULT_CODEC.encode(
-				always,
-				new DefaultsAlways((byte)(42), (short)(42), 42, 42, 42, 42, "a", 'b', Color.RED, true),
-				JsonOps.INSTANCE
-			),
 			new JsonObjectBuilder()
-			.add("defaultByte", 42)
-			.add("defaultShort", 42)
+			.add("defaultByte", (byte)(42))
+			.add("defaultShort", (short)(42))
 			.add("defaultInt", 42)
-			.add("defaultLong", 42)
-			.add("defaultFloat", 42)
-			.add("defaultDouble", 42)
+			.add("defaultLong", 42L)
+			.add("defaultFloat", 42.0F)
+			.add("defaultDouble", 42.0D)
 			.add("defaultString", "a")
 			.add("defaultChar", 'b')
 			.add("defaultColor", "RED")
 			.add("defaultBoolean", true)
-			.build()
+			.build(),
+			TestCommon.DEFAULT_CODEC.encode(
+				always,
+				new DefaultsAlways((byte)(42), (short)(42), 42, 42, 42, 42, "a", 'b', Color.RED, true),
+				JsonOps.INSTANCE
+			)
 		);
 		assertEquals(
-			TestCommon.DEFAULT_CODEC.encode(
-				notAlways,
-				new DefaultsNotAlways((byte)(123), (short)(123), 123, 123, 123, 123, "z", 'y', Color.GREEN, false),
-				JsonOps.INSTANCE
-			),
 			new JsonObjectBuilder()
-			.add("defaultByte", 123)
-			.add("defaultShort", 123)
+			.add("defaultByte", (byte)(123))
+			.add("defaultShort", (short)(123))
 			.add("defaultInt", 123)
-			.add("defaultLong", 123)
-			.add("defaultFloat", 123)
-			.add("defaultDouble", 123)
+			.add("defaultLong", 123L)
+			.add("defaultFloat", 123.0F)
+			.add("defaultDouble", 123.0D)
 			.add("defaultString", "z")
 			.add("defaultChar", 'y')
 			.add("defaultColor", "GREEN")
 			.add("defaultBoolean", false)
-			.build()
+			.build(),
+			TestCommon.DEFAULT_CODEC.encode(
+				notAlways,
+				new DefaultsNotAlways(
+					(byte)(123),
+					(short)(123),
+					123,
+					123,
+					123,
+					123,
+					"z",
+					'y',
+					Color.GREEN,
+					false
+				),
+				JsonOps.INSTANCE
+			)
 		);
 	}
 

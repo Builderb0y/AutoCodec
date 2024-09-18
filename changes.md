@@ -35,9 +35,9 @@ Only AutoCoder's support verification now. Or at least, this is now the default 
 * Removed the ability to "map" handlers to other types, because it's easy to mess up null checks this way; for example, by forgetting to call HandlerMapper.nullSafe().
 	* Create a full handler which does what you want instead. This gives you more control anyway.
 * Removed DefaultValue; it has been simplified and replaced with DefaultSpec.
+* Removed the ConstructOnly annotation, since it kind of goes against the whole point of decoding.
 
 ## Other changes
 
 * Renamed the "input" field on EncodeContext to "object" for consistency, as AutoVerifier names the T_Decoded field "object" too, and DecodeContext uses the name "input" for encoded data, not decoded objects.
-* ObjectOps now uses null instead of Unit.INSTANCE to represent empty values.
 * DefaultObject.DefaultObjectMode.METHOD_WITH_CONTEXT has been split up into encoded and decoded variants.

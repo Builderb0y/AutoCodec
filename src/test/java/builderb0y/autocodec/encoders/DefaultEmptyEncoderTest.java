@@ -20,7 +20,7 @@ public class DefaultEmptyEncoderTest {
 	@Test
 	public void testArrays() {
 		JsonElement encoded = TestCommon.DEFAULT_CODEC.encode(
-			TestCommon.DEFAULT_CODEC.createEncoder(
+			TestCommon.DEFAULT_CODEC.createCoder(
 				new ReifiedType<int @DefaultEmpty []>() {}
 			),
 			new int[0],
@@ -32,7 +32,7 @@ public class DefaultEmptyEncoderTest {
 	@Test
 	public void testLists() {
 		JsonElement encoded = TestCommon.DEFAULT_CODEC.encode(
-			TestCommon.DEFAULT_CODEC.createEncoder(
+			TestCommon.DEFAULT_CODEC.createCoder(
 				new ReifiedType<@DefaultEmpty List<String>>() {}
 			),
 			Collections.emptyList(),
@@ -44,7 +44,7 @@ public class DefaultEmptyEncoderTest {
 	@Test
 	public void testMaps() {
 		JsonElement encoded = TestCommon.DEFAULT_CODEC.encode(
-			TestCommon.DEFAULT_CODEC.createEncoder(
+			TestCommon.DEFAULT_CODEC.createCoder(
 				new ReifiedType<@DefaultEmpty Map<String, String>>() {}
 			),
 			Collections.emptyMap(),

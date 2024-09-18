@@ -10,10 +10,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import builderb0y.autocodec.annotations.EncodeInline;
+import builderb0y.autocodec.coders.AutoCoder;
 import builderb0y.autocodec.common.AutoHandler;
 import builderb0y.autocodec.common.FactoryContext;
 import builderb0y.autocodec.common.FactoryException;
-import builderb0y.autocodec.decoders.AutoDecoder;
 import builderb0y.autocodec.decoders.DecodeContext;
 import builderb0y.autocodec.decoders.DecodeException;
 import builderb0y.autocodec.imprinters.AutoImprinter.NamedImprinter;
@@ -114,7 +114,7 @@ public class MultiFieldImprinter<T_Decoded> extends NamedImprinter<T_Decoded> {
 				}
 			}
 			else {
-				AutoDecoder<T_Member> decoder = context.type(field.getType()).tryCreateDecoder();
+				AutoCoder<T_Member> decoder = context.type(field.getType()).tryCreateCoder();
 				if (decoder == null) return null;
 				InstanceWriter<T_Owner, T_Member> writer = field.createInstanceWriter(context);
 				if (field.getType().getAnnotations().has(EncodeInline.class)) {
@@ -133,16 +133,16 @@ public class MultiFieldImprinter<T_Decoded> extends NamedImprinter<T_Decoded> {
 	public static abstract class DecodingFieldStrategy<T_Owner, T_Member> extends FieldStrategy<T_Owner, T_Member> {
 
 		public final @NotNull InstanceWriter<T_Owner, T_Member> writer;
-		public final @NotNull AutoDecoder<T_Member> decoder;
+		public final @NotNull AutoCoder<T_Member> coder;
 
 		public DecodingFieldStrategy(
 			@NotNull FieldLikeMemberView<T_Owner, T_Member> field,
 			@NotNull InstanceWriter<T_Owner, T_Member> writer,
-			@NotNull AutoDecoder<T_Member> decoder
+			@NotNull AutoCoder<T_Member> coder
 		) {
-			super(field, decoder);
+			super(field, coder);
 			this.writer  = writer;
-			this.decoder = decoder;
+			this.coder = coder;
 		}
 	}
 
@@ -152,7 +152,7 @@ public class MultiFieldImprinter<T_Decoded> extends NamedImprinter<T_Decoded> {
 		public NonInlineDecodingFieldStrategy(
 			@NotNull FieldLikeMemberView<T_Owner, T_Member> field,
 			@NotNull InstanceWriter<T_Owner, T_Member> writer,
-			@NotNull AutoDecoder<T_Member> decoder
+			@NotNull AutoCoder<T_Member> decoder
 		) {
 			super(field, writer, decoder);
 		}
@@ -162,7 +162,7 @@ public class MultiFieldImprinter<T_Decoded> extends NamedImprinter<T_Decoded> {
 		public <T_Encoded> void imprint(@NotNull ImprintContext<T_Encoded, T_Owner> context) throws ImprintException {
 			try {
 				DecodeContext<T_Encoded> member = context.getFirstMember(this.field.getAliases());
-				T_Member object = member.decodeWith(this.decoder);
+				T_Member object = member.decodeWith(this.coder);
 				if (object != null) this.writer.set(context.object, object);
 			}
 			catch (ImprintException exception) {
@@ -185,7 +185,7 @@ public class MultiFieldImprinter<T_Decoded> extends NamedImprinter<T_Decoded> {
 		public InlineDecodingFieldStrategy(
 			@NotNull FieldLikeMemberView<T_Owner, T_Member> field,
 			@NotNull InstanceWriter<T_Owner, T_Member> writer,
-			@NotNull AutoDecoder<T_Member> decoder
+			@NotNull AutoCoder<T_Member> decoder
 		) {
 			super(field, writer, decoder);
 		}
@@ -194,7 +194,7 @@ public class MultiFieldImprinter<T_Decoded> extends NamedImprinter<T_Decoded> {
 		@OverrideOnly
 		public <T_Encoded> void imprint(@NotNull ImprintContext<T_Encoded, T_Owner> context) throws ImprintException {
 			try {
-				this.writer.set(context.object, context.decodeWith(this.decoder));
+				this.writer.set(context.object, context.decodeWith(this.coder));
 			}
 			catch (DecodeException exception) {
 				throw new ImprintException(exception);
@@ -203,7 +203,7 @@ public class MultiFieldImprinter<T_Decoded> extends NamedImprinter<T_Decoded> {
 
 		@Override
 		public @Nullable Stream<@NotNull String> getKeys() {
-			return this.decoder.getKeys();
+			return this.coder.getKeys();
 		}
 	}
 

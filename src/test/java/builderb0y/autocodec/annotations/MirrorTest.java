@@ -13,8 +13,8 @@ import com.google.gson.JsonPrimitive;
 import com.mojang.serialization.JsonOps;
 import org.junit.Test;
 
+import builderb0y.autocodec.coders.AutoCoder;
 import builderb0y.autocodec.common.TestCommon;
-import builderb0y.autocodec.decoders.AutoDecoder;
 import builderb0y.autocodec.decoders.DecodeException;
 import builderb0y.autocodec.reflection.reification.ReifiedType;
 import builderb0y.autocodec.verifiers.VerifyException;
@@ -25,7 +25,7 @@ public class MirrorTest {
 
 	@Test
 	public void testBasic() throws DecodeException {
-		AutoDecoder<List<String>> decoder = TestCommon.DEFAULT_CODEC.createDecoder(
+		AutoCoder<List<String>> decoder = TestCommon.DEFAULT_CODEC.createCoder(
 			new ReifiedType<@A List<String>>() {}
 		);
 		List<String> decoded = TestCommon.DEFAULT_CODEC.decode(decoder, new JsonPrimitive("test"), JsonOps.INSTANCE);
@@ -40,7 +40,7 @@ public class MirrorTest {
 
 	@Test
 	public void testNested() throws DecodeException {
-		AutoDecoder<List<String>> decoder = TestCommon.DEFAULT_CODEC.createDecoder(
+		AutoCoder<List<String>> decoder = TestCommon.DEFAULT_CODEC.createCoder(
 			new ReifiedType<@B List<String>>() {}
 		);
 		List<String> decoded = TestCommon.DEFAULT_CODEC.decode(decoder, new JsonPrimitive("test"), JsonOps.INSTANCE);

@@ -1,6 +1,7 @@
 package builderb0y.autocodec.coders;
 
 import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodType;
 
 import org.jetbrains.annotations.ApiStatus.OverrideOnly;
 import org.jetbrains.annotations.NotNull;
@@ -38,8 +39,8 @@ public class UseCoderFactory extends UseHandlerFactory0<AutoCoder<?>> implements
 			encoder = UseEncoderFactory.findMethodBeingEncoder(context, spec),
 			decoder = UseDecoderFactory.findMethodBeingDecoder(context, spec);
 		MethodHandle
-			encoderHandle = encoder.createMethodHandle(context),
-			decoderHandle = decoder.createMethodHandle(context);
+			encoderHandle = encoder.createMethodHandle(context).asType(MethodType.methodType(Object.class, EncodeContext.class)),
+			decoderHandle = decoder.createMethodHandle(context).asType(MethodType.methodType(Object.class, DecodeContext.class));
 		return new NamedCoder<>("UseCoder: { encoder: " + encoder + ", decoder: " + decoder + " }") {
 
 			@Override

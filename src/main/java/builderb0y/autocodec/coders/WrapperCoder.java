@@ -1,6 +1,7 @@
 package builderb0y.autocodec.coders;
 
 import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodType;
 
 import org.jetbrains.annotations.ApiStatus.OverrideOnly;
 import org.jetbrains.annotations.NotNull;
@@ -31,7 +32,7 @@ public class WrapperCoder<T_Wrapper, T_Wrapped> extends NamedCoder<T_Wrapper> {
 	) {
 		super(spec.wrapperType());
 		this.spec = spec;
-		this.constructorHandle = constructorHandle;
+		this.constructorHandle = constructorHandle.asType(MethodType.genericMethodType(1));
 		this.getter = getter;
 		this.wrappedCoder = wrappedCoder;
 	}

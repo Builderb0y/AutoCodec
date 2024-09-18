@@ -43,7 +43,7 @@ public class RecordCoder<T_DecodedRecord> extends MultiFieldEncoder<T_DecodedRec
 
 	public RecordCoder(@NotNull ReifiedType<T_DecodedRecord> handledType, @NotNull MethodHandle decoder, @NotNull FieldStrategy<T_DecodedRecord, ?> @NotNull [] fields) {
 		super(handledType, fields);
-		this.decoder = decoder;
+		this.decoder = decoder.asType(MethodType.methodType(Object.class, DecodeContext.class));
 	}
 
 	@Override
@@ -156,7 +156,7 @@ public class RecordCoder<T_DecodedRecord> extends MultiFieldEncoder<T_DecodedRec
 						fields[index],
 						fields[index].createInstanceReader(context),
 						context.type(fields[index].getType()).forceCreateCoder(),
-						fields[index].getAnnotations().has(EncodeInline.class)
+						fields[index].getType().getAnnotations().has(EncodeInline.class)
 					);
 				}
 				MethodHandle[] filters = new MethodHandle[length];

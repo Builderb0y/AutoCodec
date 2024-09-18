@@ -57,7 +57,7 @@ public class DefaultCoder<T_Decoded> extends NamedCoder<T_Decoded> {
 			if (!this.spec.alwaysEncode()) {
 				switch (this.spec.mode()) {
 					case ENCODED -> {
-						T_Encoded encoded = this.spec.getEncodedDefaultValue(context);
+						T_Encoded encoded = context.encodeWith(this.fallback);
 						if (Objects.equals(this.spec.getEncodedDefaultValue(context), encoded)) {
 							encoded = context.empty();
 						}

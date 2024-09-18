@@ -58,19 +58,94 @@ public record DefaultSpec(
 		if (annotation instanceof DefaultObject defaultObject) {
 			return handleObject(context, defaultObject);
 		}
-		Object value;
+		Class<?> valueClass;
+		DefaultGetter getter;
 		DefaultMode mode;
 		boolean alwaysEncode;
-		if      (annotation instanceof DefaultByte    defaultByte   ) { value = defaultByte   .value(); mode = defaultByte   .mode(); alwaysEncode = defaultByte   .alwaysEncode(); }
-		else if (annotation instanceof DefaultShort   defaultShort  ) { value = defaultShort  .value(); mode = defaultShort  .mode(); alwaysEncode = defaultShort  .alwaysEncode(); }
-		else if (annotation instanceof DefaultInt     defaultInt    ) { value = defaultInt    .value(); mode = defaultInt    .mode(); alwaysEncode = defaultInt    .alwaysEncode(); }
-		else if (annotation instanceof DefaultLong    defaultLong   ) { value = defaultLong   .value(); mode = defaultLong   .mode(); alwaysEncode = defaultLong   .alwaysEncode(); }
-		else if (annotation instanceof DefaultFloat   defaultFloat  ) { value = defaultFloat  .value(); mode = defaultFloat  .mode(); alwaysEncode = defaultFloat  .alwaysEncode(); }
-		else if (annotation instanceof DefaultDouble  defaultDouble ) { value = defaultDouble .value(); mode = defaultDouble .mode(); alwaysEncode = defaultDouble .alwaysEncode(); }
-		else if (annotation instanceof DefaultBoolean defaultBoolean) { value = defaultBoolean.value(); mode = defaultBoolean.mode(); alwaysEncode = defaultBoolean.alwaysEncode(); }
-		else if (annotation instanceof DefaultString  defaultString ) { value = defaultString .value(); mode = defaultString .mode(); alwaysEncode = defaultString .alwaysEncode(); }
-		else throw new FactoryException("Unhandled annotation: " + annotation);
-		if (mode == DefaultMode.DECODED && context.type.getRawClass() != value.getClass() && context.type.getRawClass() != Primitives.unwrap(value.getClass())) {
+		if (annotation instanceof DefaultByte defaultByte) {
+			valueClass = byte.class;
+			byte value = defaultByte.value();
+			getter = switch (defaultByte.mode()) {
+				case ENCODED -> (DynamicOpsContext<?> c) -> c.createByte(value);
+				case DECODED -> constant(value);
+			};
+			mode = defaultByte.mode();
+			alwaysEncode = defaultByte.alwaysEncode();
+		}
+		else if (annotation instanceof DefaultShort defaultShort) {
+			valueClass = short.class;
+			short value = defaultShort.value();
+			getter = switch (defaultShort.mode()) {
+				case ENCODED -> (DynamicOpsContext<?> c) -> c.createShort(value);
+				case DECODED -> constant(value);
+			};
+			mode = defaultShort.mode();
+			alwaysEncode = defaultShort.alwaysEncode();
+		}
+		else if (annotation instanceof DefaultInt defaultInt) {
+			valueClass = int.class;
+			int value = defaultInt.value();
+			getter = switch (defaultInt.mode()) {
+				case ENCODED -> (DynamicOpsContext<?> c) -> c.createInt(value);
+				case DECODED -> constant(value);
+			};
+			mode = defaultInt.mode();
+			alwaysEncode = defaultInt.alwaysEncode();
+		}
+		else if (annotation instanceof DefaultLong defaultLong) {
+			valueClass = long.class;
+			long value = defaultLong.value();
+			getter = switch (defaultLong.mode()) {
+				case ENCODED -> (DynamicOpsContext<?> c) -> c.createLong(value);
+				case DECODED -> constant(value);
+			};
+			mode = defaultLong.mode();
+			alwaysEncode = defaultLong.alwaysEncode();
+		}
+		else if (annotation instanceof DefaultFloat defaultFloat) {
+			valueClass = float.class;
+			float value = defaultFloat.value();
+			getter = switch (defaultFloat.mode()) {
+				case ENCODED -> (DynamicOpsContext<?> c) -> c.createFloat(value);
+				case DECODED -> constant(value);
+			};
+			mode = defaultFloat.mode();
+			alwaysEncode = defaultFloat.alwaysEncode();
+		}
+		else if (annotation instanceof DefaultDouble defaultDouble) {
+			valueClass = double.class;
+			double value = defaultDouble.value();
+			getter = switch (defaultDouble.mode()) {
+				case ENCODED -> (DynamicOpsContext<?> c) -> c.createDouble(value);
+				case DECODED -> constant(value);
+			};
+			mode = defaultDouble.mode();
+			alwaysEncode = defaultDouble.alwaysEncode();
+		}
+		else if (annotation instanceof DefaultBoolean defaultBoolean) {
+			valueClass = boolean.class;
+			boolean value = defaultBoolean.value();
+			getter = switch (defaultBoolean.mode()) {
+				case ENCODED -> (DynamicOpsContext<?> c) -> c.createBoolean(value);
+				case DECODED -> constant(value);
+			};
+			mode = defaultBoolean.mode();
+			alwaysEncode = defaultBoolean.alwaysEncode();
+		}
+		else if (annotation instanceof DefaultString defaultString) {
+			valueClass = String.class;
+			String value = defaultString.value();
+			getter = switch (defaultString.mode()) {
+				case ENCODED -> (DynamicOpsContext<?> c) -> c.createString(value);
+				case DECODED -> constant(value);
+			};
+			mode = defaultString.mode();
+			alwaysEncode = defaultString.alwaysEncode();
+		}
+		else {
+			throw new FactoryException("Unhandled annotation: " + annotation);
+		}
+		if (mode == DefaultMode.DECODED && context.type.getRawClass() != Primitives.wrap(valueClass) && context.type.getRawClass() != Primitives.unwrap(valueClass)) {
 			throw new FactoryException(
 				new TypeFormatter(128)
 				.annotations(true)
@@ -84,7 +159,7 @@ public record DefaultSpec(
 				.toString()
 			);
 		}
-		return new DefaultSpec(constant(value), mode, alwaysEncode);
+		return new DefaultSpec(getter, mode, alwaysEncode);
 	}
 
 	public static @NotNull DefaultSpec handleObject(@NotNull FactoryContext<?> context, @NotNull DefaultObject annotation) {
@@ -106,7 +181,7 @@ public record DefaultSpec(
 						MemberCollector.forceUnique()
 					);
 					MethodHandle getter = field.createStaticReaderHandle(context);
-					getter = MethodHandles.dropArguments(getter, 1, DynamicOpsContext.class);
+					getter = MethodHandles.dropArguments(getter, 0, DynamicOpsContext.class);
 					yield new DefaultSpec(
 						DefaultGetter.create(getter),
 						annotation.mode().defaultMode,
@@ -214,6 +289,7 @@ public record DefaultSpec(
 						MemberCollector.forceUnique()
 					);
 					MethodHandle handle = method.createMethodHandle(context);
+					handle = MethodHandles.dropArguments(handle, 0, DynamicOpsContext.class);
 					yield new DefaultSpec(
 						DefaultGetter.create(handle),
 						annotation.mode().defaultMode,

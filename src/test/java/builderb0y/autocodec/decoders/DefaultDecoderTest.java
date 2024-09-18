@@ -1,6 +1,7 @@
 package builderb0y.autocodec.decoders;
 
 import java.util.Map;
+import java.util.Objects;
 
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
@@ -9,6 +10,7 @@ import org.junit.Test;
 
 import builderb0y.autocodec.annotations.*;
 import builderb0y.autocodec.annotations.DefaultObject.DefaultObjectMode;
+import builderb0y.autocodec.coders.AutoCoder;
 import builderb0y.autocodec.coders.CoderUnitTester;
 import builderb0y.autocodec.common.DynamicOpsContext;
 import builderb0y.autocodec.common.TestCommon;
@@ -20,8 +22,8 @@ public class DefaultDecoderTest {
 
 	@Test
 	public void test() throws DecodeException {
-		AutoDecoder<Defaults> decoder = TestCommon.DEFAULT_CODEC.createDecoder(Defaults.class);
-		Defaults defaults = TestCommon.DEFAULT_CODEC.decode(decoder, new JsonObject(), JsonOps.INSTANCE);
+		AutoCoder<Defaults> coder = TestCommon.DEFAULT_CODEC.createCoder(Defaults.class);
+		Defaults defaults = TestCommon.DEFAULT_CODEC.decode(coder, new JsonObject(), JsonOps.INSTANCE);
 		assertNotNull(defaults);
 		assertEquals(42, defaults.defaultByte);
 		assertEquals(42, defaults.defaultShort);
@@ -59,7 +61,7 @@ public class DefaultDecoderTest {
 
 		new CoderUnitTester<>(TestCommon.DEFAULT_CODEC, new ReifiedType<Box<@DefaultObject(name = "OBJ_DEFAULT",          mode = DefaultObjectMode.FIELD,                       strict = false) Box<String>>> () {}).test(new Box<>(Box.DEFAULT), new JsonObject(), JsonOps.INSTANCE);
 		new CoderUnitTester<>(TestCommon.DEFAULT_CODEC, new ReifiedType<Box<@DefaultObject(name = "getObjDefaultEncoded", mode = DefaultObjectMode.METHOD_WITH_CONTEXT_ENCODED, strict = false) Box<String>>> () {}).test(new Box<>(Box.DEFAULT), new JsonObject(), JsonOps.INSTANCE);
-		new CoderUnitTester<>(TestCommon.DEFAULT_CODEC, new ReifiedType<Box<@DefaultObject(name = "getObjDefaultEncoded", mode = DefaultObjectMode.METHOD_WITH_CONTEXT_DECODED, strict = false) Box<String>>> () {}).test(new Box<>(Box.DEFAULT), new JsonObject(), JsonOps.INSTANCE);
+		new CoderUnitTester<>(TestCommon.DEFAULT_CODEC, new ReifiedType<Box<@DefaultObject(name = "getObjDefaultDecoded", mode = DefaultObjectMode.METHOD_WITH_CONTEXT_DECODED, strict = false) Box<String>>> () {}).test(new Box<>(Box.DEFAULT), new JsonObject(), JsonOps.INSTANCE);
 		new CoderUnitTester<>(TestCommon.DEFAULT_CODEC, new ReifiedType<Box<@DefaultObject(name = "getObjDefault",        mode = DefaultObjectMode.METHOD_WITHOUT_CONTEXT,      strict = false) Box<String>>> () {}).test(new Box<>(Box.DEFAULT), new JsonObject(), JsonOps.INSTANCE);
 
 		new CoderUnitTester<>(TestCommon.DEFAULT_CODEC, new ReifiedType<@DefaultObject(name = "new", mode = DefaultObjectMode.METHOD_WITHOUT_CONTEXT) Category>() {}).testEncoded(JsonNull.INSTANCE, JsonOps.INSTANCE);
@@ -67,7 +69,7 @@ public class DefaultDecoderTest {
 
 	public static record Box<T>(T value) {
 
-		public static Box<String> DEFAULT = new Box<>("");
+		public static final Box<String> DEFAULT = new Box<>("");
 
 		public static Box<String> getDefault() {
 			return DEFAULT;
@@ -111,6 +113,23 @@ public class DefaultDecoderTest {
 		public Category() {
 			this.name = "default";
 			this.value = -1;
+		}
+
+		@Override
+		public String toString() {
+			return this.getClass().getSimpleName() + ": { name: " + this.name + ", value: " + this.value + " }";
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) return true;
+			if (!(o instanceof Category category)) return false;
+			return this.value == category.value && Objects.equals(this.name, category.name);
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(this.name, this.value);
 		}
 	}
 }

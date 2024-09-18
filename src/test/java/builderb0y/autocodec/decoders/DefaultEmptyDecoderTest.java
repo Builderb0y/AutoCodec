@@ -8,6 +8,7 @@ import com.mojang.serialization.JsonOps;
 import org.junit.Test;
 
 import builderb0y.autocodec.annotations.DefaultEmpty;
+import builderb0y.autocodec.coders.AutoCoder;
 import builderb0y.autocodec.common.TestCommon;
 import builderb0y.autocodec.reflection.reification.ReifiedType;
 
@@ -18,7 +19,7 @@ public class DefaultEmptyDecoderTest {
 	@Test
 	public void testArrays() throws DecodeException {
 		int[] decoded = TestCommon.DEFAULT_CODEC.decode(
-			TestCommon.DEFAULT_CODEC.createDecoder(
+			TestCommon.DEFAULT_CODEC.createCoder(
 				new ReifiedType<int @DefaultEmpty []>() {}
 			),
 			JsonNull.INSTANCE,
@@ -26,18 +27,18 @@ public class DefaultEmptyDecoderTest {
 		);
 		assertTrue(decoded != null && decoded.length == 0);
 
-		AutoDecoder<int[]> sharedDecoder = TestCommon.DEFAULT_CODEC.createDecoder(
+		AutoCoder<int[]> sharedCoder = TestCommon.DEFAULT_CODEC.createCoder(
 			new ReifiedType<int @DefaultEmpty(shared = true) []>() {}
 		);
-		int[] sharedArray1 = TestCommon.DEFAULT_CODEC.decode(sharedDecoder, JsonNull.INSTANCE, JsonOps.INSTANCE);
-		int[] sharedArray2 = TestCommon.DEFAULT_CODEC.decode(sharedDecoder, JsonNull.INSTANCE, JsonOps.INSTANCE);
+		int[] sharedArray1 = TestCommon.DEFAULT_CODEC.decode(sharedCoder, JsonNull.INSTANCE, JsonOps.INSTANCE);
+		int[] sharedArray2 = TestCommon.DEFAULT_CODEC.decode(sharedCoder, JsonNull.INSTANCE, JsonOps.INSTANCE);
 		assertSame(sharedArray1, sharedArray2);
 	}
 
 	@Test
 	public void testLists() throws DecodeException {
 		List<String> decoded = TestCommon.DEFAULT_CODEC.decode(
-			TestCommon.DEFAULT_CODEC.createDecoder(
+			TestCommon.DEFAULT_CODEC.createCoder(
 				new ReifiedType<@DefaultEmpty List<String>>() {}
 			),
 			JsonNull.INSTANCE,
@@ -45,18 +46,18 @@ public class DefaultEmptyDecoderTest {
 		);
 		assertTrue(decoded != null && decoded.isEmpty());
 
-		AutoDecoder<List<String>> sharedDecoder = TestCommon.DEFAULT_CODEC.createDecoder(
+		AutoCoder<List<String>> sharedCoder = TestCommon.DEFAULT_CODEC.createCoder(
 			new ReifiedType<@DefaultEmpty(shared = true) List<String>>() {}
 		);
-		List<String> sharedArray1 = TestCommon.DEFAULT_CODEC.decode(sharedDecoder, JsonNull.INSTANCE, JsonOps.INSTANCE);
-		List<String> sharedArray2 = TestCommon.DEFAULT_CODEC.decode(sharedDecoder, JsonNull.INSTANCE, JsonOps.INSTANCE);
+		List<String> sharedArray1 = TestCommon.DEFAULT_CODEC.decode(sharedCoder, JsonNull.INSTANCE, JsonOps.INSTANCE);
+		List<String> sharedArray2 = TestCommon.DEFAULT_CODEC.decode(sharedCoder, JsonNull.INSTANCE, JsonOps.INSTANCE);
 		assertSame(sharedArray1, sharedArray2);
 	}
 
 	@Test
 	public void testMaps() throws DecodeException {
 		Map<String, String> decoded = TestCommon.DEFAULT_CODEC.decode(
-			TestCommon.DEFAULT_CODEC.createDecoder(
+			TestCommon.DEFAULT_CODEC.createCoder(
 				new ReifiedType<@DefaultEmpty Map<String, String>>() {}
 			),
 			JsonNull.INSTANCE,
@@ -64,11 +65,11 @@ public class DefaultEmptyDecoderTest {
 		);
 		assertTrue(decoded != null && decoded.isEmpty());
 
-		AutoDecoder<Map<String, String>> sharedDecoder = TestCommon.DEFAULT_CODEC.createDecoder(
+		AutoCoder<Map<String, String>> sharedCoder = TestCommon.DEFAULT_CODEC.createCoder(
 			new ReifiedType<@DefaultEmpty(shared = true) Map<String, String>>() {}
 		);
-		Map<String, String> sharedArray1 = TestCommon.DEFAULT_CODEC.decode(sharedDecoder, JsonNull.INSTANCE, JsonOps.INSTANCE);
-		Map<String, String> sharedArray2 = TestCommon.DEFAULT_CODEC.decode(sharedDecoder, JsonNull.INSTANCE, JsonOps.INSTANCE);
+		Map<String, String> sharedArray1 = TestCommon.DEFAULT_CODEC.decode(sharedCoder, JsonNull.INSTANCE, JsonOps.INSTANCE);
+		Map<String, String> sharedArray2 = TestCommon.DEFAULT_CODEC.decode(sharedCoder, JsonNull.INSTANCE, JsonOps.INSTANCE);
 		assertSame(sharedArray1, sharedArray2);
 	}
 }

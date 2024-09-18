@@ -1,10 +1,10 @@
 package builderb0y.autocodec.coders;
 
-import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.ApiStatus.OverrideOnly;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import builderb0y.autocodec.annotations.Intern;
 import builderb0y.autocodec.coders.AutoCoder.NamedCoder;
 import builderb0y.autocodec.common.FactoryContext;
 import builderb0y.autocodec.common.FactoryException;
@@ -44,8 +44,8 @@ public class InternedStringCoder extends NamedCoder<String> {
 		@OverrideOnly
 		@SuppressWarnings("unchecked")
 		public <T_HandledType> @Nullable AutoCoder<?> tryCreate(@NotNull FactoryContext<T_HandledType> context) throws FactoryException {
-			if (context.type.getRawClass() == String.class && context.type.getAnnotations().has(Internal.class)) {
-				return new InternedStringCoder(context.type.uncheckedCast(), (AutoCoder<String>)(context.forceCreateCoder()));
+			if (context.type.getRawClass() == String.class && context.type.getAnnotations().has(Intern.class)) {
+				return new InternedStringCoder(context.type.uncheckedCast(), (AutoCoder<String>)(context.forceCreateFallbackCoder(this)));
 			}
 			return null;
 		}

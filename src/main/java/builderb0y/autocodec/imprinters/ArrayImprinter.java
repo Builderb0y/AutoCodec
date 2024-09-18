@@ -8,9 +8,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import builderb0y.autocodec.annotations.SingletonArray;
+import builderb0y.autocodec.coders.AutoCoder;
 import builderb0y.autocodec.common.FactoryContext;
 import builderb0y.autocodec.common.FactoryException;
-import builderb0y.autocodec.decoders.AutoDecoder;
 import builderb0y.autocodec.decoders.DecodeContext;
 import builderb0y.autocodec.decoders.DecodeException;
 import builderb0y.autocodec.imprinters.AutoImprinter.NamedImprinter;
@@ -18,16 +18,16 @@ import builderb0y.autocodec.reflection.reification.ReifiedType;
 
 public abstract class ArrayImprinter<T_DecodedElement, T_DecodedArray> extends NamedImprinter<T_DecodedArray> {
 
-	public final @NotNull AutoDecoder<T_DecodedElement> componentDecoder;
+	public final @NotNull AutoCoder<T_DecodedElement> componentCoder;
 	public final boolean singleton;
 
 	public ArrayImprinter(
 		@NotNull ReifiedType<T_DecodedArray> arrayType,
-		@NotNull AutoDecoder<T_DecodedElement> componentDecoder,
+		@NotNull AutoCoder<T_DecodedElement> componentCoder,
 		boolean singleton
 	) {
 		super(arrayType);
-		this.componentDecoder = componentDecoder;
+		this.componentCoder = componentCoder;
 		this.singleton = singleton;
 	}
 
@@ -35,7 +35,7 @@ public abstract class ArrayImprinter<T_DecodedElement, T_DecodedArray> extends N
 
 		public PrimitiveArrayImprinter(
 			@NotNull ReifiedType<T_DecodedArray> arrayType,
-			@NotNull AutoDecoder<T_DecodedElement> componentDecoder,
+			@NotNull AutoCoder<T_DecodedElement> componentDecoder,
 			boolean singleton
 		) {
 			super(arrayType, componentDecoder, singleton);
@@ -53,7 +53,7 @@ public abstract class ArrayImprinter<T_DecodedElement, T_DecodedArray> extends N
 					throw new ImprintException(() -> context.pathToStringBuilder().append(" should have a length of ").append(length).append(", but it was length ").append(from.size()).toString());
 				}
 				for (int index = 0; index < length; index++) {
-					Array.set(to, index, from.get(index).decodeWith(this.componentDecoder));
+					Array.set(to, index, from.get(index).decodeWith(this.componentCoder));
 				}
 			}
 			catch (ImprintException exception) {
@@ -69,7 +69,7 @@ public abstract class ArrayImprinter<T_DecodedElement, T_DecodedArray> extends N
 
 		public ObjectArrayImprinter(
 			@NotNull ReifiedType<T_DecodedElement[]> arrayType,
-			@NotNull AutoDecoder<T_DecodedElement> componentDecoder,
+			@NotNull AutoCoder<T_DecodedElement> componentDecoder,
 			boolean singleton
 		) {
 			super(arrayType, componentDecoder, singleton);
@@ -87,7 +87,7 @@ public abstract class ArrayImprinter<T_DecodedElement, T_DecodedArray> extends N
 					throw new ImprintException(() -> context.pathToStringBuilder().append(" should have a length of ").append(length).append(", but it was length ").append(from.size()).toString());
 				}
 				for (int index = 0; index < length; index++) {
-					to[index] = from.get(index).decodeWith(this.componentDecoder);
+					to[index] = from.get(index).decodeWith(this.componentCoder);
 				}
 			}
 			catch (ImprintException exception) {
@@ -111,7 +111,7 @@ public abstract class ArrayImprinter<T_DecodedElement, T_DecodedArray> extends N
 			if (componentType != null) {
 				Class<?> componentClass = componentType.getRawClass();
 				if (componentClass != null) {
-					AutoDecoder<?> componentDecoder = context.type(componentType).forceCreateDecoder();
+					AutoCoder<?> componentDecoder = context.type(componentType).forceCreateCoder();
 					boolean singleton = context.type.getAnnotations().has(SingletonArray.class);
 					if (componentClass.isPrimitive()) {
 						return new PrimitiveArrayImprinter(context.type, componentDecoder,  singleton);
