@@ -17,7 +17,7 @@ public class UseImplementationTest {
 		AutoConstructor<X<Object, String>> constructor = TestCommon.DEFAULT_CODEC.createConstructor(
 			new ReifiedType<@UseImplementation(Y.class) X<Object, String>>() {}
 		);
-		assertEquals("builderb0y.autocodec.constructors.UseImplementationTest$Y<java.lang.String, ? extends java.lang.Object>::new", constructor.toString());
+		assertEquals("UseImplementationTest$Y<String, ? extends Object>::new", constructor.toString());
 		assertTrue(TestCommon.DEFAULT_CODEC.construct(constructor, JsonNull.INSTANCE, JsonOps.INSTANCE) instanceof Y<String, ?>);
 	}
 

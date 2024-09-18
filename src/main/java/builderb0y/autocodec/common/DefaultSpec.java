@@ -153,7 +153,7 @@ public record DefaultSpec(
 				.append(annotation)
 				.append(" was applied to type ")
 				.annotations(false)
-				.simplify(false)
+				.simplify(true)
 				.append(context.type)
 				.append(" with mode DECODED")
 				.toString()

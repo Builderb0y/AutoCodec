@@ -1,4 +1,4 @@
-This branch is for V5 of AutoCodec. For a list of things which have changed since V4, see changes.md.
+This branch is for V5 of AutoCodec. For a list of things which have changed since V4, see [changes.md](https://github.com/Builderb0y/AutoCodec/blob/V5/changes.md).
 
 # Introduction
 

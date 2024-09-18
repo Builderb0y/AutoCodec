@@ -382,7 +382,7 @@ public abstract class TaskLogger {
 				return (
 					new TypeFormatter(128)
 					.annotations(false)
-					.simplify(false)
+					.simplify(true)
 					.append("Getting all ")
 					.append(inherited ? "inherited" : "declared")
 					.append(" fields in ")
@@ -412,7 +412,7 @@ public abstract class TaskLogger {
 				return (
 					new TypeFormatter(128)
 					.annotations(false)
-					.simplify(false)
+					.simplify(true)
 					.append("Finding ")
 					.append(inherited ? "inherited" : "declared")
 					.append(' ')
@@ -444,7 +444,7 @@ public abstract class TaskLogger {
 				return (
 					new TypeFormatter(128)
 					.annotations(false)
-					.simplify(false)
+					.simplify(true)
 					.append("Getting all ")
 					.append(inherited ? "inherited" : "declared")
 					.append(" methods in ")
@@ -474,7 +474,7 @@ public abstract class TaskLogger {
 				return (
 					new TypeFormatter(128)
 					.annotations(false)
-					.simplify(false)
+					.simplify(true)
 					.append("Finding ")
 					.append(inherited ? "inherited" : "declared")
 					.append(' ')

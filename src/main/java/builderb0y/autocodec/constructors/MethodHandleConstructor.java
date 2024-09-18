@@ -34,7 +34,7 @@ public class MethodHandleConstructor<T_Decoded> extends NamedConstructor<T_Decod
 		super(
 			new TypeFormatter(64)
 			.annotations(false)
-			.simplify(false)
+			.simplify(true)
 			.append(method.getDeclaringType())
 			.append("::")
 			.append(method.getName())

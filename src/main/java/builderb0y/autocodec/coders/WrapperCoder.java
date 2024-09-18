@@ -1,18 +1,23 @@
 package builderb0y.autocodec.coders;
 
+import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodType;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.jetbrains.annotations.ApiStatus.OverrideOnly;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import builderb0y.autocodec.annotations.VerifyNullable;
 import builderb0y.autocodec.coders.AutoCoder.NamedCoder;
 import builderb0y.autocodec.common.FactoryContext;
 import builderb0y.autocodec.common.FactoryException;
 import builderb0y.autocodec.common.WrapperSpec;
 import builderb0y.autocodec.decoders.DecodeContext;
 import builderb0y.autocodec.decoders.DecodeException;
+import builderb0y.autocodec.decoders.DecoderFactoryList;
 import builderb0y.autocodec.encoders.EncodeContext;
 import builderb0y.autocodec.encoders.EncodeException;
 import builderb0y.autocodec.reflection.manipulators.InstanceReader;
@@ -42,7 +47,8 @@ public class WrapperCoder<T_Wrapper, T_Wrapped> extends NamedCoder<T_Wrapper> {
 	@SuppressWarnings("unchecked")
 	public <T_Encoded> @Nullable T_Wrapper decode(@NotNull DecodeContext<T_Encoded> context) throws DecodeException {
 		try {
-			if (context.isEmpty()) {
+			T_Wrapped wrapped = context.decodeWith(this.wrappedCoder);
+			if (wrapped == null) {
 				if (this.spec.wrapNull()) {
 					return (T_Wrapper)(this.constructorHandle.invokeExact((Object)(null)));
 				}
@@ -51,7 +57,7 @@ public class WrapperCoder<T_Wrapper, T_Wrapped> extends NamedCoder<T_Wrapper> {
 				}
 			}
 			else {
-				return (T_Wrapper)(this.constructorHandle.invokeExact(context.decodeWith(this.wrappedCoder)));
+				return (T_Wrapper)(this.constructorHandle.invokeExact(wrapped));
 			}
 		}
 		catch (DecodeException | Error exception) {
@@ -77,13 +83,34 @@ public class WrapperCoder<T_Wrapper, T_Wrapped> extends NamedCoder<T_Wrapper> {
 
 	public static class Factory extends NamedCoderFactory {
 
-		public static final Factory INSTANCE = new Factory();
+		/**
+		the problem:
+		when a wrapper is annotated with {@link VerifyNullable},
+		the wrapped type may not be. it may be desired to decode
+		null data into a null wrapper, but this requires getting
+		a null wrapped object first, which would fail verification.
+
+		the solution:
+		the VerifyNullable annotation is spoofed on the wrapped type
+		to allow it to be null always. null checking is then performed
+		on the wrapper type instead of the wrapped type.
+
+		this field can be added to by overriding {@link DecoderFactoryList#setup()}
+		to add any other annotations necessary to disable any verification which
+		would normally be applied to both the wrapper type and the wrapped type,
+		when only the wrapper type should be verified at runtime.
+		*/
+		public List<Annotation> annotationsToDisableVerification = new ArrayList<>(2);
+
+		public Factory() {
+			this.annotationsToDisableVerification.add(VerifyNullable.INSTANCE);
+		}
 
 		@Override
 		@OverrideOnly
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		public <T_HandledType> @Nullable AutoCoder<?> tryCreate(@NotNull FactoryContext<T_HandledType> context) throws FactoryException {
-			WrapperSpec<T_HandledType, ?> spec = WrapperSpec.find(context);
+			WrapperSpec<T_HandledType, ?> spec = WrapperSpec.find(context, this.annotationsToDisableVerification);
 			if (spec != null) try {
 				AutoCoder<?> wrappedCoder = context.type(spec.wrappedType()).forceCreateCoder();
 				MethodHandle handle = spec.constructor().createMethodHandle(context);

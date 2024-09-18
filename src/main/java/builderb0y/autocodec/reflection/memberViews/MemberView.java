@@ -68,7 +68,7 @@ public abstract class MemberView<T_Owner> implements TypeFormatterAppendable {
 
 	@Override
 	public @NotNull String toString() {
-		return new TypeFormatter(128).annotations(true).simplify(false).append(this).toString();
+		return new TypeFormatter(128).annotations(true).simplify(true).append(this).toString();
 	}
 
 	@Override

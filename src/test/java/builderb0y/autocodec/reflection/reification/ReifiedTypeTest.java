@@ -397,8 +397,8 @@ public class ReifiedTypeTest {
 	public void testInfiniteRecursion() throws NoSuchMethodException, NoSuchFieldException {
 		ReifiedType<?> typeA = new TypeReifier(Collections.emptyMap(), true).reify(ReifiedTypeTest.class.getDeclaredMethod("infiniteRecursion", Comparable.class).getAnnotatedParameterTypes()[0]);
 		ReifiedType<?> typeB = new TypeReifier(Collections.emptyMap(), true).reify(InfiniteRecursion.class.getDeclaredField("INSTANCE").getAnnotatedType());
-		assertEquals("unresolvable C extends java.lang.Comparable<C>", typeA.toString());
-		assertEquals("builderb0y.autocodec.reflection.reification.ReifiedTypeTest$InfiniteRecursion<unresolvable C extends java.lang.Comparable<C>>", typeB.toString());
+		assertEquals("unresolvable C extends Comparable<C>", typeA.toString());
+		assertEquals("ReifiedTypeTest$InfiniteRecursion<unresolvable C extends Comparable<C>>", typeB.toString());
 	}
 
 	public static <C extends Comparable<C>> void infiniteRecursion(C object) {}

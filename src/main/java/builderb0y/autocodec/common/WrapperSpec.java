@@ -1,5 +1,8 @@
 package builderb0y.autocodec.common;
 
+import java.lang.annotation.Annotation;
+import java.util.List;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,19 +20,25 @@ import builderb0y.autocodec.util.NamedPredicate;
 public record WrapperSpec<T_Wrapper, T_Wrapped>(
 	@NotNull FieldLikeMemberView<T_Wrapper, T_Wrapped> field,
 	@NotNull MethodLikeMemberView<T_Wrapper, T_Wrapper> constructor,
+	@NotNull ReifiedType<T_Wrapped> wrappedType,
 	boolean wrapNull
 ) {
+
+	public WrapperSpec(
+		@NotNull FieldLikeMemberView<T_Wrapper, T_Wrapped> field,
+		@NotNull MethodLikeMemberView<T_Wrapper, T_Wrapper> constructor,
+		@NotNull List<@NotNull Annotation> annotations,
+		boolean wrapNull
+	) {
+		this(field, constructor, field.getType().addAnnotations(annotations), wrapNull);
+	}
 
 	public ReifiedType<T_Wrapper> wrapperType() {
 		return this.field.getDeclaringType();
 	}
 
-	public ReifiedType<T_Wrapped> wrappedType() {
-		return this.field.getType();
-	}
-
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public static <T_Owner> @Nullable WrapperSpec<T_Owner, ?> find(@NotNull FactoryContext<T_Owner> context) {
+	public static <T_Owner> @Nullable WrapperSpec<T_Owner, ?> find(@NotNull FactoryContext<T_Owner> context, @NotNull List<@NotNull Annotation> annotations) {
 		Wrapper annotation = context.type.getAnnotations().getFirst(Wrapper.class);
 		if (annotation != null) {
 			String fieldName = annotation.value();
@@ -75,7 +84,7 @@ public record WrapperSpec<T_Wrapper, T_Wrapped>(
 					MemberCollector.forceUnique()
 				);
 			}
-			return new WrapperSpec(field, constructor, annotation.wrapNull());
+			return new WrapperSpec(field, constructor, annotations, annotation.wrapNull());
 		}
 		return null;
 	}

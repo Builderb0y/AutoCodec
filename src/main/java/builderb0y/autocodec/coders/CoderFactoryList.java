@@ -22,7 +22,7 @@ public class CoderFactoryList extends FactoryList<AutoCoder<?>, CoderFactory> im
 			UseCoderFactory.INSTANCE,
 			DefaultCoder.Factory.INSTANCE,
 			DefaultEmptyCoder.Factory.INSTANCE,
-			WrapperCoder.Factory.INSTANCE,
+			new WrapperCoder.Factory(),
 			//note: InternedStringCoder must be added before MultiLineStringCoder
 			//so that these two annotations stack with each other.
 			InternedStringCoder.Factory.INSTANCE,

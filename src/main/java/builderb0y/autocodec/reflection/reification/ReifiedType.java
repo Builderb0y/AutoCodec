@@ -1013,7 +1013,7 @@ public class ReifiedType<T> implements TypeFormatterAppendable {
 
 	@Override
 	public @NotNull String toString() {
-		return new TypeFormatter(64).annotations(true).simplify(false).append(this).toString();
+		return new TypeFormatter(64).annotations(true).simplify(true).append(this).toString();
 	}
 
 	/**

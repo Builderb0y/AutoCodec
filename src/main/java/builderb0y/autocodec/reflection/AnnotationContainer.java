@@ -425,7 +425,7 @@ public class AnnotationContainer implements TypeFormatterAppendable {
 	@Override
 	public String toString() {
 		if (this.isEmpty()) return "";
-		return new TypeFormatter(this.count() << 6).annotations(true).simplify(false).append(this).toString();
+		return new TypeFormatter(this.count() << 6).annotations(true).simplify(true).append(this).toString();
 	}
 
 	/** default implementation simply delegates to {@link #hashCodeOrdered()}. */
