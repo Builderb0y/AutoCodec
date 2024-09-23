@@ -137,6 +137,10 @@ public class DecodeContext<T_Encoded> extends DynamicOpsContext<T_Encoded> {
 		return result != null ? result : this.ops.empty();
 	}
 
+	public boolean hasMember(String name) {
+		return !Objects.equals(this.getPrimitiveMember(name), this.empty());
+	}
+
 	public @NotNull DecodeContext<T_Encoded> getMember(@NotNull String name) {
 		return this.input(this.getPrimitiveMember(name), new ObjectDecodePath(name));
 	}

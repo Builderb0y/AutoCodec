@@ -37,6 +37,7 @@ Only AutoCoder's support verification now. Or at least, this is now the default 
 ## Additions
 
 * DecodeContext.tryAsStream()/forceAsStream(): like try/forceAsList(), but returns a Stream. Also does not allocate a List as an intermediate operation.
+* DecodeContext.hasMember(String name): returns true if the encoded data is a map which contains the provided name as one of its keys, false otherwise.
 * MultiLine.value(): the line separator to use for encoding and decoding.
 * The "default" annotations now have a new "mode" attribute which allows you to specify whether the provided value should be treated as the encoded value or the decoded value.
 	* DefaultObject in particular works slightly differently due to having multiple ways to specify the targeted value. Some of these ways are compatible with encoded values, others are compatible with decoded values.

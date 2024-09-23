@@ -1,4 +1,4 @@
-This branch is for V5 of AutoCodec. For a list of things which have changed since V4, see [changes.md](https://github.com/Builderb0y/AutoCodec/blob/V5/changes.md).
+This branch is for V5 of AutoCodec. For a list of things which have changed since V4, see [changes.md](https://github.com/Builderb0y/AutoCodec/blob/V5/changes.md). For information about V4, see the [master](https://github.com/Builderb0y/AutoCodec/tree/master) branch.
 
 # Introduction
 
@@ -80,14 +80,14 @@ Further customization can be achieved by use of [annotations](https://github.com
 public static final AutoCodec AUTO_CODEC = new AutoCodec() {
 
 	@Override
-	public @NotNull DecoderFactoryList createDecoders() {
-		return new DecoderFactoryList() {
+	public @NotNull CoderFactoryList createDecoders() {
+		return new CoderFactoryList() {
 
 			@Override
 			public void setup() {
 				super.setup();
-				this.addFactoryAfter(LookupDecoderFactory.class, new MySpecialDecoderFactory());
-				this.addFactoryBefore(RecordDecoder.Factory.INSTANCE, new MyOtherDecoderFactory());
+				this.addFactoryAfter(LookupCoderFactory.class, new MySpecialCoderFactory());
+				this.addFactoryBefore(RecordCoder.Factory.INSTANCE, new MyOtherCoderFactory());
 			}
 		};
 	}
@@ -97,11 +97,11 @@ public static final AutoCodec AUTO_CODEC = new AutoCodec() {
 # How it works under the hood
 
 When customizing AutoCodec to fit the types you need to (de)serialize, it helps to know how AutoCodec is internally structured. AutoCodec divides the work of encoding and decoding into 6 tasks:
-* Coding means encoding or decoding, or both, depending on context. A Coder can perform encoding and decoding operations.
+* Coding means encoding or decoding, or both, depending on context. An AutoCoder can perform encoding and decoding operations.
 * Encoding is the process of taking a java object and converting it to data in some way.
 * Decoding is the process of taking some data and converting it to a java object in some way.
 * Constructing is the process of creating a java object without any data.
-* Imprinting is the process of taking a java object and some data, and applying that data to that object in some way.
+* Imprinting is the process of taking a java object and some data, and using that data to mutate the object in some way.
 * Verifying is the process of ensuring that a java object meets some criteria. For example, ensuring that it is not null.
 
 Coding is sometimes broken down into encoding and decoding, meaning that some coders delegate to an encoder/decoder pair. Other coder implementations can handle encoding/decoding on their own, without delegating to anything. Likewise, decoding is sometimes broken down into constructing and imprinting. Coding almost always includes a verification step at the end. Encoding, constructing, imprinting, and verifying are not broken down into smaller tasks.
