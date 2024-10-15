@@ -11,7 +11,7 @@ By default, AutoCodec will handle a variety of types automatically, including:
 * Enums
 * Arrays
 * Collections
-	* Including abstract collections (meaning that you declared a field as type List instead of ArrayList; see [LookupConstructorFactory](https://github.com/Builderb0y/AutoCodec/blob/master/src/main/java/builderb0y/autocodec/constructors/LookupConstructorFactory.java) for the full list of default implementations)
+	* Including abstract collections (meaning that you declared a field as type List instead of ArrayList; see [LookupConstructorFactory](https://github.com/Builderb0y/AutoCodec/blob/V5/src/main/java/builderb0y/autocodec/constructors/LookupConstructorFactory.java) for the full list of default implementations)
 * Maps
 	* Including EnumMaps
 * Optionals
@@ -80,7 +80,7 @@ Further customization can be achieved by use of [annotations](https://github.com
 public static final AutoCodec AUTO_CODEC = new AutoCodec() {
 
 	@Override
-	public @NotNull CoderFactoryList createDecoders() {
+	public @NotNull CoderFactoryList createCoders() {
 		return new CoderFactoryList() {
 
 			@Override
