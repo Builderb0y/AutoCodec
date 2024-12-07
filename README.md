@@ -35,7 +35,7 @@ public class Node {
 
 The provided gradle build script is sufficient to build AutoCodec. It will place the build artifacts in a platform-specific maven local directory. Other projects which depend on AutoCodec can then reference that directory via
 ```groovy
-reposotories {
+repositories {
 	mavenLocal()
 }
 ```
