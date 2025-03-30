@@ -4,7 +4,7 @@ plugins() {
 }
 
 group('builderb0y')
-version('5.0.0')
+version('5.0.1')
 archivesBaseName = 'AutoCodec'
 
 repositories() {
@@ -20,8 +20,10 @@ dependencies() {
 	//1.19.4 - 6.0.6
 	//1.20.1 - 6.0.8
 	//1.20.5 - 7.0.14
-	implementation    ('com.mojang:datafixerupper:7.0.14')
-	testImplementation('com.mojang:datafixerupper:7.0.14')
+	//1.21.1 - 8.0.16
+	//1.21.4 - 8.0.16
+	implementation    ('com.mojang:datafixerupper:8.0.16')
+	testImplementation('com.mojang:datafixerupper:8.0.16')
 	implementation    ('org.jetbrains:annotations:23.0.0')
 	testImplementation('org.jetbrains:annotations:23.0.0')
 	testImplementation('junit:junit:4.13.2')
