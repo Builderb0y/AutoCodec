@@ -9,6 +9,11 @@ import static org.junit.Assert.*;
 public class AnnotationContainerTest {
 
 	@Test
+	public void testAssertionsEnabled() {
+		assertTrue("Asserts not enabled", AnnotationContainer.areAssertsEnabled());
+	}
+
+	@Test
 	public void testDeclaredAndInherited() {
 		AnnotationContainer declared = AnnotationContainer.fromDeclared(ClassWithRepeatedAnnotations.class);
 		assertEquals(4, declared.getAll().length);
@@ -47,4 +52,23 @@ public class AnnotationContainerTest {
 	public static class ClassWithRepeatedAnnotations {}
 
 	public static class ClassWithInheritedAnnotations extends ClassWithRepeatedAnnotations {}
+
+	@Test
+	public void testRetentions() {
+		assertTrue(AnnotationContainer.isRuntimeRetained(RuntimeAnnotation.class));
+		assertFalse(AnnotationContainer.isRuntimeRetained(ClassAnnotation.class));
+		assertFalse(AnnotationContainer.isRuntimeRetained(SourceAnnotation.class));
+		assertFalse(AnnotationContainer.isRuntimeRetained(NoRetentionAnnotation.class));
+	}
+
+	@Retention(RetentionPolicy.RUNTIME)
+	public static @interface RuntimeAnnotation {}
+
+	@Retention(RetentionPolicy.CLASS)
+	public static @interface ClassAnnotation {}
+
+	@Retention(RetentionPolicy.SOURCE)
+	public static @interface SourceAnnotation {}
+
+	public static @interface NoRetentionAnnotation {}
 }

@@ -2,6 +2,8 @@ package builderb0y.autocodec.reflection;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Repeatable;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
@@ -14,6 +16,7 @@ import java.util.function.Predicate;
 import it.unimi.dsi.fastutil.Hash;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.VisibleForTesting;
 
 import builderb0y.autocodec.annotations.Mirror;
 import builderb0y.autocodec.util.*;
@@ -153,6 +156,7 @@ public class AnnotationContainer implements TypeFormatterAppendable {
 	otherwise, this method is equivalent to {@link AnnotatedElement#isAnnotationPresent(Class)}.
 	*/
 	public <A extends Annotation> boolean has(@NotNull Class<A> annotationClass) {
+		checkRuntimeRetained(annotationClass);
 		for (Annotation annotation : this.annotations) {
 			if (annotation.annotationType() == annotationClass) {
 				return true;
@@ -177,6 +181,7 @@ public class AnnotationContainer implements TypeFormatterAppendable {
 	this method is mostly just useful for annotations which are {@link Repeatable}.
 	*/
 	public <A extends Annotation> int count(@NotNull Class<A> annotationClass) {
+		checkRuntimeRetained(annotationClass);
 		int count = 0;
 		for (Annotation annotation : this.annotations) {
 			if (annotation.annotationType() == annotationClass) {
@@ -193,6 +198,7 @@ public class AnnotationContainer implements TypeFormatterAppendable {
 	is (annotationClass), or null if no such annotation exists.
 	*/
 	public <A extends Annotation> @Nullable A getFirst(@NotNull Class<A> annotationClass) {
+		checkRuntimeRetained(annotationClass);
 		for (Annotation annotation : this.annotations) {
 			if (annotation.annotationType() == annotationClass) {
 				return annotationClass.cast(annotation);
@@ -204,6 +210,7 @@ public class AnnotationContainer implements TypeFormatterAppendable {
 	/** similar to {@link #getFirst(Class)}, but can match multiple target classes. */
 	@SafeVarargs
 	public final @Nullable Annotation getFirst(@NotNull Class<? extends Annotation> @NotNull ... classes) {
+		checkRuntimeRetained(classes);
 		for (Annotation annotation : this.annotations) {
 			Class<? extends Annotation> annotationClass = annotation.annotationType();
 			for (Class<? extends Annotation> expectedClass : classes) {
@@ -267,6 +274,7 @@ public class AnnotationContainer implements TypeFormatterAppendable {
 	*/
 	@SuppressWarnings("unchecked")
 	public <A extends Annotation> @NotNull A @NotNull [] getAll(@NotNull Class<A> annotationClass) {
+		checkRuntimeRetained(annotationClass);
 		A first = null;
 		Annotation[] annotations = this.annotations;
 		int length = annotations.length;
@@ -438,6 +446,58 @@ public class AnnotationContainer implements TypeFormatterAppendable {
 	@Override
 	public boolean equals(Object obj) {
 		return obj instanceof AnnotationContainer that && this.equalsOrdered(that);
+	}
+
+	/**
+	throws an {@link AssertionError} if both of the following conditions are met:
+	1. asserts are enabled for this class, and
+	2. any of the provided annotation classes are NOT annotated with {@code
+		@Retention(RetentionPolicy.RUNTIME)
+	}
+	if the former condition is not met, this method fast paths and does not check the latter condition.
+	this makes it useful for development, without harming performance in production.
+	*/
+	@SafeVarargs
+	public static void checkRuntimeRetained(@NotNull Class<? extends Annotation>... annotationClasses) {
+		if (areAssertsEnabled()) {
+			for (Class<? extends Annotation> annotationClass : annotationClasses) {
+				checkRuntimeRetained(annotationClass);
+			}
+		}
+	}
+
+	/** returns true if assertions are enabled for this class, false otherwise. */
+	@VisibleForTesting
+	@SuppressWarnings({ "AssertWithSideEffects", "ConstantValue" })
+	public static boolean areAssertsEnabled() {
+		boolean enabled = false;
+		assert enabled = true; //intentional side effect.
+		return enabled;
+	}
+
+	/**
+	throws an {@link AssertionError} if both of the following conditions are met:
+	1. asserts are enabled for this class, and
+	2. the provided annotation class is NOT annotated with {@code
+		@Retention(RetentionPolicy.RUNTIME)
+	}
+	if the former condition is not met, this method fast paths and does not check the latter condition.
+	this makes it useful for development, without harming performance in production.
+	*/
+	public static void checkRuntimeRetained(@NotNull Class<? extends Annotation> annotationClass) {
+		assert isRuntimeRetained(annotationClass) : annotationClass + " is not annotated with @Retention(RetentionPolicy.RUNTIME) and, under normal circumstances, will never be present in an AnnotationContainer. As such, trying to query whether an AnnotationContainer contains this annotation is considered a bug.";
+	}
+
+	/**
+	returns true if the annotation class is annotated with {@code
+		@Retention(RetentionPolicy.RUNTIME)
+	}
+	false otherwise.
+	this method can be used always, as it does not fast path if asserts are disabled.
+	*/
+	public static boolean isRuntimeRetained(@NotNull Class<? extends Annotation> annotationClass) {
+		Retention retention = annotationClass.getDeclaredAnnotation(Retention.class);
+		return retention != null && retention.value() == RetentionPolicy.RUNTIME;
 	}
 
 	/**

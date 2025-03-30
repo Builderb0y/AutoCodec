@@ -118,4 +118,15 @@ public class AutoCodecUtil {
 			}
 		}
 	}
+
+	/** convenience method only exists on {@link String}, not {@link CharSequence}. */
+	@Internal
+	public static boolean regionMatches(CharSequence a, int aStart, CharSequence b, int bStart, int length) {
+		if (aStart < 0 || aStart + length > a.length()) return false;
+		if (bStart < 0 || bStart + length > b.length()) return false;
+		for (int offset = 0; offset < length; offset++) {
+			if (a.charAt(aStart + offset) != b.charAt(bStart + offset)) return false;
+		}
+		return true;
+	}
 }

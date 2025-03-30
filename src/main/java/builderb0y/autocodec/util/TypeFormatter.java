@@ -46,6 +46,12 @@ public class TypeFormatter {
 		return this;
 	}
 
+	public TypeFormatter appendAnnotation(String annotation) {
+		if (this.simplify) appendSimpleAnnotationUnchecked(this.builder, annotation);
+		else this.append(annotation);
+		return this;
+	}
+
 	public TypeFormatter append(int value) {
 		this.builder.append(value);
 		return this;
@@ -83,7 +89,7 @@ public class TypeFormatter {
 	}
 
 	public TypeFormatter append(Annotation annotation) {
-		return this.appendType(annotation.toString());
+		return this.appendAnnotation(annotation.toString());
 	}
 
 	public TypeFormatter append(TypeFormatterAppendable appendable) {
@@ -127,8 +133,8 @@ public class TypeFormatter {
 		@NotNull CharSequence text
 	)
 	throws IOException {
-		int length = text.length();
 		int start = 0;
+		int length = text.length();
 		for (int index = 0; index < length;) {
 			char c = text.charAt(index++);
 			if (!Character.isJavaIdentifierPart(c)) {
@@ -136,6 +142,123 @@ public class TypeFormatter {
 					appendable.append(text, start, index);
 				}
 				start = index;
+			}
+		}
+		if (start < length) {
+			appendable.append(text, start, length);
+		}
+		return appendable;
+	}
+
+	/**
+	more sophisticated version of {@link #appendSimple(Appendable, CharSequence)}
+	which is used specifically for annotations. the primary difference is NOT
+	simplifying numbers, strings, chars, or the .class suffix on class literals.
+
+	for example, {@code
+		@foo.bar.Example(a = "hello.world", b = 42.0, c = foo.bar.Example.class)
+	}
+	should be simplified to {@code
+		@Example(a = "hello.world", b = 42.0, c = Example.class)
+	}
+	not {@code
+		@Example(a = "world", b = 0, c = class)
+	}
+	the former will be returned by this method,
+	where as the latter would be returned by
+	{@link #appendSimple(Appendable, CharSequence)}.
+	*/
+	@Contract("_, _ -> param1")
+	public static <A extends Appendable> @NotNull A appendSimpleAnnotation(
+		@NotNull A appendable,
+		@NotNull CharSequence text
+	)
+	throws IOException {
+		//0: unknown (just appended something).
+		//1: normal (simplifying).
+		//2: number (don't simplify 1.0 to 0).
+		//3: string (don't simplify text inside strings).
+		//4: escaped character in string (obviously don't simplify this).
+		//5: char literal (don't simplify text inside char literals).
+		//6: escaped character in char literal (don't simplify this either).
+		int part = 0;
+		int start = 0;
+		int length = text.length();
+
+		for (int index = 0; index < length;) {
+			char c = text.charAt(index++);
+			switch (part) {
+				case 0 -> {
+					start = index - 1;
+					switch (c) {
+						case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' -> {
+							part = 2;
+						}
+						case '"' -> {
+							part = 3;
+						}
+						case '\'' -> {
+							part = 5;
+						}
+						default -> {
+							if (Character.isJavaIdentifierStart(c)) {
+								part = 1;
+							}
+							else {
+								appendable.append(c);
+								start = index;
+							}
+						}
+					}
+				}
+				case 1 -> {
+					if (!Character.isJavaIdentifierPart(c)) {
+						if (c != '.') {
+							appendable.append(text, start, index);
+							part = 0;
+						}
+						if (!AutoCodecUtil.regionMatches(text, index - 1, ".class", 0, ".class".length())) {
+							start = index;
+						}
+					}
+				}
+				case 2 -> {
+					if (!Character.isJavaIdentifierPart(c)) {
+						appendable.append(text, start, index);
+						start = index;
+						part = 0;
+					}
+				}
+				case 3 -> {
+					switch (c) {
+						case '\\' -> {
+							part = 4;
+						}
+						case '"' -> {
+							appendable.append(text, start, index);
+							start = index;
+							part = 0;
+						}
+					}
+				}
+				case 4 -> {
+					part = 3;
+				}
+				case 5 -> {
+					switch (c) {
+						case '\\' -> {
+							part = 6;
+						}
+						case '\'' -> {
+							appendable.append(text, start, index);
+							start = index;
+							part = 0;
+						}
+					}
+				}
+				case 6 -> {
+					part = 5;
+				}
 			}
 		}
 		if (start < length) {
@@ -170,6 +293,23 @@ public class TypeFormatter {
 	) {
 		try {
 			return appendSimple(appendable, text);
+		}
+		catch (IOException exception) {
+			throw AutoCodecUtil.rethrow(exception);
+		}
+	}
+
+	/**
+	see the docs of {@link #appendSimpleAnnotation(Appendable, CharSequence)}
+	and {@link #appendSimpleUnchecked(Appendable, CharSequence)}.
+	*/
+	@Contract("_, _ -> param1")
+	public static <A extends Appendable> @NotNull A appendSimpleAnnotationUnchecked(
+		@NotNull A appendable,
+		@NotNull CharSequence text
+	) {
+		try {
+			return appendSimpleAnnotation(appendable, text);
 		}
 		catch (IOException exception) {
 			throw AutoCodecUtil.rethrow(exception);
