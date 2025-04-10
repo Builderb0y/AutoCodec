@@ -6,6 +6,8 @@ import org.jetbrains.annotations.Nullable;
 import builderb0y.autocodec.AutoCodec;
 import builderb0y.autocodec.coders.AutoCoder.CoderFactory;
 import builderb0y.autocodec.common.*;
+import builderb0y.autocodec.fixers.AutoFixer;
+import builderb0y.autocodec.fixers.NoopFixer;
 import builderb0y.autocodec.verifiers.AutoVerifier;
 import builderb0y.autocodec.verifiers.NoopVerifier;
 
@@ -57,6 +59,10 @@ public class CoderFactoryList extends FactoryList<AutoCoder<?>, CoderFactory> im
 			AutoVerifier verifier = context.forceCreateVerifier();
 			if (verifier != NoopVerifier.INSTANCE) {
 				coder = new VerifyingCoder(context.type, coder, verifier);
+			}
+			AutoFixer fixer = context.forceCreateFixer();
+			if (fixer != NoopFixer.INSTANCE) {
+				coder = new FixingCoder(context.type, coder, fixer);
 			}
 		}
 		return coder;

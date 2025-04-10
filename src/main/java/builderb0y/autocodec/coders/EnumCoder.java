@@ -3,7 +3,6 @@ package builderb0y.autocodec.coders;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.checkerframework.checker.units.qual.N;
 import org.jetbrains.annotations.ApiStatus.OverrideOnly;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -22,14 +21,14 @@ public class EnumCoder<T_DecodedEnum extends Enum<T_DecodedEnum>> extends NamedC
 
 	public final @NotNull EnumName enumName;
 	public final @NotNull T_DecodedEnum @NotNull [] valueArray;
-	public final @N Map<@NotNull String, @NotNull T_DecodedEnum> valueMap;
+	public final @NotNull Map<@NotNull String, @NotNull T_DecodedEnum> valueMap;
 
 	public EnumCoder(@NotNull Class<T_DecodedEnum> enumClass, @NotNull EnumName enumName) {
 		super(ReifiedType.from(enumClass));
 		this.enumName = enumName;
 		this.valueArray = enumClass.getEnumConstants();
 		this.valueMap = new LinkedHashMap<>(this.valueArray.length);
-		for (@NotNull T_DecodedEnum value : this.valueArray) {
+		for (T_DecodedEnum value : this.valueArray) {
 			String name = enumName.getEnumName(value);
 			if (this.valueMap.putIfAbsent(name, value) != null) {
 				throw new IllegalArgumentException("Duplicate enum: " + name);

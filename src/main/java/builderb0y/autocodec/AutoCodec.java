@@ -30,6 +30,8 @@ import builderb0y.autocodec.encoders.AutoEncoder;
 import builderb0y.autocodec.encoders.EncodeContext;
 import builderb0y.autocodec.encoders.EncodeException;
 import builderb0y.autocodec.encoders.EncoderFactoryList;
+import builderb0y.autocodec.fixers.AutoFixer;
+import builderb0y.autocodec.fixers.FixerFactoryList;
 import builderb0y.autocodec.imprinters.AutoImprinter;
 import builderb0y.autocodec.imprinters.ImprintException;
 import builderb0y.autocodec.imprinters.ImprinterFactoryList;
@@ -62,6 +64,7 @@ public class AutoCodec implements ReflectContextProvider {
 
 	public final @NotNull       CoderFactoryList coders;
 	public final @NotNull     EncoderFactoryList encoders;
+	public final @NotNull       FixerFactoryList fixers;
 	public final @NotNull ConstructorFactoryList constructors;
 	public final @NotNull   ImprinterFactoryList imprinters;
 	public final @NotNull     DecoderFactoryList decoders;
@@ -77,6 +80,7 @@ public class AutoCodec implements ReflectContextProvider {
 
 		this.coders            = this.createCoders();
 		this.encoders          = this.createEncoders();
+		this.fixers            = this.createFixers();
 		this.constructors      = this.createConstructors();
 		this.imprinters        = this.createImprinters();
 		this.decoders          = this.createDecoders();
@@ -235,6 +239,34 @@ public class AutoCodec implements ReflectContextProvider {
 	@TestOnly
 	public <T_Decoded> @NotNull AutoEncoder<T_Decoded> createEncoder(@NotNull ReifiedType<T_Decoded> type) throws FactoryException {
 		return this.newFactoryContext(type).forceCreateEncoder();
+	}
+
+	/**
+	creates an {@link AutoFixer} which can handle schema changes in instances of the provided class.
+	if such a fixer could not be created for any reason, a {@link FactoryException} is thrown.
+
+	this method is marked as {@link TestOnly} because from a serialization perspective,
+	an {@link AutoFixer} has no use without an associated {@link AutoDecoder}.
+	if you are writing your own {@link AutoDecoder} and need an {@link AutoFixer}
+	for it, consider using the methods on {@link FactoryContext} instead.
+	*/
+	@TestOnly
+	public <T_Decoded> @NotNull AutoFixer<T_Decoded> createFixer(@NotNull Class<T_Decoded> clazz) throws FactoryException {
+		return this.newFactoryContext(clazz).forceCreateFixer();
+	}
+
+	/**
+	creates an {@link AutoFixer} which can handle schema changes in instances of the provided type.
+	if such a fixer could not be created for any reason, a {@link FactoryException} is thrown.
+
+	this method is marked as {@link TestOnly} because from a serialization perspective,
+	an {@link AutoFixer} has no use without an associated {@link AutoDecoder}.
+	if you are writing your own {@link AutoDecoder} and need an {@link AutoFixer}
+	for it, consider using the methods on {@link FactoryContext} instead.
+	*/
+	@TestOnly
+	public <T_Decoded> @NotNull AutoFixer<T_Decoded> createFixer(@NotNull ReifiedType<T_Decoded> type) throws FactoryException {
+		return this.newFactoryContext(type).forceCreateFixer();
 	}
 
 	/**
@@ -525,6 +557,17 @@ public class AutoCodec implements ReflectContextProvider {
 	@OverrideOnly
 	public @NotNull EncoderFactoryList createEncoders() {
 		return new EncoderFactoryList(this);
+	}
+
+	/**
+	creates the {@link FixerFactoryList} which this
+	AutoCodec uses to create {@link AutoFixer}'s.
+	anonymous subclasses of AutoCodec can override this method to
+	provide an FixerFactoryList with different factories built into it.
+	*/
+	@OverrideOnly
+	public @NotNull FixerFactoryList createFixers() {
+		return new FixerFactoryList(this);
 	}
 
 	/**

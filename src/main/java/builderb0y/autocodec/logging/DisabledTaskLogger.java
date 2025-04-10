@@ -20,6 +20,9 @@ import builderb0y.autocodec.decoders.DecodeException;
 import builderb0y.autocodec.encoders.AutoEncoder;
 import builderb0y.autocodec.encoders.EncodeContext;
 import builderb0y.autocodec.encoders.EncodeException;
+import builderb0y.autocodec.fixers.AutoFixer;
+import builderb0y.autocodec.fixers.DataFixContext;
+import builderb0y.autocodec.fixers.DataFixException;
 import builderb0y.autocodec.imprinters.AutoImprinter;
 import builderb0y.autocodec.imprinters.ImprintContext;
 import builderb0y.autocodec.imprinters.ImprintException;
@@ -63,8 +66,13 @@ public class DisabledTaskLogger extends TaskLogger {
 	//////////////// handlers ////////////////
 
 	@Override
-	public <T_Encoded, T_Decoded> T_Encoded encode(@NotNull AutoEncoder<T_Decoded> encoder, @NotNull EncodeContext<T_Encoded, T_Decoded> context) throws EncodeException {
+	public <T_Encoded, T_Decoded> @NotNull T_Encoded encode(@NotNull AutoEncoder<T_Decoded> encoder, @NotNull EncodeContext<T_Encoded, T_Decoded> context) throws EncodeException {
 		return encoder.encode(context);
+	}
+
+	@Override
+	public @NotNull <T_Encoded, T_Decoded> DataFixContext<T_Encoded> fix(@NotNull AutoFixer<T_Decoded> fixer, @NotNull DataFixContext<T_Encoded> context) throws DataFixException {
+		return fixer.fix(context);
 	}
 
 	@Override
@@ -73,7 +81,7 @@ public class DisabledTaskLogger extends TaskLogger {
 	}
 
 	@Override
-	public <T_Encoded, T_Decoded> T_Decoded construct(@NotNull AutoConstructor<T_Decoded> constructor, @NotNull ConstructContext<T_Encoded> context) throws ConstructException {
+	public <T_Encoded, T_Decoded> @NotNull T_Decoded construct(@NotNull AutoConstructor<T_Decoded> constructor, @NotNull ConstructContext<T_Encoded> context) throws ConstructException {
 		return constructor.construct(context);
 	}
 

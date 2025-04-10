@@ -1,8 +1,16 @@
 package builderb0y.autocodec.util;
 
-import java.lang.invoke.*;
+import java.lang.invoke.LambdaMetafactory;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
@@ -128,5 +136,41 @@ public class AutoCodecUtil {
 			if (a.charAt(aStart + offset) != b.charAt(bStart + offset)) return false;
 		}
 		return true;
+	}
+
+	/**
+	guarantees that you get the kind of map you want,
+	unlike {@link Collectors#toMap(Function, Function)}.
+	also allows null values, and doesn't make you specify the merger.
+	might be slightly faster, depending on how the merge is performed.
+	*/
+	@Internal
+	public static <T_Both, T_Key, T_Value, T_Map extends Map<T_Key, T_Value>> @NotNull Collector<T_Both, ?, T_Map> collectToMap(
+		@NotNull Function<T_Both, T_Key> keyGetter,
+		@NotNull Function<T_Both, T_Value> valueGetter,
+		@NotNull Supplier<T_Map> mapConstructor
+	) {
+		return Collector.of(
+			mapConstructor,
+			(T_Map map, T_Both entry) -> {
+				T_Key key = keyGetter.apply(entry);
+				if (map.containsKey(key)) throw new IllegalArgumentException("Duplicate key: " + key);
+				T_Value value = valueGetter.apply(entry);
+				map.put(key, value);
+			},
+			(T_Map map1, T_Map map2) -> {
+				if (map1.size() < map2.size()) {
+					T_Map tmp = map1;
+					map1 = map2;
+					map2 = tmp;
+				}
+				for (Map.Entry<T_Key, T_Value> entry : map2.entrySet()) {
+					T_Key key = entry.getKey();
+					if (map1.containsKey(key)) throw new IllegalArgumentException("Duplicate key: " + key);
+					map1.put(key, entry.getValue());
+				}
+				return map1;
+			}
+		);
 	}
 }

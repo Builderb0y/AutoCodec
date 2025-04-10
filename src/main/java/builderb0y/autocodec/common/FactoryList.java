@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.ReentrantLock;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenCustomHashMap;
 import org.jetbrains.annotations.ApiStatus.OverrideOnly;
@@ -147,6 +148,8 @@ extends NamedFactory<T_Handler> {
 
 	//////////////////////////////// request handling ////////////////////////////////
 
+	public final ReentrantLock lock = new ReentrantLock();
+
 	public final @NotNull Map<@NotNull ReifiedType<?>, @NotNull T_Handler> cache = new Object2ObjectOpenCustomHashMap<>(256, ReifiedType.ORDERED_ANNOTATIONS_STRATEGY);
 
 	/**
@@ -185,30 +188,36 @@ extends NamedFactory<T_Handler> {
 	@Override
 	@OverrideOnly
 	public <T_HandledType> @Nullable T_Handler tryCreate(@NotNull FactoryContext<T_HandledType> context) throws FactoryException {
-		ReifiedType<?> type = context.type;
-		T_Handler handler = this.cache.get(type);
-		if (handler != null) {
-			context.logger().logMessage("Found cached handler.");
-			return handler;
-		}
-		LazyHandler<T_Handler> lazy = this.requestStack.get(type);
-		if (lazy != null) {
-			context.logger().logMessage("Recursive request. Using lazy handler.");
-			return lazy.getThisHandler();
-		}
-		lazy = this.createLazyHandler();
-		this.requestStack.put(type, lazy);
+		this.lock.lock();
 		try {
-			context.logger().logMessage("No cached or lazy handler found. Creating a new handler...");
-			handler = this.doCreate(context);
+			ReifiedType<?> type = context.type;
+			T_Handler handler = this.cache.get(type);
 			if (handler != null) {
-				lazy.setDelegateHandler(handler);
-				this.cache.put(type, handler);
+				context.logger().logMessage("Found cached handler.");
+				return handler;
 			}
-			return handler;
+			LazyHandler<T_Handler> lazy = this.requestStack.get(type);
+			if (lazy != null) {
+				context.logger().logMessage("Recursive request. Using lazy handler.");
+				return lazy.getThisHandler();
+			}
+			lazy = this.createLazyHandler();
+			this.requestStack.put(type, lazy);
+			try {
+				context.logger().logMessage("No cached or lazy handler found. Creating a new handler...");
+				handler = this.doCreate(context);
+				if (handler != null) {
+					lazy.setDelegateHandler(handler);
+					this.cache.put(type, handler);
+				}
+				return handler;
+			}
+			finally {
+				this.requestStack.remove(type);
+			}
 		}
 		finally {
-			this.requestStack.remove(type);
+			this.lock.unlock();
 		}
 	}
 

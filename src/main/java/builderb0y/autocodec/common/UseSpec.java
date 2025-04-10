@@ -39,6 +39,15 @@ public record UseSpec(
 		return annotation == null ? null : new UseSpec(annotation.name(), inType(annotation.in(), type), annotation.usage(), annotation.strict());
 	}
 
+	public static @Nullable UseSpec fromUseFixer(@NotNull ReifiedType<?> type) {
+		UseFixer[] annotations = type.getAnnotations().getAll(UseFixer.class);
+		return switch (annotations.length) {
+			case 0 -> null;
+			case 1 -> new UseSpec(annotations[0].name(), inType(annotations[0].in(), type), annotations[0].usage(), annotations[0].strict());
+			default -> throw new FactoryException("More than one @UseFixer annotations applied to type " + type);
+		};
+	}
+
 	public static @Nullable UseSpec fromUseConstructor(@NotNull ReifiedType<?> type) {
 		UseConstructor annotation = type.getAnnotations().getFirst(UseConstructor.class);
 		return annotation == null ? null : new UseSpec(annotation.name(), inType(annotation.in(), type), annotation.usage(), annotation.strict());

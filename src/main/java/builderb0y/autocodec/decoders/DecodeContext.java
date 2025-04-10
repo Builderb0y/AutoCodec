@@ -14,6 +14,9 @@ import builderb0y.autocodec.common.DynamicOpsContext;
 import builderb0y.autocodec.constructors.AutoConstructor;
 import builderb0y.autocodec.constructors.ConstructContext;
 import builderb0y.autocodec.constructors.ConstructException;
+import builderb0y.autocodec.fixers.AutoFixer;
+import builderb0y.autocodec.fixers.DataFixContext;
+import builderb0y.autocodec.fixers.DataFixException;
 import builderb0y.autocodec.imprinters.AutoImprinter;
 import builderb0y.autocodec.imprinters.ImprintContext;
 import builderb0y.autocodec.imprinters.ImprintException;
@@ -260,6 +263,10 @@ public class DecodeContext<T_Encoded> extends DynamicOpsContext<T_Encoded> {
 	}
 
 	//////////////////////////////// handlers ////////////////////////////////
+
+	public <T_Decoded> @NotNull DataFixContext<T_Encoded> fixWith(@NotNull AutoFixer<T_Decoded> fixer) throws DataFixException {
+		return this.logger().fix(fixer, new DataFixContext<>(this));
+	}
 
 	public <T_Decoded> T_Decoded decodeWith(@NotNull AutoDecoder<T_Decoded> decoder) throws DecodeException {
 		return this.logger().decode(decoder, this);

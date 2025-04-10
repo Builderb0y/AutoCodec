@@ -94,7 +94,7 @@ public class UseVerifierFactory extends UseHandlerFactory1<AutoVerifier<?>> impl
 				(MethodPredicate predicate) -> (
 					predicate
 					.returnsVoid()
-					.parameterType(0, new NamedPredicate<>((ReifiedType<?> type) -> type.getRawClass() == VerifyContext.class, "VerifyContext"))
+					.parameterType(0, ReifiedType.RAW_TYPE_STRATEGY, ReifiedType.parameterizeWithWildcards(VerifyContext.class))
 				)
 			),
 			MemberCollector.forceUnique()

@@ -17,6 +17,9 @@ import builderb0y.autocodec.decoders.DecoderFactoryList;
 import builderb0y.autocodec.encoders.AutoEncoder;
 import builderb0y.autocodec.encoders.AutoEncoder.EncoderFactory;
 import builderb0y.autocodec.encoders.EncoderFactoryList;
+import builderb0y.autocodec.fixers.AutoFixer;
+import builderb0y.autocodec.fixers.AutoFixer.FixerFactory;
+import builderb0y.autocodec.fixers.FixerFactoryList;
 import builderb0y.autocodec.imprinters.AutoImprinter;
 import builderb0y.autocodec.imprinters.AutoImprinter.ImprinterFactory;
 import builderb0y.autocodec.logging.TaskLogger;
@@ -346,6 +349,72 @@ public class FactoryContext<T_HandledType> extends TaskContext implements Reflec
 	@SuppressWarnings("unchecked")
 	public @NotNull AutoImprinter<T_HandledType> forceCreateFallbackImprinter(@NotNull ImprinterFactory caller) throws FactoryException {
 		return (AutoImprinter<T_HandledType>)(this.logger().forceCreateFallbackHandler(this.autoCodec.imprinters, this, caller));
+	}
+
+	//////////////// fixers ////////////////
+
+	/**
+	attempts to create an {@link AutoFixer} from all factories
+	in our {@link #autoCodec}'s {@link AutoCodec#fixers} list.
+	if no factories on that list are able to create
+	the requested {@link AutoFixer}, returns null.
+	if more than one factory on the list is able to create
+	an {@link AutoFixer}, a {@link FactoryException} is thrown.
+	a {@link FactoryException} may also be thrown if any factories encountered
+	an error while trying to create the requested {@link AutoFixer}.
+	*/
+	public @Nullable AutoFixer<T_HandledType> tryCreateFixer() throws FactoryException {
+		return this.tryCreateFixer(this.autoCodec.fixers);
+	}
+
+	/**
+	same as {@link #tryCreateFixer()}, but will throw a
+	{@link FactoryException} on failure instead of returning null.
+	*/
+	public @NotNull AutoFixer<T_HandledType> forceCreateFixer() throws FactoryException {
+		return this.forceCreateFixer(this.autoCodec.fixers);
+	}
+
+	/**
+	attempts to create an {@link AutoFixer} with the provided factory.
+	if the factory is unable to create the requested {@link AutoFixer}, returns null.
+	throws {@link FactoryException} if the factory encountered
+	an error while trying to create the requested {@link AutoFixer}.
+	*/
+	@SuppressWarnings("unchecked")
+	public @Nullable AutoFixer<T_HandledType> tryCreateFixer(@NotNull FixerFactory factory) throws FactoryException {
+		return (AutoFixer<T_HandledType>)(this.logger().tryCreateHandler(factory, this));
+	}
+
+	/**
+	same as {@link #tryCreateFixer(FixerFactory)}, but will throw
+	a {@link FactoryException} on failure instead of returning null.
+	*/
+	@SuppressWarnings("unchecked")
+	public @NotNull AutoFixer<T_HandledType> forceCreateFixer(@NotNull FixerFactory factory) throws FactoryException {
+		return (AutoFixer<T_HandledType>)(this.logger().forceCreateHandler(factory, this));
+	}
+
+	/**
+	returns the {@link AutoFixer} which *would* be returned
+	by {@link #tryCreateFixer()} IF the provided factory
+	(caller) and all factories that come before it in the
+	{@link FixerFactoryList} were not present at all.
+	this can be used by factories which want to wrap
+	an existing handler in a different handler.
+	*/
+	@SuppressWarnings("unchecked")
+	public @Nullable AutoFixer<T_HandledType> tryCreateFallbackFixer(@NotNull FixerFactory caller) throws FactoryException {
+		return (AutoFixer<T_HandledType>)(this.logger().tryCreateFallbackHandler(this.autoCodec.fixers, this, caller));
+	}
+
+	/**
+	same as {@link #tryCreateFallbackFixer(FixerFactory)}, but will
+	throw a {@link FactoryException} on failure instead of returning null.
+	*/
+	@SuppressWarnings("unchecked")
+	public @NotNull AutoFixer<T_HandledType> forceCreateFallbackFixer(@NotNull FixerFactory caller) throws FactoryException {
+		return (AutoFixer<T_HandledType>)(this.logger().forceCreateFallbackHandler(this.autoCodec.fixers, this, caller));
 	}
 
 	//////////////// decoders ////////////////

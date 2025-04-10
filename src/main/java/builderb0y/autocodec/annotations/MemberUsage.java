@@ -7,19 +7,20 @@ import builderb0y.autocodec.common.FactoryException;
 import builderb0y.autocodec.constructors.AutoConstructor;
 import builderb0y.autocodec.decoders.AutoDecoder;
 import builderb0y.autocodec.encoders.AutoEncoder;
+import builderb0y.autocodec.fixers.AutoFixer;
 import builderb0y.autocodec.imprinters.AutoImprinter;
 import builderb0y.autocodec.verifiers.AutoVerifier;
 
 /**
-used by {@link UseEncoder}, {@link UseDecoder}, {@link UseCoder},
+used by {@link UseEncoder}, {@link UseDecoder}, {@link UseCoder}, {@link UseFixer},
 {@link UseConstructor}, {@link UseImprinter}, and {@link UseVerifier}.
 this enum defines how the targeted member will be used.
 
 for the following documentation, it is assumed
 that one of the above annotations is applied to type T,
 and (handler) is one of: {@link AutoEncoder}, {@link AutoDecoder},
-{@link AutoCoder}, {@link AutoConstructor}, {@link AutoImprinter},
-or {@link AutoVerifier}, depending on the annotation used.
+{@link AutoCoder}, {@link AutoFixer}, {@link AutoConstructor},
+{@link AutoImprinter}, or {@link AutoVerifier}, depending on the annotation used.
 
 all of the above annotations have a "strict" attribute
 which defines whether or not the targeted member
