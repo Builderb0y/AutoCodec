@@ -26,22 +26,28 @@ public abstract class Data<T_Encoded> {
 
 	public boolean isEmpty() { return false; }
 
-	public @Nullable Number tryAsNumber() { return null; }
-
+	public boolean isBoolean() { return false; }
 	public @Nullable Boolean tryAsBoolean() { return null; }
-	public @Nullable Byte tryAsByte() { return null; }
-	public @Nullable Short tryAsShort() { return null; }
-	public @Nullable Integer tryAsInt() { return null; }
-	public @Nullable Long tryAsLong() { return null; }
-	public @Nullable Float tryAsFloat() { return null; }
-	public @Nullable Double tryAsDouble() { return null; }
+
+	public boolean isNumber() { return false; }
+	public @Nullable AbstractNumberData<T_Encoded> tryAsNumber() { return null; }
+
+	public boolean isString() { return false; }
 	public @Nullable String tryAsString() { return null; }
 
+	public boolean isByteList() { return false; }
 	public @Nullable ByteList tryAsByteList() { return null; }
+
+	public boolean isIntList() { return false; }
 	public @Nullable IntList tryAsIntList() { return null; }
+
+	public boolean isLongList() { return false; }
 	public @Nullable LongList tryAsLongList() { return null; }
 
+	public boolean isList() { return false; }
 	public @Nullable List<@NotNull Data<T_Encoded>> tryAsList() { return null; }
+
+	public boolean isMap() { return false; }
 	public @Nullable Map<@NotNull Data<T_Encoded>, @NotNull Data<T_Encoded>> tryAsMap() { return null; }
 
 	@Override public abstract boolean equals(Object obj);

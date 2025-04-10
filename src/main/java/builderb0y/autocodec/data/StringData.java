@@ -23,6 +23,11 @@ public class StringData<T_Encoded> extends Data<T_Encoded> {
 	}
 
 	@Override
+	public boolean isString() {
+		return true;
+	}
+
+	@Override
 	public @NotNull String tryAsString() {
 		return this.value.toString();
 	}

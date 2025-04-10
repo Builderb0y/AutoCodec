@@ -77,125 +77,18 @@ public class UnknownData<T_Encoded> extends Data<T_Encoded> {
 	}
 
 	@Override
-	public @Nullable Number tryAsNumber() {
+	public @Nullable AbstractNumberData<T_Encoded> tryAsNumber() {
 		if (this.resolution != null) {
-			if (this.resolution instanceof NumberData<T_Encoded> data) {
-				return data.tryAsNumber();
+			if (this.resolution instanceof AbstractNumberData<T_Encoded> data) {
+				return data;
 			}
 		}
 		else {
 			Number value = DFUVersions.getResult(this.ops.getNumberValue(this.payload));
 			if (value != null) {
-				this.resolution = new UnknownNumberData<>(this.ops, value);
-				return value;
-			}
-		}
-		return null;
-	}
-
-	@Override
-	public @Nullable Byte tryAsByte() {
-		if (this.resolution != null) {
-			if (this.resolution instanceof ByteData<T_Encoded> data) {
-				return data.byteValue();
-			}
-		}
-		else {
-			Number value = DFUVersions.getResult(this.ops.getNumberValue(this.payload));
-			if (value != null) {
-				byte byteValue = value.byteValue();
-				this.resolution = new ByteData<>(this.ops, byteValue);
-				return byteValue;
-			}
-		}
-		return null;
-	}
-
-	@Override
-	public @Nullable Short tryAsShort() {
-		if (this.resolution != null) {
-			if (this.resolution instanceof ShortData<T_Encoded> data) {
-				return data.shortValue();
-			}
-		}
-		else {
-			Number value = DFUVersions.getResult(this.ops.getNumberValue(this.payload));
-			if (value != null) {
-				short shortValue = value.shortValue();
-				this.resolution = new ShortData<>(this.ops, shortValue);
-				return shortValue;
-			}
-		}
-		return null;
-	}
-
-	@Override
-	public @Nullable Integer tryAsInt() {
-		if (this.resolution != null) {
-			if (this.resolution instanceof IntData<T_Encoded> data) {
-				return data.intValue();
-			}
-		}
-		else {
-			Number value = DFUVersions.getResult(this.ops.getNumberValue(this.payload));
-			if (value != null) {
-				int intValue = value.intValue();
-				this.resolution = new IntData<>(this.ops, intValue);
-				return intValue;
-			}
-		}
-		return null;
-	}
-
-	@Override
-	public @Nullable Long tryAsLong() {
-		if (this.resolution != null) {
-			if (this.resolution instanceof LongData<T_Encoded> data) {
-				return data.longValue();
-			}
-		}
-		else {
-			Number value = DFUVersions.getResult(this.ops.getNumberValue(this.payload));
-			if (value != null) {
-				long longValue = value.longValue();
-				this.resolution = new LongData<>(this.ops, longValue);
-				return longValue;
-			}
-		}
-		return null;
-	}
-
-	@Override
-	public @Nullable Float tryAsFloat() {
-		if (this.resolution != null) {
-			if (this.resolution instanceof FloatData<T_Encoded> data) {
-				return data.floatValue();
-			}
-		}
-		else {
-			Number value = DFUVersions.getResult(this.ops.getNumberValue(this.payload));
-			if (value != null) {
-				float floatValue = value.floatValue();
-				this.resolution = new FloatData<>(this.ops, floatValue);
-				return floatValue;
-			}
-		}
-		return null;
-	}
-
-	@Override
-	public @Nullable Double tryAsDouble() {
-		if (this.resolution != null) {
-			if (this.resolution instanceof DoubleData<T_Encoded> data) {
-				return data.doubleValue();
-			}
-		}
-		else {
-			Number value = DFUVersions.getResult(this.ops.getNumberValue(this.payload));
-			if (value != null) {
-				double doubleValue = value.doubleValue();
-				this.resolution = new DoubleData<>(this.ops, doubleValue);
-				return doubleValue;
+				UnknownNumberData<T_Encoded> numberData = new UnknownNumberData<>(this.ops, value);
+				this.resolution = numberData;
+				return numberData;
 			}
 		}
 		return null;

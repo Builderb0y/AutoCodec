@@ -19,6 +19,11 @@ public class BooleanData<T_Encoded> extends Data<T_Encoded> {
 	}
 
 	@Override
+	public boolean isBoolean() {
+		return true;
+	}
+
+	@Override
 	public @Nullable Boolean tryAsBoolean() {
 		return this.value;
 	}

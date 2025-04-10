@@ -30,6 +30,11 @@ public class IntArrayData<T_Encoded> extends Data<T_Encoded> {
 	}
 
 	@Override
+	public boolean isIntList() {
+		return true;
+	}
+
+	@Override
 	public @NotNull IntList tryAsIntList() {
 		return this.value;
 	}

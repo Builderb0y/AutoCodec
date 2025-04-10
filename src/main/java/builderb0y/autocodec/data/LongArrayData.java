@@ -30,6 +30,11 @@ public class LongArrayData<T_Encoded> extends Data<T_Encoded> {
 	}
 
 	@Override
+	public boolean isLongList() {
+		return true;
+	}
+
+	@Override
 	public @NotNull LongList tryAsLongList() {
 		return this.value;
 	}

@@ -3,7 +3,7 @@ package builderb0y.autocodec.data;
 import com.mojang.serialization.DynamicOps;
 import org.jetbrains.annotations.NotNull;
 
-public class UnknownNumberData<T_Encoded> extends NumberData<T_Encoded> {
+public class UnknownNumberData<T_Encoded> extends AbstractNumberData<T_Encoded> {
 
 	public @NotNull Number value;
 
@@ -18,8 +18,33 @@ public class UnknownNumberData<T_Encoded> extends NumberData<T_Encoded> {
 	}
 
 	@Override
-	public @NotNull Number tryAsNumber() {
-		return this.value;
+	public void set(byte value) {
+		this.value = value;
+	}
+
+	@Override
+	public void set(short value) {
+		this.value = value;
+	}
+
+	@Override
+	public void set(int value) {
+		this.value = value;
+	}
+
+	@Override
+	public void set(long value) {
+		this.value = value;
+	}
+
+	@Override
+	public void set(float value) {
+		this.value = value;
+	}
+
+	@Override
+	public void set(double value) {
+		this.value = value;
 	}
 
 	@Override

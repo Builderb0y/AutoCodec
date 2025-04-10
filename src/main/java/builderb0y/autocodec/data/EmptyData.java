@@ -3,17 +3,19 @@ package builderb0y.autocodec.data;
 import com.mojang.serialization.DynamicOps;
 import org.jetbrains.annotations.NotNull;
 
-public class EmptyData extends Data {
+public class EmptyData<T_Encoded> extends Data<T_Encoded> {
 
-	public static final EmptyData INSTANCE = new EmptyData();
+	public EmptyData(@NotNull DynamicOps<T_Encoded> ops) {
+		super(ops);
+	}
 
 	@Override
-	public <T_Encoded> @NotNull T_Encoded encode(@NotNull DynamicOps<T_Encoded> ops) {
+	public <T_NewEncoded> @NotNull T_NewEncoded convert(@NotNull DynamicOps<T_NewEncoded> ops) {
 		return ops.empty();
 	}
 
 	@Override
-	public <T_Encoded> boolean isEmpty(@NotNull DynamicOps<T_Encoded> ops) {
+	public boolean isEmpty() {
 		return true;
 	}
 

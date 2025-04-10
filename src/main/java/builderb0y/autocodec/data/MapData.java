@@ -37,8 +37,21 @@ public class MapData<T_Encoded> extends Data<T_Encoded> {
 	}
 
 	@Override
+	public boolean isMap() {
+		return true;
+	}
+
+	@Override
 	public @NotNull Map<@NotNull Data<T_Encoded>, @NotNull Data<T_Encoded>> tryAsMap() {
 		return this.value;
+	}
+
+	public Data<T_Encoded> get(String key) {
+		return this.get(new StringData<>(this.ops, key));
+	}
+
+	public Data<T_Encoded> get(Data<T_Encoded> key) {
+		return this.value.get(key);
 	}
 
 	public void put(String key, boolean value) {
@@ -46,27 +59,27 @@ public class MapData<T_Encoded> extends Data<T_Encoded> {
 	}
 
 	public void put(String key, byte value) {
-		this.put(new StringData<>(this.ops, key), new ByteData<>(this.ops, value));
+		this.put(new StringData<>(this.ops, key), new NumberData<>(this.ops, value));
 	}
 
 	public void put(String key, short value) {
-		this.put(new StringData<>(this.ops, key), new ShortData<>(this.ops, value));
+		this.put(new StringData<>(this.ops, key), new NumberData<>(this.ops, value));
 	}
 
 	public void put(String key, int value) {
-		this.put(new StringData<>(this.ops, key), new IntData<>(this.ops, value));
+		this.put(new StringData<>(this.ops, key), new NumberData<>(this.ops, value));
 	}
 
 	public void put(String key, long value) {
-		this.put(new StringData<>(this.ops, key), new LongData<>(this.ops, value));
+		this.put(new StringData<>(this.ops, key), new NumberData<>(this.ops, value));
 	}
 
 	public void put(String key, float value) {
-		this.put(new StringData<>(this.ops, key), new FloatData<>(this.ops, value));
+		this.put(new StringData<>(this.ops, key), new NumberData<>(this.ops, value));
 	}
 
 	public void put(String key, double value) {
-		this.put(new StringData<>(this.ops, key), new DoubleData<>(this.ops, value));
+		this.put(new StringData<>(this.ops, key), new NumberData<>(this.ops, value));
 	}
 
 	public void put(String key, CharSequence value) {

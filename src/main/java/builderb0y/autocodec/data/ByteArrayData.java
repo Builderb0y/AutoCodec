@@ -37,6 +37,11 @@ public class ByteArrayData<T_Encoded> extends Data<T_Encoded> {
 	}
 
 	@Override
+	public boolean isByteList() {
+		return true;
+	}
+
+	@Override
 	public @NotNull ByteList tryAsByteList() {
 		return this.value;
 	}

@@ -36,6 +36,11 @@ public class ListData<T_Encoded> extends Data<T_Encoded> {
 	}
 
 	@Override
+	public boolean isList() {
+		return true;
+	}
+
+	@Override
 	public @NotNull List<@NotNull Data<T_Encoded>> tryAsList() {
 		return this.value;
 	}
@@ -45,27 +50,27 @@ public class ListData<T_Encoded> extends Data<T_Encoded> {
 	}
 
 	public void add(byte value) {
-		this.add(new ByteData<>(this.ops, value));
+		this.add(new NumberData<>(this.ops, value));
 	}
 
 	public void add(short value) {
-		this.add(new ShortData<>(this.ops, value));
+		this.add(new NumberData<>(this.ops, value));
 	}
 
 	public void add(int value) {
-		this.add(new IntData<>(this.ops, value));
+		this.add(new NumberData<>(this.ops, value));
 	}
 
 	public void add(long value) {
-		this.add(new LongData<>(this.ops, value));
+		this.add(new NumberData<>(this.ops, value));
 	}
 
 	public void add(float value) {
-		this.add(new FloatData<>(this.ops, value));
+		this.add(new NumberData<>(this.ops, value));
 	}
 
 	public void add(double value) {
-		this.add(new DoubleData<>(this.ops, value));
+		this.add(new NumberData<>(this.ops, value));
 	}
 
 	public void add(CharSequence value) {
