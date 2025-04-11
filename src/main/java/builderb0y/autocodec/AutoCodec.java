@@ -391,7 +391,7 @@ public class AutoCodec implements ReflectContextProvider {
 	any exceptions thrown by the encoder are relayed to the caller.
 	*/
 	public <T_Encoded, T_Decoded> @NotNull T_Encoded encode(@NotNull AutoEncoder<T_Decoded> encoder, T_Decoded input, @NotNull DynamicOps<T_Encoded> ops) throws EncodeException {
-		return new EncodeContext<>(this, input, ops).encodeWith(encoder);
+		return new EncodeContext<>(this, input, ops).encodeWith(encoder).encode();
 	}
 
 	/**

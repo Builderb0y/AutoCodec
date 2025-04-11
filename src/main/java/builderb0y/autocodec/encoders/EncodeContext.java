@@ -6,6 +6,7 @@ import org.jetbrains.annotations.Nullable;
 
 import builderb0y.autocodec.AutoCodec;
 import builderb0y.autocodec.common.DynamicOpsContext;
+import builderb0y.autocodec.data.Data;
 import builderb0y.autocodec.logging.TaskLogger;
 import builderb0y.autocodec.util.ObjectArrayFactory;
 
@@ -37,7 +38,7 @@ public class EncodeContext<T_Encoded, T_Decoded> extends DynamicOpsContext<T_Enc
 
 	//////////////// other ////////////////
 
-	public @NotNull T_Encoded encodeWith(@NotNull AutoEncoder<T_Decoded> encoder) throws EncodeException {
+	public @NotNull Data<T_Encoded> encodeWith(@NotNull AutoEncoder<T_Decoded> encoder) throws EncodeException {
 		return this.logger().encode(encoder, this);
 	}
 

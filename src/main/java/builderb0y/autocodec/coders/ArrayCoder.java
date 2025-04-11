@@ -12,6 +12,7 @@ import builderb0y.autocodec.annotations.SingletonArray;
 import builderb0y.autocodec.coders.AutoCoder.NamedCoder;
 import builderb0y.autocodec.common.FactoryContext;
 import builderb0y.autocodec.common.FactoryException;
+import builderb0y.autocodec.data.Data;
 import builderb0y.autocodec.decoders.DecodeContext;
 import builderb0y.autocodec.decoders.DecodeException;
 import builderb0y.autocodec.encoders.EncodeContext;
@@ -55,7 +56,7 @@ public class ArrayCoder<T_DecodedElement, T_DecodedArray> extends NamedCoder<T_D
 	@Override
 	@OverrideOnly
 	@SuppressWarnings("unchecked")
-	public <T_Encoded> @NotNull T_Encoded encode(@NotNull EncodeContext<T_Encoded, T_DecodedArray> context) throws EncodeException {
+	public <T_Encoded> @NotNull Data<T_Encoded> encode(@NotNull EncodeContext<T_Encoded, T_DecodedArray> context) throws EncodeException {
 		T_DecodedArray from = context.object;
 		if (from == null) return context.empty();
 		int length = Array.getLength(from);
@@ -63,7 +64,7 @@ public class ArrayCoder<T_DecodedElement, T_DecodedArray> extends NamedCoder<T_D
 			T_DecodedElement decodedElement = (T_DecodedElement)(Array.get(from, 0));
 			return context.object(decodedElement).encodeWith(this.elementCoder);
 		}
-		List<T_Encoded> to = new ArrayList<>(length);
+		List<Data<T_Encoded>> to = new ArrayList<>(length);
 		for (int index = 0; index < length; index++) {
 			T_DecodedElement decodedElement = (T_DecodedElement)(Array.get(from, index));
 			to.add(context.object(decodedElement).encodeWith(this.elementCoder));

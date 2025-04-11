@@ -11,6 +11,7 @@ import builderb0y.autocodec.coders.AutoCoder.NamedCoder;
 import builderb0y.autocodec.common.EnumName;
 import builderb0y.autocodec.common.FactoryContext;
 import builderb0y.autocodec.common.FactoryException;
+import builderb0y.autocodec.data.Data;
 import builderb0y.autocodec.decoders.DecodeContext;
 import builderb0y.autocodec.decoders.DecodeException;
 import builderb0y.autocodec.encoders.EncodeContext;
@@ -61,7 +62,7 @@ public class EnumCoder<T_DecodedEnum extends Enum<T_DecodedEnum>> extends NamedC
 	}
 
 	@Override
-	public <T_Encoded> @NotNull T_Encoded encode(@NotNull EncodeContext<T_Encoded, T_DecodedEnum> context) throws EncodeException {
+	public <T_Encoded> @NotNull Data<T_Encoded> encode(@NotNull EncodeContext<T_Encoded, T_DecodedEnum> context) throws EncodeException {
 		if (context.object == null) return context.empty();
 		return (
 			context.isCompressed()

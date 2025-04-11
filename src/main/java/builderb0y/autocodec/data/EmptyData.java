@@ -33,4 +33,9 @@ public class EmptyData<T_Encoded> extends Data<T_Encoded> {
 	public String toString() {
 		return "<empty>";
 	}
+
+	@Override
+	public @NotNull Data<T_Encoded> deepCopy() {
+		return this;
+	}
 }

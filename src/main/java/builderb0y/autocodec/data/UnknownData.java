@@ -60,6 +60,16 @@ public class UnknownData<T_Encoded> extends Data<T_Encoded> {
 	}
 
 	@Override
+	public boolean isBoolean() {
+		if (this.resolution != null) {
+			return this.resolution.isBoolean();
+		}
+		else {
+			return DFUVersions.getResult(this.ops.getBooleanValue(this.payload)) != null;
+		}
+	}
+
+	@Override
 	public @Nullable Boolean tryAsBoolean() {
 		if (this.resolution != null) {
 			if (this.resolution instanceof BooleanData<?> data) {
@@ -74,6 +84,16 @@ public class UnknownData<T_Encoded> extends Data<T_Encoded> {
 			}
 		}
 		return null;
+	}
+
+	@Override
+	public boolean isNumber() {
+		if (this.resolution != null) {
+			return this.resolution.isNumber();
+		}
+		else {
+			return DFUVersions.getResult(this.ops.getNumberValue(this.payload)) != null;
+		}
 	}
 
 	@Override
@@ -95,6 +115,16 @@ public class UnknownData<T_Encoded> extends Data<T_Encoded> {
 	}
 
 	@Override
+	public boolean isString() {
+		if (this.resolution != null) {
+			return this.resolution.isString();
+		}
+		else {
+			return DFUVersions.getResult(this.ops.getStringValue(this.payload)) != null;
+		}
+	}
+
+	@Override
 	public @Nullable String tryAsString() {
 		if (this.resolution != null) {
 			if (this.resolution instanceof StringData<T_Encoded> data) {
@@ -109,6 +139,16 @@ public class UnknownData<T_Encoded> extends Data<T_Encoded> {
 			}
 		}
 		return null;
+	}
+
+	@Override
+	public boolean isList() {
+		if (this.resolution != null) {
+			return this.resolution.isList();
+		}
+		else {
+			return DFUVersions.getResult(this.ops.getStream(this.payload)) != null;
+		}
 	}
 
 	@Override
@@ -127,6 +167,16 @@ public class UnknownData<T_Encoded> extends Data<T_Encoded> {
 			}
 		}
 		return null;
+	}
+
+	@Override
+	public boolean isByteList() {
+		if (this.resolution != null) {
+			return this.resolution.isByteList();
+		}
+		else {
+			return DFUVersions.getResult(this.ops.getByteBuffer(this.payload)) != null;
+		}
 	}
 
 	@Override
@@ -150,6 +200,16 @@ public class UnknownData<T_Encoded> extends Data<T_Encoded> {
 	}
 
 	@Override
+	public boolean isIntList() {
+		if (this.resolution != null) {
+			return this.resolution.isIntList();
+		}
+		else {
+			return DFUVersions.getResult(this.ops.getIntStream(this.payload)) != null;
+		}
+	}
+
+	@Override
 	public @Nullable IntList tryAsIntList() {
 		if (this.resolution != null) {
 			if (this.resolution instanceof IntArrayData<T_Encoded> data) {
@@ -168,6 +228,16 @@ public class UnknownData<T_Encoded> extends Data<T_Encoded> {
 	}
 
 	@Override
+	public boolean isLongList() {
+		if (this.resolution != null) {
+			return this.resolution.isLongList();
+		}
+		else {
+			return DFUVersions.getResult(this.ops.getLongStream(this.payload)) != null;
+		}
+	}
+
+	@Override
 	public @Nullable LongList tryAsLongList() {
 		if (this.resolution != null) {
 			if (this.resolution instanceof LongArrayData<T_Encoded> data) {
@@ -183,6 +253,16 @@ public class UnknownData<T_Encoded> extends Data<T_Encoded> {
 			}
 		}
 		return null;
+	}
+
+	@Override
+	public boolean isMap() {
+		if (this.resolution != null) {
+			return this.resolution.isMap();
+		}
+		else {
+			return DFUVersions.getResult(this.ops.getMapValues(this.payload)) != null;
+		}
 	}
 
 	@Override
@@ -216,5 +296,10 @@ public class UnknownData<T_Encoded> extends Data<T_Encoded> {
 	@Override
 	public String toString() {
 		return this.payload.toString();
+	}
+
+	@Override
+	public @NotNull Data<T_Encoded> deepCopy() {
+		return new UnknownData<>(this.ops, this.payload); //assume payload will not be modified.
 	}
 }

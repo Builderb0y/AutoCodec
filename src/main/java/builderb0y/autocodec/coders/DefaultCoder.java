@@ -11,6 +11,7 @@ import builderb0y.autocodec.coders.AutoCoder.NamedCoder;
 import builderb0y.autocodec.common.DefaultSpec;
 import builderb0y.autocodec.common.FactoryContext;
 import builderb0y.autocodec.common.FactoryException;
+import builderb0y.autocodec.data.Data;
 import builderb0y.autocodec.decoders.DecodeContext;
 import builderb0y.autocodec.decoders.DecodeException;
 import builderb0y.autocodec.encoders.EncodeContext;
@@ -37,7 +38,7 @@ public class DefaultCoder<T_Decoded> extends NamedCoder<T_Decoded> {
 	public <T_Encoded> @Nullable T_Decoded decode(@NotNull DecodeContext<T_Encoded> context) throws DecodeException {
 		try {
 			if (context.isEmpty()) switch (this.spec.mode()) {
-				case ENCODED -> context = context.input(this.spec.getEncodedDefaultValue(context));
+				case ENCODED -> context = context.input(this.spec.getEncodedDefaultValue(context).encode());
 				case DECODED -> { return this.spec.getDecodedDefaultValue(context); }
 			}
 			return context.decodeWith(this.fallback);
@@ -52,12 +53,12 @@ public class DefaultCoder<T_Decoded> extends NamedCoder<T_Decoded> {
 
 	@Override
 	@OverrideOnly
-	public <T_Encoded> @NotNull T_Encoded encode(@NotNull EncodeContext<T_Encoded, T_Decoded> context) throws EncodeException {
+	public <T_Encoded> @NotNull Data<T_Encoded> encode(@NotNull EncodeContext<T_Encoded, T_Decoded> context) throws EncodeException {
 		try {
 			if (!this.spec.alwaysEncode()) {
 				switch (this.spec.mode()) {
 					case ENCODED -> {
-						T_Encoded encoded = context.encodeWith(this.fallback);
+						Data<T_Encoded> encoded = context.encodeWith(this.fallback);
 						if (Objects.equals(this.spec.getEncodedDefaultValue(context), encoded)) {
 							encoded = context.empty();
 						}

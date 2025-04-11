@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import builderb0y.autocodec.coders.AutoCoder.NamedCoder;
+import builderb0y.autocodec.data.Data;
 import builderb0y.autocodec.decoders.DecodeContext;
 import builderb0y.autocodec.decoders.DecodeException;
 import builderb0y.autocodec.encoders.EncodeContext;
@@ -49,7 +50,7 @@ public class FixingCoder<T_Decoded> extends NamedCoder<T_Decoded> {
 
 	@Override
 	@OverrideOnly
-	public <T_Encoded> @NotNull T_Encoded encode(@NotNull EncodeContext<T_Encoded, T_Decoded> context) throws EncodeException {
+	public <T_Encoded> @NotNull Data<T_Encoded> encode(@NotNull EncodeContext<T_Encoded, T_Decoded> context) throws EncodeException {
 		return context.encodeWith(this.coder);
 	}
 

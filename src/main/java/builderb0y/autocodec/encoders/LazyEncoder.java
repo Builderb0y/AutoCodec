@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import builderb0y.autocodec.common.LazyHandler;
+import builderb0y.autocodec.data.Data;
 
 public class LazyEncoder<T> extends LazyHandler<AutoEncoder<T>> implements AutoEncoder<T> {
 
@@ -24,7 +25,7 @@ public class LazyEncoder<T> extends LazyHandler<AutoEncoder<T>> implements AutoE
 
 	@Override
 	@OverrideOnly
-	public <T_Encoded> @NotNull T_Encoded encode(@NotNull EncodeContext<T_Encoded, T> context) throws EncodeException {
+	public <T_Encoded> @NotNull Data<T_Encoded> encode(@NotNull EncodeContext<T_Encoded, T> context) throws EncodeException {
 		return context.encodeWith(this.getDelegateHandler());
 	}
 

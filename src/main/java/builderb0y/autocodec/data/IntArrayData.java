@@ -53,4 +53,9 @@ public class IntArrayData<T_Encoded> extends Data<T_Encoded> {
 	public String toString() {
 		return this.value.toString();
 	}
+
+	@Override
+	public @NotNull Data<T_Encoded> deepCopy() {
+		return new IntArrayData<>(this.ops, new IntArrayList(this.value));
+	}
 }

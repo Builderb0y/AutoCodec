@@ -10,6 +10,7 @@ import builderb0y.autocodec.annotations.SingletonArray;
 import builderb0y.autocodec.coders.AutoCoder;
 import builderb0y.autocodec.common.FactoryContext;
 import builderb0y.autocodec.common.FactoryException;
+import builderb0y.autocodec.data.Data;
 import builderb0y.autocodec.encoders.AutoEncoder.NamedEncoder;
 import builderb0y.autocodec.reflection.reification.ReifiedType;
 
@@ -30,7 +31,7 @@ public class CollectionEncoder<T_Element, T_Collection extends Collection<T_Elem
 
 	@Override
 	@OverrideOnly
-	public <T_Encoded> @NotNull T_Encoded encode(@NotNull EncodeContext<T_Encoded, T_Collection> context) throws EncodeException {
+	public <T_Encoded> @NotNull Data<T_Encoded> encode(@NotNull EncodeContext<T_Encoded, T_Collection> context) throws EncodeException {
 		if (context.object == null) return context.empty();
 		AutoCoder<T_Element> coder = this.elementCoder;
 		return context.createList(context.object.stream().map((T_Element element) -> context.object(element).encodeWith(coder)));

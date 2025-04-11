@@ -2,6 +2,7 @@ package builderb0y.autocodec.data;
 
 import com.mojang.serialization.DynamicOps;
 import it.unimi.dsi.fastutil.HashCommon;
+import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.NotNull;
 
 public class NumberData<T_Encoded> extends AbstractNumberData<T_Encoded> {
@@ -15,7 +16,14 @@ public class NumberData<T_Encoded> extends AbstractNumberData<T_Encoded> {
 		DOUBLE = 5;
 
 	public long bits; //basically a union.
+	@MagicConstant(valuesFromClass = NumberData.class)
 	public byte precision;
+
+	public NumberData(@NotNull DynamicOps<T_Encoded> ops, long bits, @MagicConstant(valuesFromClass = NumberData.class) byte precision) {
+		super(ops);
+		this.bits = bits;
+		this.precision = precision;
+	}
 
 	public NumberData(@NotNull DynamicOps<T_Encoded> ops) {
 		super(ops);
@@ -181,5 +189,10 @@ public class NumberData<T_Encoded> extends AbstractNumberData<T_Encoded> {
 			case DOUBLE -> Double.toString(Double.longBitsToDouble(this.bits));
 			default -> throw new IllegalStateException("Invalid precision: " + this.precision);
 		};
+	}
+
+	@Override
+	public @NotNull AbstractNumberData<T_Encoded> deepCopy() {
+		return new NumberData<>(this.ops, this.bits, this.precision);
 	}
 }

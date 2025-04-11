@@ -14,6 +14,7 @@ import builderb0y.autocodec.coders.AutoCoder.NamedCoder;
 import builderb0y.autocodec.common.FactoryContext;
 import builderb0y.autocodec.common.FactoryException;
 import builderb0y.autocodec.common.PatternFlags;
+import builderb0y.autocodec.data.Data;
 import builderb0y.autocodec.decoders.DecodeContext;
 import builderb0y.autocodec.decoders.DecodeException;
 import builderb0y.autocodec.encoders.EncodeContext;
@@ -54,17 +55,17 @@ public class PatternCoder extends NamedCoder<Pattern> {
 
 	@Override
 	@OverrideOnly
-	public <T_Encoded> @NotNull T_Encoded encode(@NotNull EncodeContext<T_Encoded, Pattern> context) throws EncodeException {
+	public <T_Encoded> @NotNull Data<T_Encoded> encode(@NotNull EncodeContext<T_Encoded, Pattern> context) throws EncodeException {
 		if (context.object == null) return context.empty();
 		if (context.object.flags() == 0) return context.createString(context.object.pattern());
-		Map<T_Encoded, T_Encoded> map = new Object2ObjectArrayMap<>(2);
+		Map<Data<T_Encoded>, Data<T_Encoded>> map = new Object2ObjectArrayMap<>(2);
 		map.put(context.createString("pattern"), context.createString(context.object.pattern()));
 		if (context.isCompressed()) {
 			map.put(context.createString("flags"), context.createInt(context.object.flags()));
 		}
 		else {
 			int flags = context.object.flags();
-			List<T_Encoded> list = new ArrayList<>(Integer.bitCount(flags));
+			List<Data<T_Encoded>> list = new ArrayList<>(Integer.bitCount(flags));
 			for (PatternFlags flag : PatternFlags.VALUES) {
 				if ((flags & flag.flag) != 0) {
 					list.add(context.object(flag).encodeWith(this.flagsCoder));
@@ -72,7 +73,7 @@ public class PatternCoder extends NamedCoder<Pattern> {
 			}
 			map.put(context.createString("flags"), context.createList(list));
 		}
-		return context.createGenericMap(map);
+		return context.createMap(map);
 	}
 
 	@Override

@@ -9,6 +9,7 @@ import org.jetbrains.annotations.Nullable;
 import builderb0y.autocodec.coders.AutoCoder.NamedCoder;
 import builderb0y.autocodec.common.FactoryContext;
 import builderb0y.autocodec.common.FactoryException;
+import builderb0y.autocodec.data.Data;
 import builderb0y.autocodec.decoders.DecodeContext;
 import builderb0y.autocodec.decoders.DecodeException;
 import builderb0y.autocodec.encoders.EncodeContext;
@@ -32,7 +33,7 @@ public class OptionalCoder<T> extends NamedCoder<Optional<T>> {
 
 	@Override
 	@OverrideOnly
-	public <T_Encoded> @NotNull T_Encoded encode(@NotNull EncodeContext<T_Encoded, Optional<T>> context) throws EncodeException {
+	public <T_Encoded> @NotNull Data<T_Encoded> encode(@NotNull EncodeContext<T_Encoded, Optional<T>> context) throws EncodeException {
 		Optional<T> optional = context.object;
 		if (optional == null || optional.isEmpty()) return context.empty();
 		return context.object(optional.get()).encodeWith(this.coder);

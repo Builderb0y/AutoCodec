@@ -60,4 +60,9 @@ public class ByteArrayData<T_Encoded> extends Data<T_Encoded> {
 	public String toString() {
 		return this.value.toString();
 	}
+
+	@Override
+	public @NotNull Data<T_Encoded> deepCopy() {
+		return new ByteArrayData<>(this.ops, new ByteArrayList(this.value));
+	}
 }

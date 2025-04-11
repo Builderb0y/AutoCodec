@@ -11,6 +11,7 @@ import builderb0y.autocodec.annotations.MultiLine;
 import builderb0y.autocodec.coders.AutoCoder.NamedCoder;
 import builderb0y.autocodec.common.FactoryContext;
 import builderb0y.autocodec.common.FactoryException;
+import builderb0y.autocodec.data.Data;
 import builderb0y.autocodec.decoders.DecodeContext;
 import builderb0y.autocodec.decoders.DecodeException;
 import builderb0y.autocodec.encoders.EncodeContext;
@@ -50,7 +51,7 @@ public class MultiLineStringCoder extends NamedCoder<@MultiLine String> {
 	}
 
 	@Override
-	public <T_Encoded> @NotNull T_Encoded encode(@NotNull EncodeContext<T_Encoded, @MultiLine String> context) throws EncodeException {
+	public <T_Encoded> @NotNull Data<T_Encoded> encode(@NotNull EncodeContext<T_Encoded, @MultiLine String> context) throws EncodeException {
 		String string = context.object;
 		if (string == null) return context.empty();
 		int index = string.indexOf(this.lineSeparator);

@@ -16,6 +16,7 @@ import builderb0y.autocodec.common.FactoryList;
 import builderb0y.autocodec.constructors.AutoConstructor;
 import builderb0y.autocodec.constructors.ConstructContext;
 import builderb0y.autocodec.constructors.ConstructException;
+import builderb0y.autocodec.data.Data;
 import builderb0y.autocodec.decoders.AutoDecoder;
 import builderb0y.autocodec.decoders.DecodeContext;
 import builderb0y.autocodec.decoders.DecodeException;
@@ -173,15 +174,15 @@ public abstract class TaskLogger {
 
 
 
-	public <T_Encoded, T_Decoded> @NotNull T_Encoded encode(
+	public <T_Encoded, T_Decoded> @NotNull Data<T_Encoded> encode(
 		@NotNull AutoEncoder<T_Decoded> encoder,
 		@NotNull EncodeContext<T_Encoded, T_Decoded> context
 	)
 	throws EncodeException {
-		return this.runTask(new LoggableTask<T_Encoded, EncodeException>() {
+		return this.runTask(new LoggableTask<Data<T_Encoded>, EncodeException>() {
 
 			@Override
-			public @NotNull T_Encoded run() throws EncodeException {
+			public @NotNull Data<T_Encoded> run() throws EncodeException {
 				return encoder.encode(context);
 			}
 

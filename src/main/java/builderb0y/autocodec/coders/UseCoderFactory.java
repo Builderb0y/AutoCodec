@@ -12,6 +12,7 @@ import builderb0y.autocodec.coders.AutoCoder.NamedCoder;
 import builderb0y.autocodec.common.FactoryContext;
 import builderb0y.autocodec.common.UseHandlerFactory0;
 import builderb0y.autocodec.common.UseSpec;
+import builderb0y.autocodec.data.Data;
 import builderb0y.autocodec.decoders.DecodeContext;
 import builderb0y.autocodec.decoders.DecodeException;
 import builderb0y.autocodec.decoders.UseDecoderFactory;
@@ -39,16 +40,16 @@ public class UseCoderFactory extends UseHandlerFactory0<AutoCoder<?>> implements
 			encoder = UseEncoderFactory.findMethodBeingEncoder(context, spec),
 			decoder = UseDecoderFactory.findMethodBeingDecoder(context, spec);
 		MethodHandle
-			encoderHandle = encoder.createMethodHandle(context).asType(MethodType.methodType(Object.class, EncodeContext.class)),
+			encoderHandle = encoder.createMethodHandle(context).asType(MethodType.methodType(Data  .class, EncodeContext.class)),
 			decoderHandle = decoder.createMethodHandle(context).asType(MethodType.methodType(Object.class, DecodeContext.class));
 		return new NamedCoder<>("UseCoder: { encoder: " + encoder + ", decoder: " + decoder + " }") {
 
 			@Override
 			@OverrideOnly
 			@SuppressWarnings("unchecked")
-			public <T_Encoded> @NotNull T_Encoded encode(@NotNull EncodeContext<T_Encoded, Object> context) throws EncodeException {
+			public <T_Encoded> @NotNull Data<T_Encoded> encode(@NotNull EncodeContext<T_Encoded, Object> context) throws EncodeException {
 				try {
-					return (T_Encoded)(encoderHandle.invokeExact(context));
+					return (Data<T_Encoded>)(encoderHandle.invokeExact(context));
 				}
 				catch (EncodeException | Error normal) {
 					throw normal;

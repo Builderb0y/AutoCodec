@@ -53,4 +53,9 @@ public class LongArrayData<T_Encoded> extends Data<T_Encoded> {
 	public String toString() {
 		return this.value.toString();
 	}
+
+	@Override
+	public @NotNull Data<T_Encoded> deepCopy() {
+		return new LongArrayData<>(this.ops, new LongArrayList(this.value));
+	}
 }

@@ -1,6 +1,8 @@
 package builderb0y.autocodec.coders;
 
 import java.lang.reflect.Array;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import com.mojang.datafixers.util.Unit;
@@ -16,13 +18,13 @@ import builderb0y.autocodec.constructors.AutoConstructor;
 import builderb0y.autocodec.constructors.AutoConstructor.NamedConstructor;
 import builderb0y.autocodec.constructors.ConstructContext;
 import builderb0y.autocodec.constructors.ConstructException;
+import builderb0y.autocodec.data.Data;
 import builderb0y.autocodec.decoders.DecodeContext;
 import builderb0y.autocodec.decoders.DecodeException;
 import builderb0y.autocodec.encoders.EncodeContext;
 import builderb0y.autocodec.encoders.EncodeException;
 import builderb0y.autocodec.reflection.reification.ReifiedType;
 import builderb0y.autocodec.reflection.reification.TypeClassification;
-import builderb0y.autocodec.util.DFUVersions;
 import builderb0y.autocodec.util.ObjectOps;
 
 public class DefaultEmptyCoder<T_Decoded> extends NamedCoder<T_Decoded> {
@@ -59,18 +61,19 @@ public class DefaultEmptyCoder<T_Decoded> extends NamedCoder<T_Decoded> {
 
 	@Override
 	@OverrideOnly
-	public <T_Encoded> @NotNull T_Encoded encode(@NotNull EncodeContext<T_Encoded, T_Decoded> context) throws EncodeException {
-		T_Encoded encoded = context.encodeWith(this.nonEmpty);
+	public <T_Encoded> @NotNull Data<T_Encoded> encode(@NotNull EncodeContext<T_Encoded, T_Decoded> context) throws EncodeException {
+		Data<T_Encoded> encoded = context.encodeWith(this.nonEmpty);
+		done:
 		if (!this.alwaysEncode) {
-			Stream<?> stream = DFUVersions.getResult(context.ops.getStream(encoded));
-			if (stream != null && stream.findAny().isEmpty()) {
-				encoded = context.empty();
+			List<Data<T_Encoded>> list = encoded.tryAsList();
+			if (list != null) {
+				if (list.isEmpty()) encoded = context.empty();
+				break done;
 			}
-			else {
-				stream = DFUVersions.getResult(context.ops.getMapValues(encoded));
-				if (stream != null && stream.findAny().isEmpty()) {
-					encoded = context.empty();
-				}
+			Map<Data<T_Encoded>, Data<T_Encoded>> map = encoded.tryAsMap();
+			if (map != null) {
+				if (map.isEmpty()) encoded = context.empty();
+				break done;
 			}
 		}
 		return encoded;

@@ -33,4 +33,7 @@ public abstract class AbstractNumberData<T_Encoded> extends Data<T_Encoded> {
 	public abstract void set(long value);
 	public abstract void set(float value);
 	public abstract void set(double value);
+
+	@Override
+	public abstract @NotNull AbstractNumberData<T_Encoded> deepCopy();
 }

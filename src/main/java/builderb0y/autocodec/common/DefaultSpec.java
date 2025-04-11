@@ -13,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import builderb0y.autocodec.annotations.*;
+import builderb0y.autocodec.data.Data;
 import builderb0y.autocodec.reflection.FieldPredicate;
 import builderb0y.autocodec.reflection.MemberCollector;
 import builderb0y.autocodec.reflection.MethodPredicate;
@@ -31,8 +32,8 @@ public record DefaultSpec(
 ) {
 
 	@SuppressWarnings("unchecked")
-	public <T_Encoded> T_Encoded getEncodedDefaultValue(@NotNull DynamicOpsContext<T_Encoded> context) throws Exception {
-		if (this.mode == DefaultMode.ENCODED) return (T_Encoded)(this.getter.get(context));
+	public <T_Encoded> Data<T_Encoded> getEncodedDefaultValue(@NotNull DynamicOpsContext<T_Encoded> context) throws Exception {
+		if (this.mode == DefaultMode.ENCODED) return (Data<T_Encoded>)(this.getter.get(context));
 		else throw new IllegalStateException("requested encoded value from non-encoded DefaultSpec");
 	}
 
@@ -194,21 +195,35 @@ public record DefaultSpec(
 						new MethodPredicate()
 						.name(annotation.name())
 						.isStatic()
+						.parameterCount(1)
 						.applyConditional(
 							annotation.strict(),
 							(MethodPredicate predicate) -> predicate.actualMember(
 								new NamedPredicate<>(
 									(AnnotatedElement element) -> {
-										if (!(element instanceof Method actualMethod)) return false;
-										if (actualMethod.getParameterCount() != 1 || actualMethod.getParameterTypes()[0] != DynamicOpsContext.class) return false;
-										TypeVariable<?>[] typeParameters = actualMethod.getTypeParameters();
-										if (typeParameters.length != 1) return false;
-										if (!actualMethod.getGenericReturnType().equals(typeParameters[0])) return false;
-										if (!(actualMethod.getGenericParameterTypes()[0] instanceof ParameterizedType parameterized)) return false;
-										if (!parameterized.getActualTypeArguments()[0].equals(typeParameters[0])) return false;
-										return true;
+										if (element instanceof Method actualMethod) {
+											TypeVariable<?>[] typeParameters = actualMethod.getTypeParameters();
+											if (typeParameters.length != 1) return false;
+											TypeVariable<?> t_encoded = typeParameters[0];
+											Type[] returnParameters;
+											if (
+												//check return type.
+												actualMethod.getGenericReturnType() instanceof ParameterizedType parameterizedReturn &&
+												parameterizedReturn.getRawType() == Data.class &&
+												(returnParameters = parameterizedReturn.getActualTypeArguments()).length == 1 &&
+												returnParameters[0].equals(t_encoded) &&
+
+												//check parameter type.
+												actualMethod.getGenericParameterTypes()[0] instanceof ParameterizedType parameterized &&
+												parameterized.getRawType() == DynamicOpsContext.class &&
+												parameterized.getActualTypeArguments()[0].equals(t_encoded)
+											) {
+												return true;
+											}
+										}
+										return false;
 									},
-									"signature matches 'public static <T> T name(DynamicOpsContext<T> context)'"
+									"signature matches 'public static <T> Data<T> name(DynamicOpsContext<T> context)'"
 								)
 							),
 							(MethodPredicate predicate) -> predicate.actualMember(
@@ -219,7 +234,7 @@ public record DefaultSpec(
 										if (actualMethod.getReturnType() == void.class) return false;
 										return true;
 									},
-									"signature matches 'public static non-void name(DynamicOpsContext context)'"
+									"signature matches 'public static Data name(DynamicOpsContext context)'"
 								)
 							)
 						),

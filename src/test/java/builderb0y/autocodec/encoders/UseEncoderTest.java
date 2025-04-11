@@ -10,6 +10,7 @@ import builderb0y.autocodec.annotations.UseEncoder;
 import builderb0y.autocodec.common.FactoryContext;
 import builderb0y.autocodec.common.FactoryException;
 import builderb0y.autocodec.common.TestCommon;
+import builderb0y.autocodec.data.Data;
 import builderb0y.autocodec.encoders.AutoEncoder.EncoderFactory;
 import builderb0y.autocodec.reflection.reification.ReifiedType;
 
@@ -63,7 +64,7 @@ public class UseEncoderTest {
 
 			@Override
 			@OverrideOnly
-			public <T_Encoded> @NotNull T_Encoded encode(@NotNull EncodeContext<T_Encoded, Empty> context) throws EncodeException {
+			public <T_Encoded> @NotNull Data<T_Encoded> encode(@NotNull EncodeContext<T_Encoded, Empty> context) throws EncodeException {
 				actualSuccesses++;
 				return context.empty();
 			}
@@ -85,7 +86,7 @@ public class UseEncoderTest {
 			return FACTORY;
 		}
 
-		public static <T_Encoded> T_Encoded encode(EncodeContext<T_Encoded, Empty> context) {
+		public static <T_Encoded> Data<T_Encoded> encode(EncodeContext<T_Encoded, Empty> context) {
 			return context.encodeWith(ENCODER);
 		}
 
@@ -97,7 +98,7 @@ public class UseEncoderTest {
 
 			@Override
 			@OverrideOnly
-			public <T_Encoded> @NotNull T_Encoded encode(@NotNull EncodeContext<T_Encoded, Object> context) throws EncodeException {
+			public <T_Encoded> @NotNull Data<T_Encoded> encode(@NotNull EncodeContext<T_Encoded, Object> context) throws EncodeException {
 				actualSuccesses++;
 				return context.empty();
 			}
@@ -120,7 +121,7 @@ public class UseEncoderTest {
 		}
 
 		@SuppressWarnings({ "unchecked", "rawtypes" })
-		public static Object wildcardEncode(EncodeContext<?, ?> context) {
+		public static Data wildcardEncode(EncodeContext<?, ?> context) {
 			return ((EncodeContext)(context)).encodeWith(ENCODER);
 		}
 

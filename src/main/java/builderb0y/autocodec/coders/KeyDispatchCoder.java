@@ -1,5 +1,6 @@
 package builderb0y.autocodec.coders;
 
+import java.util.Map;
 import java.util.function.Function;
 
 import com.mojang.serialization.Codec;
@@ -7,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import builderb0y.autocodec.coders.AutoCoder.NamedCoder;
+import builderb0y.autocodec.data.Data;
 import builderb0y.autocodec.decoders.DecodeContext;
 import builderb0y.autocodec.decoders.DecodeException;
 import builderb0y.autocodec.encoders.EncodeContext;
@@ -73,7 +75,7 @@ public abstract class KeyDispatchCoder<T_Key, T_Decoded> extends NamedCoder<T_De
 	}
 
 	@Override
-	public <T_Encoded> @NotNull T_Encoded encode(@NotNull EncodeContext<T_Encoded, T_Decoded> context) throws EncodeException {
+	public <T_Encoded> @NotNull Data<T_Encoded> encode(@NotNull EncodeContext<T_Encoded, T_Decoded> context) throws EncodeException {
 		T_Decoded object = context.object;
 		if (object == null) return context.empty();
 		T_Key key = this.getKey(object);
@@ -81,7 +83,11 @@ public abstract class KeyDispatchCoder<T_Key, T_Decoded> extends NamedCoder<T_De
 		@SuppressWarnings("unchecked")
 		AutoCoder<T_Decoded> coder = (AutoCoder<T_Decoded>)(this.getCoder(key));
 		if (coder == null) throw new EncodeException(() -> "No such coder for key " + key);
-		return context.addToStringMap(context.encodeWith(coder), this.keyName, context.object(key).encodeWith(this.keyCoder));
+		Data<T_Encoded> data = context.encodeWith(coder);
+		Map<Data<T_Encoded>, Data<T_Encoded>> map = data.tryAsMap();
+		if (map == null) throw new EncodeException(() -> object + " encoded into non-map " + data + " and " + this.keyName + " cannot be stored.");
+		map.put(context.createString(this.keyName), context.object(key).encodeWith(this.keyCoder));
+		return data;
 	}
 
 	/**

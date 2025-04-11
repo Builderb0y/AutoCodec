@@ -42,4 +42,9 @@ public class BooleanData<T_Encoded> extends Data<T_Encoded> {
 	public String toString() {
 		return Boolean.toString(this.value);
 	}
+
+	@Override
+	public @NotNull Data<T_Encoded> deepCopy() {
+		return new BooleanData<>(this.ops, this.value);
+	}
 }

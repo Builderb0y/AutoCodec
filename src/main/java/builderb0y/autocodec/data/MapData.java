@@ -1,11 +1,14 @@
 package builderb0y.autocodec.data;
 
 import java.util.Map;
+import java.util.stream.Stream;
 
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.DynamicOps;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import org.jetbrains.annotations.NotNull;
+
+import builderb0y.autocodec.util.AutoCodecUtil;
 
 public class MapData<T_Encoded> extends Data<T_Encoded> {
 
@@ -26,14 +29,20 @@ public class MapData<T_Encoded> extends Data<T_Encoded> {
 		this.value = value;
 	}
 
+	public @NotNull Stream<Map.@NotNull Entry<@NotNull Data<T_Encoded>, @NotNull Data<T_Encoded>>> streamNonEmpty() {
+		return this.value.entrySet().stream().filter((Map.Entry<Data<T_Encoded>, Data<T_Encoded>> entry) -> {
+			return entry.getValue() != null && !entry.getValue().isEmpty();
+		});
+	}
+
 	@Override
 	public @NotNull T_Encoded encode() {
-		return this.ops.createMap(this.value.entrySet().stream().map((Map.Entry<Data<T_Encoded>, Data<T_Encoded>> entry) -> Pair.of(entry.getKey().encode(), entry.getValue().encode())));
+		return this.ops.createMap(this.streamNonEmpty().map((Map.Entry<Data<T_Encoded>, Data<T_Encoded>> entry) -> Pair.of(entry.getKey().encode(), entry.getValue().encode())));
 	}
 
 	@Override
 	public <T_NewEncoded> @NotNull T_NewEncoded convert(@NotNull DynamicOps<T_NewEncoded> ops) {
-		return ops.createMap(this.value.entrySet().stream().map((Map.Entry<Data<T_Encoded>, Data<T_Encoded>> entry) -> Pair.of(entry.getKey().convert(ops), entry.getValue().convert(ops))));
+		return ops.createMap(this.streamNonEmpty().map((Map.Entry<Data<T_Encoded>, Data<T_Encoded>> entry) -> Pair.of(entry.getKey().convert(ops), entry.getValue().convert(ops))));
 	}
 
 	@Override
@@ -82,7 +91,7 @@ public class MapData<T_Encoded> extends Data<T_Encoded> {
 		this.put(new StringData<>(this.ops, key), new NumberData<>(this.ops, value));
 	}
 
-	public void put(String key, CharSequence value) {
+	public void put(String key, String value) {
 		this.put(new StringData<>(this.ops, key), new StringData<>(this.ops, value));
 	}
 
@@ -107,5 +116,10 @@ public class MapData<T_Encoded> extends Data<T_Encoded> {
 	@Override
 	public String toString() {
 		return this.value.toString();
+	}
+
+	@Override
+	public @NotNull Data<T_Encoded> deepCopy() {
+		return new MapData<>(this.ops, this.value.entrySet().stream().collect(AutoCodecUtil.collectToMap((Map.Entry<Data<T_Encoded>, Data<T_Encoded>> entry) -> entry.getKey().deepCopy(), (Map.Entry<Data<T_Encoded>, Data<T_Encoded>> entry) -> entry.getValue().deepCopy(), Object2ObjectLinkedOpenHashMap::new)));
 	}
 }

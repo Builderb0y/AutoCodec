@@ -14,6 +14,7 @@ import builderb0y.autocodec.common.FactoryList;
 import builderb0y.autocodec.constructors.AutoConstructor;
 import builderb0y.autocodec.constructors.ConstructContext;
 import builderb0y.autocodec.constructors.ConstructException;
+import builderb0y.autocodec.data.Data;
 import builderb0y.autocodec.decoders.AutoDecoder;
 import builderb0y.autocodec.decoders.DecodeContext;
 import builderb0y.autocodec.decoders.DecodeException;
@@ -66,7 +67,7 @@ public class DisabledTaskLogger extends TaskLogger {
 	//////////////// handlers ////////////////
 
 	@Override
-	public <T_Encoded, T_Decoded> @NotNull T_Encoded encode(@NotNull AutoEncoder<T_Decoded> encoder, @NotNull EncodeContext<T_Encoded, T_Decoded> context) throws EncodeException {
+	public <T_Encoded, T_Decoded> @NotNull Data<T_Encoded> encode(@NotNull AutoEncoder<T_Decoded> encoder, @NotNull EncodeContext<T_Encoded, T_Decoded> context) throws EncodeException {
 		return encoder.encode(context);
 	}
 

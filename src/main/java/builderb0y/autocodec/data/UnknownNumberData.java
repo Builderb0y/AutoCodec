@@ -91,4 +91,9 @@ public class UnknownNumberData<T_Encoded> extends AbstractNumberData<T_Encoded> 
 	public String toString() {
 		return this.value.toString();
 	}
+
+	@Override
+	public @NotNull AbstractNumberData<T_Encoded> deepCopy() {
+		return new UnknownNumberData<>(this.ops, this.value); //assume Number instances are immutable.
+	}
 }

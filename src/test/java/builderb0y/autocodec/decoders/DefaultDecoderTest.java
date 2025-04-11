@@ -14,6 +14,7 @@ import builderb0y.autocodec.coders.AutoCoder;
 import builderb0y.autocodec.coders.CoderUnitTester;
 import builderb0y.autocodec.common.DynamicOpsContext;
 import builderb0y.autocodec.common.TestCommon;
+import builderb0y.autocodec.data.Data;
 import builderb0y.autocodec.reflection.reification.ReifiedType;
 
 import static org.junit.Assert.*;
@@ -79,8 +80,8 @@ public class DefaultDecoderTest {
 			return DEFAULT;
 		}
 
-		public static <T_Encoded> T_Encoded getDefaultEncoded(DynamicOpsContext<T_Encoded> context) {
-			return context.createStringMap(Map.of("value", context.createString("")));
+		public static <T_Encoded> Data<T_Encoded> getDefaultEncoded(DynamicOpsContext<T_Encoded> context) {
+			return context.createMap(Map.of(context.createString("value"), context.createString("")));
 		}
 
 		public static Object OBJ_DEFAULT = new Box<>("");
@@ -94,8 +95,8 @@ public class DefaultDecoderTest {
 		}
 
 		@SuppressWarnings({ "unchecked", "rawtypes" })
-		public static Object getObjDefaultEncoded(DynamicOpsContext context) {
-			return context.createStringMap(Map.of("value", context.createString("")));
+		public static Data getObjDefaultEncoded(DynamicOpsContext context) {
+			return context.createMap(Map.of(context.createString("value"), context.createString("")));
 		}
 	}
 

@@ -6,8 +6,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import builderb0y.autocodec.common.FactoryContext;
-import builderb0y.autocodec.common.UseSpec;
 import builderb0y.autocodec.common.UseHandlerFactory1;
+import builderb0y.autocodec.common.UseSpec;
+import builderb0y.autocodec.data.Data;
 import builderb0y.autocodec.encoders.AutoEncoder.EncoderFactory;
 import builderb0y.autocodec.reflection.MemberCollector;
 import builderb0y.autocodec.reflection.MethodPredicate;
@@ -20,7 +21,7 @@ public class UseEncoderFactory extends UseHandlerFactory1<AutoEncoder<?>> implem
 	public static final @NotNull UseEncoderFactory INSTANCE = new UseEncoderFactory();
 
 	public UseEncoderFactory() {
-		super(AutoEncoder.class, EncoderFactory.class, EncodeContext.class, Object.class, "encode");
+		super(AutoEncoder.class, EncoderFactory.class, EncodeContext.class, Data.class, "encode");
 	}
 
 	@Override
@@ -51,7 +52,14 @@ public class UseEncoderFactory extends UseHandlerFactory1<AutoEncoder<?>> implem
 							TypeVariable<?>[] typeParameters = executable.getTypeParameters();
 							if (typeParameters.length == 1) {
 								TypeVariable<?> t_encoded = typeParameters[0];
-								if (executable.getAnnotatedReturnType().getType().equals(t_encoded)) {
+								Type returnType = executable.getAnnotatedReturnType().getType();
+								Type[] returnParameters;
+								if (
+									returnType instanceof ParameterizedType parameterizedReturn &&
+									parameterizedReturn.getRawType() == Data.class &&
+									(returnParameters = parameterizedReturn.getActualTypeArguments()).length == 1 &&
+									returnParameters[0].equals(t_encoded)
+								) {
 									AnnotatedType[] parameterTypes = executable.getAnnotatedParameterTypes();
 									if (parameterTypes.length == 1 && parameterTypes[0] instanceof AnnotatedParameterizedType encodeContext) {
 										if (((ParameterizedType)(encodeContext.getType())).getRawType() == EncodeContext.class) {
@@ -70,8 +78,8 @@ public class UseEncoderFactory extends UseHandlerFactory1<AutoEncoder<?>> implem
 				),
 				(MethodPredicate predicate) -> (
 					predicate
-					.returnsNotVoid()
-					.parameterType(0, new NamedPredicate<>((ReifiedType<?> type) -> type.getRawClass() == EncodeContext.class, "EncodeContext"))
+					.returnType(ReifiedType.RAW_TYPE_STRATEGY, ReifiedType.parameterizeWithWildcards(Data.class))
+					.parameterType(0, ReifiedType.RAW_TYPE_STRATEGY, ReifiedType.parameterizeWithWildcards(EncodeContext.class))
 				)
 			),
 			MemberCollector.forceUnique()

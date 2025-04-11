@@ -1,6 +1,10 @@
 # Major changes compared to V5:
 * Added a hook for data fixers.
 	* There are no built-in data fixers, you have to write your own, but the hook is there.
+* Added a new Data system to reduce the reliance on DynamicOps for everything.
+	* DynamicOps is still used internally, but implementors of handlers no longer need to think about that.
+	* AutoEncoder's now return Data<T_Encoded> instead of T_Encoded directly.
+	* AutoDecoder's now use Data<T_Encoded> as their input. Still wrapped in a DecodeContext though.
 
 # Minor changes compared to V5:
 * FactoryList is now thread-safe, so handlers can now be requested from the AutoCodec from multiple threads at once.

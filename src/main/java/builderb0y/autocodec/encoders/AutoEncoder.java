@@ -12,6 +12,7 @@ import builderb0y.autocodec.common.AutoHandler;
 import builderb0y.autocodec.common.FactoryContext;
 import builderb0y.autocodec.common.FactoryException;
 import builderb0y.autocodec.common.KeyHolder;
+import builderb0y.autocodec.data.Data;
 import builderb0y.autocodec.reflection.reification.ReifiedType;
 import builderb0y.autocodec.util.ObjectArrayFactory;
 
@@ -35,7 +36,7 @@ public interface AutoEncoder<T_Decoded> extends AutoHandler, KeyHolder {
 	to encode and log what is being encoded.
 	*/
 	@OverrideOnly
-	public abstract <T_Encoded> @NotNull T_Encoded encode(@NotNull EncodeContext<T_Encoded, T_Decoded> context) throws EncodeException;
+	public abstract <T_Encoded> @NotNull Data<T_Encoded> encode(@NotNull EncodeContext<T_Encoded, T_Decoded> context) throws EncodeException;
 
 	/**
 	if this AutoEncoder encodes into an object with known keys,

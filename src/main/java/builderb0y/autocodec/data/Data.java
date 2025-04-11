@@ -3,6 +3,7 @@ package builderb0y.autocodec.data;
 import java.util.List;
 import java.util.Map;
 
+import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.DynamicOps;
 import it.unimi.dsi.fastutil.bytes.ByteList;
 import it.unimi.dsi.fastutil.ints.IntList;
@@ -10,6 +11,11 @@ import it.unimi.dsi.fastutil.longs.LongList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+analogous to {@link Dynamic}, but less heavy on DataResult's.
+additionally, all subclasses of Data are mutable by default.
+this is useful for data fixers and occasionally performance in other places.
+*/
 public abstract class Data<T_Encoded> {
 
 	public final @NotNull DynamicOps<T_Encoded> ops;
@@ -53,4 +59,6 @@ public abstract class Data<T_Encoded> {
 	@Override public abstract boolean equals(Object obj);
 	@Override public abstract int hashCode();
 	@Override public abstract String toString();
+
+	public abstract @NotNull Data<T_Encoded> deepCopy();
 }
