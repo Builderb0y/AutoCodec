@@ -1,6 +1,6 @@
 package builderb0y.autocodec.coders;
 
-import java.util.stream.Collectors;
+import java.util.StringJoiner;
 import java.util.stream.Stream;
 
 import org.jetbrains.annotations.ApiStatus.OverrideOnly;
@@ -12,12 +12,12 @@ import builderb0y.autocodec.coders.AutoCoder.NamedCoder;
 import builderb0y.autocodec.common.FactoryContext;
 import builderb0y.autocodec.common.FactoryException;
 import builderb0y.autocodec.data.Data;
+import builderb0y.autocodec.data.ListData;
 import builderb0y.autocodec.decoders.DecodeContext;
 import builderb0y.autocodec.decoders.DecodeException;
 import builderb0y.autocodec.encoders.EncodeContext;
 import builderb0y.autocodec.encoders.EncodeException;
 import builderb0y.autocodec.reflection.reification.ReifiedType;
-import builderb0y.autocodec.util.AutoCodecUtil;
 
 public class MultiLineStringCoder extends NamedCoder<@MultiLine String> {
 
@@ -33,17 +33,13 @@ public class MultiLineStringCoder extends NamedCoder<@MultiLine String> {
 	@Override
 	public <T_Encoded> @Nullable @MultiLine String decode(@NotNull DecodeContext<T_Encoded> context) throws DecodeException {
 		if (context.isEmpty()) return null;
-		Stream<DecodeContext<T_Encoded>> stream = context.tryAsStream(false);
-		if (stream != null) {
-			return stream.map((DecodeContext<T_Encoded> elementContext) -> {
-				try {
-					return elementContext.decodeWith(this.fallback);
-				}
-				catch (DecodeException exception) {
-					throw AutoCodecUtil.rethrow(exception);
-				}
-			})
-			.collect(Collectors.joining(this.lineSeparator));
+		ListData<T_Encoded> list = context.tryAsList();
+		if (list != null) {
+			StringJoiner joiner = new StringJoiner(this.lineSeparator);
+			for (int index = 0, size = list.value.size(); index < size; index++) {
+				joiner.add(context.input(index, list.value.get(index)).decodeWith(this.fallback));
+			}
+			return joiner.toString();
 		}
 		else {
 			return context.decodeWith(this.fallback);

@@ -5,21 +5,21 @@ import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import org.jetbrains.annotations.NotNull;
 
-public class IntArrayData<T_Encoded> extends Data<T_Encoded> {
+public class IntListData<T_Encoded> extends Data<T_Encoded> {
 
 	public @NotNull IntList value;
 
-	public IntArrayData(@NotNull DynamicOps<T_Encoded> ops) {
+	public IntListData(@NotNull DynamicOps<T_Encoded> ops) {
 		super(ops);
 		this.value = new IntArrayList();
 	}
 
-	public IntArrayData(@NotNull DynamicOps<T_Encoded> ops, int capacity) {
+	public IntListData(@NotNull DynamicOps<T_Encoded> ops, int capacity) {
 		super(ops);
 		this.value = new IntArrayList(capacity);
 	}
 
-	public IntArrayData(@NotNull DynamicOps<T_Encoded> ops, @NotNull IntList value) {
+	public IntListData(@NotNull DynamicOps<T_Encoded> ops, @NotNull IntList value) {
 		super(ops);
 		this.value = value;
 	}
@@ -30,18 +30,9 @@ public class IntArrayData<T_Encoded> extends Data<T_Encoded> {
 	}
 
 	@Override
-	public boolean isIntList() {
-		return true;
-	}
-
-	@Override
-	public @NotNull IntList tryAsIntList() {
-		return this.value;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		return obj instanceof IntArrayData<?> that && this.value.equals(that.value);
+	public boolean equals(Object object) {
+		IntListData<?> intList;
+		return object instanceof IntListData<?> data && (intList = data.tryAsIntList()) != null && this.value.equals(intList.value);
 	}
 
 	@Override
@@ -56,6 +47,6 @@ public class IntArrayData<T_Encoded> extends Data<T_Encoded> {
 
 	@Override
 	public @NotNull Data<T_Encoded> deepCopy() {
-		return new IntArrayData<>(this.ops, new IntArrayList(this.value));
+		return new IntListData<>(this.ops, new IntArrayList(this.value));
 	}
 }

@@ -38,7 +38,7 @@ public class DefaultCoder<T_Decoded> extends NamedCoder<T_Decoded> {
 	public <T_Encoded> @Nullable T_Decoded decode(@NotNull DecodeContext<T_Encoded> context) throws DecodeException {
 		try {
 			if (context.isEmpty()) switch (this.spec.mode()) {
-				case ENCODED -> context = context.input(this.spec.getEncodedDefaultValue(context).encode());
+				case ENCODED -> context = context.input(this.spec.getEncodedDefaultValue(context));
 				case DECODED -> { return this.spec.getDecodedDefaultValue(context); }
 			}
 			return context.decodeWith(this.fallback);

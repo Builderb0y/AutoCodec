@@ -1,6 +1,5 @@
 package builderb0y.autocodec.coders;
 
-import java.util.Map;
 import java.util.function.Function;
 
 import com.mojang.serialization.Codec;
@@ -9,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 
 import builderb0y.autocodec.coders.AutoCoder.NamedCoder;
 import builderb0y.autocodec.data.Data;
+import builderb0y.autocodec.data.MapData;
 import builderb0y.autocodec.decoders.DecodeContext;
 import builderb0y.autocodec.decoders.DecodeException;
 import builderb0y.autocodec.encoders.EncodeContext;
@@ -65,13 +65,14 @@ public abstract class KeyDispatchCoder<T_Key, T_Decoded> extends NamedCoder<T_De
 
 	@Override
 	public <T_Encoded> @Nullable T_Decoded decode(@NotNull DecodeContext<T_Encoded> context) throws DecodeException {
-		if (context.isEmpty()) return null;
-		DecodeContext<T_Encoded> type = context.getMember(this.keyName);
-		T_Key key = type.decodeWith(this.keyCoder);
-		if (key == null) throw new DecodeException(() -> "No such key for " + this.keyName + ' ' + type);
+		if (context.input.isEmpty()) return null;
+		Data<T_Encoded> type = context.forceAsMap().value.remove(context.createString(this.keyName));
+		if (type == null) throw new DecodeException(() -> "Missing key " + this.keyName);
+		T_Key key = context.input(type).decodeWith(this.keyCoder);
+		if (key == null) throw new DecodeException(() -> "Key " + this.keyName + ' ' + type + " decoded into null");
 		AutoCoder<? extends T_Decoded> coder = this.getCoder(key);
-		if (coder == null) throw new DecodeException(() -> "No such coder for " + this.keyName + ' ' + key);
-		return context.removeMember(this.keyName).decodeWith(coder);
+		if (coder == null) throw new DecodeException(() -> "No such coder for key " + this.keyName + ": " + key);
+		return context.decodeWith(coder);
 	}
 
 	@Override
@@ -84,9 +85,9 @@ public abstract class KeyDispatchCoder<T_Key, T_Decoded> extends NamedCoder<T_De
 		AutoCoder<T_Decoded> coder = (AutoCoder<T_Decoded>)(this.getCoder(key));
 		if (coder == null) throw new EncodeException(() -> "No such coder for key " + key);
 		Data<T_Encoded> data = context.encodeWith(coder);
-		Map<Data<T_Encoded>, Data<T_Encoded>> map = data.tryAsMap();
+		MapData<T_Encoded> map = data.tryAsMap();
 		if (map == null) throw new EncodeException(() -> object + " encoded into non-map " + data + " and " + this.keyName + " cannot be stored.");
-		map.put(context.createString(this.keyName), context.object(key).encodeWith(this.keyCoder));
+		map.value.put(context.createString(this.keyName), context.object(key).encodeWith(this.keyCoder));
 		return data;
 	}
 

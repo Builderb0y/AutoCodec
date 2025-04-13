@@ -14,7 +14,8 @@ import builderb0y.autocodec.coders.AutoCoder;
 import builderb0y.autocodec.common.AutoHandler;
 import builderb0y.autocodec.common.FactoryContext;
 import builderb0y.autocodec.common.FactoryException;
-import builderb0y.autocodec.decoders.DecodeContext;
+import builderb0y.autocodec.data.Data;
+import builderb0y.autocodec.data.MapData;
 import builderb0y.autocodec.decoders.DecodeException;
 import builderb0y.autocodec.imprinters.AutoImprinter.NamedImprinter;
 import builderb0y.autocodec.reflection.FieldPredicate;
@@ -161,9 +162,26 @@ public class MultiFieldImprinter<T_Decoded> extends NamedImprinter<T_Decoded> {
 		@OverrideOnly
 		public <T_Encoded> void imprint(@NotNull ImprintContext<T_Encoded, T_Owner> context) throws ImprintException {
 			try {
-				DecodeContext<T_Encoded> member = context.getFirstMember(this.field.getAliases());
-				T_Member object = member.decodeWith(this.coder);
-				if (object != null) this.writer.set(context.object, object);
+				MapData<T_Encoded> map = context.tryAsMap();
+				if (map != null) {
+					for (String alias : this.field.getAliases()) {
+						Data<T_Encoded> member = map.value.get(context.createString(alias));
+						if (member != null) {
+							T_Member decodedMember = context.input(alias, member).decodeWith(this.coder);
+							if (decodedMember != null) {
+								this.writer.set(context.object, decodedMember);
+							}
+							return;
+						}
+					}
+				}
+				//if we didn't return from the loop, then no aliases were specified in the data.
+				//attempt to call the decoder on empty data, to see if it turns it into something useful.
+				//the @Default<type> annotations can do this.
+				T_Member decodedMember = context.input(this.field.getSerializedName(), context.empty()).decodeWith(this.coder);
+				if (decodedMember != null) {
+					this.writer.set(context.object, decodedMember);
+				}
 			}
 			catch (ImprintException exception) {
 				throw exception;
@@ -237,9 +255,24 @@ public class MultiFieldImprinter<T_Decoded> extends NamedImprinter<T_Decoded> {
 		@Override
 		@OverrideOnly
 		public <T_Encoded> void imprint(@NotNull ImprintContext<T_Encoded, T_Owner> context) throws ImprintException {
-			DecodeContext<T_Encoded> member = context.getFirstMember(this.field.getAliases());
 			T_Member object = this.reader.get(context.object);
-			if (object != null) member.imprintWith(this.imprinter, object);
+			if (object != null) {
+				MapData<T_Encoded> map = context.tryAsMap();
+				if (map != null) {
+					if (object != null) {
+						for (String alias : this.field.getAliases()) {
+							Data<T_Encoded> member = map.value.get(context.createString(alias));
+							if (member != null) {
+								context.input(alias, member).imprintWith(this.imprinter, object);
+								return;
+							}
+						}
+					}
+				}
+				//if we didn't return from the loop, then no aliases were specified in the data.
+				//attempt to call the decoder on empty data, to see if it does anything useful with it.
+				context.input(this.field.getSerializedName(), context.empty()).imprintWith(this.imprinter, object);
+			}
 		}
 
 		@Override

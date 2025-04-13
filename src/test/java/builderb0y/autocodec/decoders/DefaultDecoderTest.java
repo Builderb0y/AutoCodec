@@ -1,11 +1,11 @@
 package builderb0y.autocodec.decoders;
 
-import java.util.Map;
 import java.util.Objects;
 
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.mojang.serialization.JsonOps;
+import it.unimi.dsi.fastutil.objects.Object2ObjectMaps;
 import org.junit.Test;
 
 import builderb0y.autocodec.annotations.*;
@@ -81,7 +81,7 @@ public class DefaultDecoderTest {
 		}
 
 		public static <T_Encoded> Data<T_Encoded> getDefaultEncoded(DynamicOpsContext<T_Encoded> context) {
-			return context.createMap(Map.of(context.createString("value"), context.createString("")));
+			return context.createMap(Object2ObjectMaps.singleton(context.createString("value"), context.createString("")));
 		}
 
 		public static Object OBJ_DEFAULT = new Box<>("");
@@ -96,7 +96,7 @@ public class DefaultDecoderTest {
 
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		public static Data getObjDefaultEncoded(DynamicOpsContext context) {
-			return context.createMap(Map.of(context.createString("value"), context.createString("")));
+			return context.createMap(Object2ObjectMaps.singleton(context.createString("value"), context.createString("")));
 		}
 	}
 

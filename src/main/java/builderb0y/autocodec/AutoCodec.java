@@ -21,6 +21,7 @@ import builderb0y.autocodec.common.ReflectContextProvider;
 import builderb0y.autocodec.constructors.AutoConstructor;
 import builderb0y.autocodec.constructors.ConstructException;
 import builderb0y.autocodec.constructors.ConstructorFactoryList;
+import builderb0y.autocodec.data.UnknownData;
 import builderb0y.autocodec.decoders.AutoDecoder;
 import builderb0y.autocodec.decoders.DecodeContext;
 import builderb0y.autocodec.decoders.DecodeContext.RootDecodePath;
@@ -403,7 +404,7 @@ public class AutoCodec implements ReflectContextProvider {
 	*/
 	@Internal
 	public <T_Encoded> @NotNull DecodeContext<T_Encoded> newDecodeContext(@NotNull T_Encoded input, @NotNull DynamicOps<T_Encoded> ops) {
-		return new DecodeContext<>(this, null, RootDecodePath.INSTANCE, input, ops);
+		return new DecodeContext<>(this, null, RootDecodePath.INSTANCE, new UnknownData<>(ops, input), ops);
 	}
 
 	/**

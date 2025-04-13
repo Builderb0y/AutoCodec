@@ -2,7 +2,6 @@ package builderb0y.autocodec.data;
 
 import com.mojang.serialization.DynamicOps;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class BooleanData<T_Encoded> extends Data<T_Encoded> {
 
@@ -19,18 +18,9 @@ public class BooleanData<T_Encoded> extends Data<T_Encoded> {
 	}
 
 	@Override
-	public boolean isBoolean() {
-		return true;
-	}
-
-	@Override
-	public @Nullable Boolean tryAsBoolean() {
-		return this.value;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		return obj instanceof BooleanData<?> that && this.value == that.value;
+	public boolean equals(Object object) {
+		BooleanData<?> bool;
+		return object instanceof Data<?> data && (bool = data.tryAsBoolean()) != null && this.value == bool.value;
 	}
 
 	@Override

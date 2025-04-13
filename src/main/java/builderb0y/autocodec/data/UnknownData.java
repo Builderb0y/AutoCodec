@@ -1,8 +1,6 @@
 package builderb0y.autocodec.data;
 
 import java.nio.ByteBuffer;
-import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -17,6 +15,7 @@ import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.longs.LongList;
+import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.jetbrains.annotations.NotNull;
@@ -70,17 +69,18 @@ public class UnknownData<T_Encoded> extends Data<T_Encoded> {
 	}
 
 	@Override
-	public @Nullable Boolean tryAsBoolean() {
+	public @Nullable BooleanData<T_Encoded> tryAsBoolean() {
 		if (this.resolution != null) {
-			if (this.resolution instanceof BooleanData<?> data) {
-				return data.value;
+			if (this.resolution instanceof BooleanData<T_Encoded> data) {
+				return data;
 			}
 		}
 		else {
 			Boolean value = DFUVersions.getResult(this.ops.getBooleanValue(this.payload));
 			if (value != null) {
-				this.resolution = new BooleanData<>(this.ops, value);
-				return value;
+				BooleanData<T_Encoded> resolution = new BooleanData<>(this.ops, value);
+				this.resolution = resolution;
+				return resolution;
 			}
 		}
 		return null;
@@ -125,17 +125,18 @@ public class UnknownData<T_Encoded> extends Data<T_Encoded> {
 	}
 
 	@Override
-	public @Nullable String tryAsString() {
+	public @Nullable StringData<T_Encoded> tryAsString() {
 		if (this.resolution != null) {
 			if (this.resolution instanceof StringData<T_Encoded> data) {
-				return data.tryAsString();
+				return data;
 			}
 		}
 		else {
 			String value = DFUVersions.getResult(this.ops.getStringValue(this.payload));
 			if (value != null) {
-				this.resolution = new StringData<>(this.ops, value);
-				return value;
+				StringData<T_Encoded> resolution = new StringData<>(this.ops, value);
+				this.resolution = resolution;
+				return resolution;
 			}
 		}
 		return null;
@@ -152,18 +153,19 @@ public class UnknownData<T_Encoded> extends Data<T_Encoded> {
 	}
 
 	@Override
-	public @Nullable List<@NotNull Data<T_Encoded>> tryAsList() {
+	public @Nullable ListData<T_Encoded> tryAsList() {
 		if (this.resolution != null) {
 			if (this.resolution instanceof ListData<T_Encoded> data) {
-				return data.tryAsList();
+				return data;
 			}
 		}
 		else {
 			Stream<T_Encoded> value = DFUVersions.getResult(this.ops.getStream(this.payload));
 			if (value != null) {
 				ObjectArrayList<Data<T_Encoded>> listValue = value.map((T_Encoded encoded) -> new UnknownData<>(this.ops, encoded)).collect(Collectors.toCollection(ObjectArrayList::new));
-				this.resolution = new ListData<>(this.ops, listValue);
-				return listValue;
+				ListData<T_Encoded> resolution = new ListData<>(this.ops, listValue);
+				this.resolution = resolution;
+				return resolution;
 			}
 		}
 		return null;
@@ -180,10 +182,10 @@ public class UnknownData<T_Encoded> extends Data<T_Encoded> {
 	}
 
 	@Override
-	public @Nullable ByteList tryAsByteList() {
+	public @Nullable ByteListData<T_Encoded> tryAsByteList() {
 		if (this.resolution != null) {
-			if (this.resolution instanceof ByteArrayData<T_Encoded> data) {
-				return data.tryAsByteList();
+			if (this.resolution instanceof ByteListData<T_Encoded> data) {
+				return data;
 			}
 		}
 		else {
@@ -192,8 +194,9 @@ public class UnknownData<T_Encoded> extends Data<T_Encoded> {
 				byte[] bytes = new byte[value.limit()];
 				value.get(0, bytes);
 				ByteList list = ByteArrayList.wrap(bytes);
-				this.resolution = new ByteArrayData<>(this.ops, list);
-				return list;
+				ByteListData<T_Encoded> resolution = new ByteListData<>(this.ops, list);
+				this.resolution = resolution;
+				return resolution;
 			}
 		}
 		return null;
@@ -210,18 +213,19 @@ public class UnknownData<T_Encoded> extends Data<T_Encoded> {
 	}
 
 	@Override
-	public @Nullable IntList tryAsIntList() {
+	public @Nullable IntListData<T_Encoded> tryAsIntList() {
 		if (this.resolution != null) {
-			if (this.resolution instanceof IntArrayData<T_Encoded> data) {
-				return data.tryAsIntList();
+			if (this.resolution instanceof IntListData<T_Encoded> data) {
+				return data;
 			}
 		}
 		else {
 			IntStream stream = DFUVersions.getResult(this.ops.getIntStream(this.payload));
 			if (stream != null) {
 				IntList list = IntArrayList.wrap(stream.toArray());
-				this.resolution = new IntArrayData<>(this.ops, list);
-				return list;
+				IntListData<T_Encoded> resolution = new IntListData<>(this.ops, list);
+				this.resolution = resolution;
+				return resolution;
 			}
 		}
 		return null;
@@ -238,18 +242,19 @@ public class UnknownData<T_Encoded> extends Data<T_Encoded> {
 	}
 
 	@Override
-	public @Nullable LongList tryAsLongList() {
+	public @Nullable LongListData<T_Encoded> tryAsLongList() {
 		if (this.resolution != null) {
-			if (this.resolution instanceof LongArrayData<T_Encoded> data) {
-				return data.tryAsLongList();
+			if (this.resolution instanceof LongListData<T_Encoded> data) {
+				return data;
 			}
 		}
 		else {
 			LongStream stream = DFUVersions.getResult(this.ops.getLongStream(this.payload));
 			if (stream != null) {
 				LongList list = LongArrayList.wrap(stream.toArray());
-				this.resolution = new LongArrayData<>(this.ops, list);
-				return list;
+				LongListData<T_Encoded> resolution = new LongListData<>(this.ops, list);
+				this.resolution = resolution;
+				return resolution;
 			}
 		}
 		return null;
@@ -266,36 +271,74 @@ public class UnknownData<T_Encoded> extends Data<T_Encoded> {
 	}
 
 	@Override
-	public @Nullable Map<@NotNull Data<T_Encoded>, @NotNull Data<T_Encoded>> tryAsMap() {
+	public @Nullable MapData<T_Encoded> tryAsMap() {
 		if (this.resolution != null) {
 			if (this.resolution instanceof MapData<T_Encoded> data) {
-				return data.tryAsMap();
+				return data;
 			}
 		}
 		else {
 			Stream<Pair<T_Encoded, T_Encoded>> stream = DFUVersions.getResult(this.ops.getMapValues(this.payload));
 			if (stream != null) {
-				Map<Data<T_Encoded>, Data<T_Encoded>> map = stream.collect(AutoCodecUtil.collectToMap((Pair<T_Encoded, T_Encoded> pair) -> new UnknownData<>(this.ops, pair.getFirst()), (Pair<T_Encoded, T_Encoded> pair) -> new UnknownData<>(this.ops, pair.getSecond()), Object2ObjectOpenHashMap::new));
-				this.resolution = new MapData<>(this.ops, map);
-				return map;
+				Object2ObjectMap<Data<T_Encoded>, Data<T_Encoded>> map = stream.collect(
+					AutoCodecUtil.collectToMap(
+						(Pair<T_Encoded, T_Encoded> pair) -> new UnknownData<>(this.ops, pair.getFirst()),
+						(Pair<T_Encoded, T_Encoded> pair) -> new UnknownData<>(this.ops, pair.getSecond()),
+						Object2ObjectOpenHashMap::new
+					)
+				);
+				MapData<T_Encoded> resolution = new MapData<>(this.ops, map);
+				this.resolution = resolution;
+				return resolution;
 			}
 		}
 		return null;
 	}
 
+	public @Nullable Data<T_Encoded> resolve() {
+		Data<T_Encoded> resolution = this.resolution;
+		notDone:
+		if (resolution == null) {
+			done: {
+				if (this.isEmpty()) { resolution = EmptyData.forOps(this.ops); break done; }
+				if ((resolution = this.tryAsMap     ()) != null) break done;
+				if ((resolution = this.tryAsByteList()) != null) break done;
+				if ((resolution = this.tryAsIntList ()) != null) break done;
+				if ((resolution = this.tryAsLongList()) != null) break done;
+				if ((resolution = this.tryAsList    ()) != null) break done;
+				if ((resolution = this.tryAsBoolean ()) != null) break done;
+				if ((resolution = this.tryAsNumber  ()) != null) break done;
+				if ((resolution = this.tryAsString  ()) != null) break done;
+				break notDone;
+			}
+			this.resolution = resolution;
+		}
+		return resolution;
+	}
+
 	@Override
-	public boolean equals(Object obj) {
-		return obj instanceof UnknownData<?> that && this.payload.equals(that.payload);
+	public boolean equals(Object object) {
+		if (object instanceof Data<?> data) {
+			Data<T_Encoded> resolution = this.resolve();
+			if (resolution != null) {
+				return resolution.equals(data);
+			}
+			else {
+				return this.encode().equals(data.encode()); //future-proof unknown value types.
+			}
+		}
+		return false;
 	}
 
 	@Override
 	public int hashCode() {
-		return this.payload.hashCode();
+		Data<T_Encoded> resolution = this.resolve();
+		return (resolution != null ? resolution : this.payload).hashCode();
 	}
 
 	@Override
 	public String toString() {
-		return this.payload.toString();
+		return (this.resolution != null ? this.resolution : this.payload).toString();
 	}
 
 	@Override

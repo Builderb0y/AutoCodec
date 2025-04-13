@@ -28,7 +28,7 @@ public interface DataFactory<T_Encoded> {
 	public abstract @NotNull DynamicOps<T_Encoded> ops();
 
 	public default @NotNull EmptyData<T_Encoded> empty() {
-		return new EmptyData<>(this.ops());
+		return EmptyData.forOps(this.ops());
 	}
 
 	public default @NotNull BooleanData<T_Encoded> createBoolean(boolean value) {
@@ -67,28 +67,28 @@ public interface DataFactory<T_Encoded> {
 		return new StringData<>(this.ops(), value);
 	}
 
-	public default @NotNull ByteArrayData<T_Encoded> createByteArray(@NotNull ByteList value) {
-		return new ByteArrayData<>(this.ops(), value);
+	public default @NotNull ByteListData<T_Encoded> createByteList(@NotNull ByteList value) {
+		return new ByteListData<>(this.ops(), value);
 	}
 
-	public default @NotNull ByteArrayData<T_Encoded> createByteArray(byte @NotNull ... value) {
-		return this.createByteArray(ByteArrayList.wrap(value));
+	public default @NotNull ByteListData<T_Encoded> createByteList(byte @NotNull ... value) {
+		return this.createByteList(ByteArrayList.wrap(value));
 	}
 
-	public default @NotNull IntArrayData<T_Encoded> createIntArray(@NotNull IntList value) {
-		return new IntArrayData<>(this.ops(), value);
+	public default @NotNull IntListData<T_Encoded> createIntList(@NotNull IntList value) {
+		return new IntListData<>(this.ops(), value);
 	}
 
-	public default @NotNull IntArrayData<T_Encoded> createIntArray(int @NotNull ... value) {
-		return this.createIntArray(IntArrayList.wrap(value));
+	public default @NotNull IntListData<T_Encoded> createIntList(int @NotNull ... value) {
+		return this.createIntList(IntArrayList.wrap(value));
 	}
 
-	public default @NotNull LongArrayData<T_Encoded> createLongArray(@NotNull LongList value) {
-		return new LongArrayData<>(this.ops(), value);
+	public default @NotNull LongListData<T_Encoded> createLongList(@NotNull LongList value) {
+		return new LongListData<>(this.ops(), value);
 	}
 
-	public default @NotNull LongArrayData<T_Encoded> createLongArray(long @NotNull ... value) {
-		return this.createLongArray(LongArrayList.wrap(value));
+	public default @NotNull LongListData<T_Encoded> createLongList(long @NotNull ... value) {
+		return this.createLongList(LongArrayList.wrap(value));
 	}
 
 	public default @NotNull ListData<T_Encoded> emptyList() {

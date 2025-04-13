@@ -2,7 +2,6 @@ package builderb0y.autocodec.data;
 
 import com.mojang.serialization.DynamicOps;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public abstract class AbstractNumberData<T_Encoded> extends Data<T_Encoded> {
 
@@ -10,15 +9,7 @@ public abstract class AbstractNumberData<T_Encoded> extends Data<T_Encoded> {
 		super(ops);
 	}
 
-	@Override
-	public boolean isNumber() {
-		return true;
-	}
-
-	@Override
-	public @Nullable AbstractNumberData<T_Encoded> tryAsNumber() {
-		return this;
-	}
+	public abstract @NotNull Number numberValue();
 
 	public abstract byte byteValue();
 	public abstract short shortValue();

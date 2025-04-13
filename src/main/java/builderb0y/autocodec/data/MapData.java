@@ -46,66 +46,9 @@ public class MapData<T_Encoded> extends Data<T_Encoded> {
 	}
 
 	@Override
-	public boolean isMap() {
-		return true;
-	}
-
-	@Override
-	public @NotNull Map<@NotNull Data<T_Encoded>, @NotNull Data<T_Encoded>> tryAsMap() {
-		return this.value;
-	}
-
-	public Data<T_Encoded> get(String key) {
-		return this.get(new StringData<>(this.ops, key));
-	}
-
-	public Data<T_Encoded> get(Data<T_Encoded> key) {
-		return this.value.get(key);
-	}
-
-	public void put(String key, boolean value) {
-		this.put(new StringData<>(this.ops, key), new BooleanData<>(this.ops, value));
-	}
-
-	public void put(String key, byte value) {
-		this.put(new StringData<>(this.ops, key), new NumberData<>(this.ops, value));
-	}
-
-	public void put(String key, short value) {
-		this.put(new StringData<>(this.ops, key), new NumberData<>(this.ops, value));
-	}
-
-	public void put(String key, int value) {
-		this.put(new StringData<>(this.ops, key), new NumberData<>(this.ops, value));
-	}
-
-	public void put(String key, long value) {
-		this.put(new StringData<>(this.ops, key), new NumberData<>(this.ops, value));
-	}
-
-	public void put(String key, float value) {
-		this.put(new StringData<>(this.ops, key), new NumberData<>(this.ops, value));
-	}
-
-	public void put(String key, double value) {
-		this.put(new StringData<>(this.ops, key), new NumberData<>(this.ops, value));
-	}
-
-	public void put(String key, String value) {
-		this.put(new StringData<>(this.ops, key), new StringData<>(this.ops, value));
-	}
-
-	public void put(String key, Data<T_Encoded> value) {
-		this.put(new StringData<>(this.ops, key), value);
-	}
-
-	public void put(Data<T_Encoded> key, Data<T_Encoded> value) {
-		this.value.put(key, value);
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		return obj instanceof MapData<?> that && this.value.equals(that.value);
+	public boolean equals(Object object) {
+		MapData<?> map;
+		return object instanceof Data<?> data && (map = data.tryAsMap()) != null && this.value.equals(map.value);
 	}
 
 	@Override

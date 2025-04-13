@@ -18,6 +18,11 @@ public class UnknownNumberData<T_Encoded> extends AbstractNumberData<T_Encoded> 
 	}
 
 	@Override
+	public @NotNull Number numberValue() {
+		return this.value;
+	}
+
+	@Override
 	public void set(byte value) {
 		this.value = value;
 	}
@@ -78,8 +83,9 @@ public class UnknownNumberData<T_Encoded> extends AbstractNumberData<T_Encoded> 
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		return obj instanceof UnknownNumberData<?> that && this.value.equals(that.value);
+	public boolean equals(Object object) {
+		AbstractNumberData<?> number;
+		return object instanceof Data<?> data && (number = data.tryAsNumber()) != null && this.numberValue().equals(number.numberValue());
 	}
 
 	@Override

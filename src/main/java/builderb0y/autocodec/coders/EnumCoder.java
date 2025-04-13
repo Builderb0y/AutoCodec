@@ -11,7 +11,9 @@ import builderb0y.autocodec.coders.AutoCoder.NamedCoder;
 import builderb0y.autocodec.common.EnumName;
 import builderb0y.autocodec.common.FactoryContext;
 import builderb0y.autocodec.common.FactoryException;
+import builderb0y.autocodec.data.AbstractNumberData;
 import builderb0y.autocodec.data.Data;
+import builderb0y.autocodec.data.StringData;
 import builderb0y.autocodec.decoders.DecodeContext;
 import builderb0y.autocodec.decoders.DecodeException;
 import builderb0y.autocodec.encoders.EncodeContext;
@@ -39,9 +41,9 @@ public class EnumCoder<T_DecodedEnum extends Enum<T_DecodedEnum>> extends NamedC
 
 	@Override
 	public <T_Encoded> @Nullable T_DecodedEnum decode(@NotNull DecodeContext<T_Encoded> context) throws DecodeException {
-		if (context.isEmpty()) return null;
+		if (context.input.isEmpty()) return null;
 		//note: check ordinal first, as some ops will implicitly convert numbers to strings.
-		Number ordinal = context.tryAsNumber();
+		AbstractNumberData<T_Encoded> ordinal = context.input.tryAsNumber();
 		if (ordinal != null) {
 			int actualOrdinal = ordinal.intValue();
 			int length = this.valueArray.length;
@@ -52,11 +54,11 @@ public class EnumCoder<T_DecodedEnum extends Enum<T_DecodedEnum>> extends NamedC
 				throw new DecodeException(() -> "Ordinal out of bounds: " + ordinal + " (there are only " + length + " enums to choose from)");
 			}
 		}
-		String name = context.tryAsString();
+		StringData<T_Encoded> name = context.input.tryAsString();
 		if (name != null) {
-			T_DecodedEnum value = this.valueMap.get(name);
+			T_DecodedEnum value = this.valueMap.get(name.value);
 			if (value != null) return value;
-			else throw new DecodeException(() -> "Invalid name: " + name + " (valid names are: " + this.valueMap.keySet() + ')');
+			else throw new DecodeException(() -> "Invalid name: " + name.value + " (valid names are: " + this.valueMap.keySet() + ')');
 		}
 		throw context.notA("string or number");
 	}

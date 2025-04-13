@@ -9,7 +9,7 @@ import org.jetbrains.annotations.Nullable;
 import builderb0y.autocodec.coders.AutoCoder;
 import builderb0y.autocodec.common.FactoryContext;
 import builderb0y.autocodec.common.FactoryException;
-import builderb0y.autocodec.decoders.DecodeContext;
+import builderb0y.autocodec.data.Data;
 import builderb0y.autocodec.decoders.DecodeException;
 import builderb0y.autocodec.imprinters.AutoImprinter.NamedImprinter;
 import builderb0y.autocodec.reflection.reification.ReifiedType;
@@ -33,9 +33,9 @@ public class MapImprinter<T_Key, T_Value, T_Map extends Map<T_Key, T_Value>> ext
 	@OverrideOnly
 	public <T_Encoded> void imprint(@NotNull ImprintContext<T_Encoded, T_Map> context) throws ImprintException {
 		try {
-			for (Map.Entry<DecodeContext<T_Encoded>, DecodeContext<T_Encoded>> entry : context.forceAsContextMap().entrySet()) {
-				T_Key key = entry.getKey().decodeWith(this.keyDecoder);
-				T_Value value = entry.getValue().decodeWith(this.valueDecoder);
+			for (Map.Entry<Data<T_Encoded>, Data<T_Encoded>> entry : context.forceAsMap().value.entrySet()) {
+				T_Key key = context.input("<key>", entry.getKey()).decodeWith(this.keyDecoder);
+				T_Value value = context.input(entry.getKey().toString(), entry.getValue()).decodeWith(this.valueDecoder);
 				if (key != null && value != null) context.object.put(key, value);
 			}
 		}

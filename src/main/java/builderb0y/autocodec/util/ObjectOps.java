@@ -18,9 +18,14 @@ import com.mojang.serialization.MapLike;
 import org.jetbrains.annotations.NotNull;
 
 /**
-a DynamicOps implementation that uses
-ordinary java objects to represent data.
-note: this class pre-dates {@link JavaOps}.
+differs from {@link JavaOps} in the following ways:
+1. this class pre-dates JavaOps, and can be used
+	in DFU versions which do not have JavaOps.
+2. the empty value uses Unit.INSTANCE instead of null.
+	null is not an allowed value for T_Encoded
+	anywhere else in this project anyway.
+3. primitive arrays are represented with actual
+	arrays instead of fastutil primitive lists.
 */
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class ObjectOps implements DynamicOps<Object> {
@@ -92,20 +97,28 @@ public class ObjectOps implements DynamicOps<Object> {
 	}
 
 	@Override
-	public DataResult<Object> mergeToList(Object list, Object value) {
-		if (list instanceof List actualList) {
-			if (value instanceof List otherList) {
-				ArrayList newList = new ArrayList(actualList.size() + otherList.size());
-				newList.addAll(actualList);
-				newList.addAll(otherList);
+	public DataResult<Object> mergeToList(Object input, Object value) {
+		if (input == this.empty()) {
+			//JavaOps does not check for value == this.empty().
+			//I don't know if this is an error or not,
+			//but I want to ensure behavioral parity.
+			return DFUVersions.createSuccessDataResult(Collections.singletonList(value));
+		}
+		else if (input instanceof List<?> list) {
+			//JavaOps doesn't check for value being empty here either.
+			if (list.isEmpty()) {
+				return DFUVersions.createSuccessDataResult(Collections.singletonList(value));
+			}
+			else {
+				ArrayList<Object> newList = new ArrayList<>(list.size() + 1);
+				newList.addAll(list);
+				newList.add(value);
 				return DFUVersions.createSuccessDataResult(newList);
 			}
-			ArrayList newList = new ArrayList(actualList.size() + 1);
-			newList.addAll(actualList);
-			newList.add(value);
-			return DFUVersions.createSuccessDataResult(newList);
 		}
-		return notA("List", list);
+		else {
+			return notA("list", input);
+		}
 	}
 
 	@Override

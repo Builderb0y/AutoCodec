@@ -13,6 +13,7 @@ import builderb0y.autocodec.coders.AutoCoder.NamedCoder;
 import builderb0y.autocodec.common.FactoryContext;
 import builderb0y.autocodec.common.FactoryException;
 import builderb0y.autocodec.data.Data;
+import builderb0y.autocodec.data.ListData;
 import builderb0y.autocodec.decoders.DecodeContext;
 import builderb0y.autocodec.decoders.DecodeException;
 import builderb0y.autocodec.encoders.EncodeContext;
@@ -44,11 +45,11 @@ public class ArrayCoder<T_DecodedElement, T_DecodedArray> extends NamedCoder<T_D
 	@OverrideOnly
 	public <T_Encoded> @Nullable T_DecodedArray decode(@NotNull DecodeContext<T_Encoded> context) throws DecodeException {
 		if (context.isEmpty()) return null;
-		List<DecodeContext<T_Encoded>> from = context.forceAsList(this.singleton);
-		int length = from.size();
+		ListData<T_Encoded> from = context.forceAsListMaybeSingleton(this.singleton);
+		int length = from.value.size();
 		T_DecodedArray to = this.arrayFactory.apply(length);
 		for (int index = 0; index < length; index++) {
-			Array.set(to, index, from.get(index).decodeWith(this.elementCoder));
+			Array.set(to, index, context.input(index, from.value.get(index)).decodeWith(this.elementCoder));
 		}
 		return to;
 	}

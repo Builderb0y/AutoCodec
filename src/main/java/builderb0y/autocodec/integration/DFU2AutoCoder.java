@@ -78,7 +78,7 @@ implements AutoCoder<T_Decoded> {
 	public <T_Encoded> @Nullable T_Decoded decode(@NotNull DecodeContext<T_Encoded> context) throws DecodeException {
 		if (context.isEmpty() && !this.nullSafe) return null;
 		return context.logger().unwrapLazy(
-			this.codec.parse(context.ops, context.input),
+			this.codec.parse(context.ops, context.input.encode()),
 			this.allowPartial,
 			DecodeException::new
 		);

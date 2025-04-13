@@ -23,18 +23,9 @@ public class StringData<T_Encoded> extends Data<T_Encoded> {
 	}
 
 	@Override
-	public boolean isString() {
-		return true;
-	}
-
-	@Override
-	public @NotNull String tryAsString() {
-		return this.value;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		return obj instanceof StringData<?> that && this.value.equals(that.value);
+	public boolean equals(Object object) {
+		StringData<?> string;
+		return object instanceof Data<?> data && (string = data.tryAsString()) != null && this.value.equals(string.value);
 	}
 
 	@Override

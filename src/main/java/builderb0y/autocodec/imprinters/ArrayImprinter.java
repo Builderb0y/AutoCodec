@@ -1,7 +1,6 @@
 package builderb0y.autocodec.imprinters;
 
 import java.lang.reflect.Array;
-import java.util.List;
 
 import org.jetbrains.annotations.ApiStatus.OverrideOnly;
 import org.jetbrains.annotations.NotNull;
@@ -11,7 +10,7 @@ import builderb0y.autocodec.annotations.SingletonArray;
 import builderb0y.autocodec.coders.AutoCoder;
 import builderb0y.autocodec.common.FactoryContext;
 import builderb0y.autocodec.common.FactoryException;
-import builderb0y.autocodec.decoders.DecodeContext;
+import builderb0y.autocodec.data.ListData;
 import builderb0y.autocodec.decoders.DecodeException;
 import builderb0y.autocodec.imprinters.AutoImprinter.NamedImprinter;
 import builderb0y.autocodec.reflection.reification.ReifiedType;
@@ -48,12 +47,17 @@ public abstract class ArrayImprinter<T_DecodedElement, T_DecodedArray> extends N
 			try {
 				T_DecodedArray to = context.object;
 				int length = Array.getLength(to);
-				List<DecodeContext<T_Encoded>> from = context.forceAsList(this.singleton);
-				if (from.size() != length) {
-					throw new ImprintException(() -> context.pathToStringBuilder().append(" should have a length of ").append(length).append(", but it was length ").append(from.size()).toString());
+				ListData<T_Encoded> from = context.input.tryAsList();
+				if (from == null) {
+					if (this.singleton) from = context.createList(context.input);
+					else throw context.notA("list");
+				}
+				int size = from.value.size();
+				if (size != length) {
+					throw new ImprintException(() -> context.pathToStringBuilder().append(" should have a length of ").append(length).append(", but it was length ").append(size).toString());
 				}
 				for (int index = 0; index < length; index++) {
-					Array.set(to, index, from.get(index).decodeWith(this.componentCoder));
+					Array.set(to, index, context.input(index, from.value.get(index)).decodeWith(this.componentCoder));
 				}
 			}
 			catch (ImprintException exception) {
@@ -82,12 +86,12 @@ public abstract class ArrayImprinter<T_DecodedElement, T_DecodedArray> extends N
 			try {
 				T_DecodedElement[] to = context.object;
 				int length = to.length;
-				List<DecodeContext<T_Encoded>> from = context.forceAsList(this.singleton);
-				if (from.size() != length) {
-					throw new ImprintException(() -> context.pathToStringBuilder().append(" should have a length of ").append(length).append(", but it was length ").append(from.size()).toString());
+				ListData<T_Encoded> from = context.forceAsListMaybeSingleton(this.singleton);
+				if (from.value.size() != length) {
+					throw new ImprintException(() -> context.pathToStringBuilder().append(" should have a length of ").append(length).append(", but it was length ").append(from.value.size()).toString());
 				}
 				for (int index = 0; index < length; index++) {
-					to[index] = from.get(index).decodeWith(this.componentCoder);
+					to[index] = context.input(index, from.value.get(index)).decodeWith(this.componentCoder);
 				}
 			}
 			catch (ImprintException exception) {

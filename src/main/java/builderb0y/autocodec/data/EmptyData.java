@@ -1,12 +1,25 @@
 package builderb0y.autocodec.data;
 
+import java.util.WeakHashMap;
+
 import com.mojang.serialization.DynamicOps;
+import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
 
 public class EmptyData<T_Encoded> extends Data<T_Encoded> {
 
+	@Internal
+	public static final WeakHashMap<DynamicOps<?>, EmptyData<?>> OPS_CACHE = new WeakHashMap<>();
+
 	public EmptyData(@NotNull DynamicOps<T_Encoded> ops) {
 		super(ops);
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <T_Encoded> @NotNull EmptyData<T_Encoded> forOps(@NotNull DynamicOps<T_Encoded> ops) {
+		synchronized (OPS_CACHE) {
+			return (EmptyData<T_Encoded>)(OPS_CACHE.computeIfAbsent(ops, EmptyData::new));
+		}
 	}
 
 	@Override
@@ -15,13 +28,8 @@ public class EmptyData<T_Encoded> extends Data<T_Encoded> {
 	}
 
 	@Override
-	public boolean isEmpty() {
-		return true;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		return obj instanceof EmptyData;
+	public boolean equals(Object object) {
+		return object instanceof Data<?> data && data.isEmpty();
 	}
 
 	@Override

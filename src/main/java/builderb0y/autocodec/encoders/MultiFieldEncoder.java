@@ -1,12 +1,13 @@
 package builderb0y.autocodec.encoders;
 
 import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import org.jetbrains.annotations.ApiStatus.OverrideOnly;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -16,6 +17,7 @@ import builderb0y.autocodec.coders.AutoCoder;
 import builderb0y.autocodec.common.FactoryContext;
 import builderb0y.autocodec.common.FactoryException;
 import builderb0y.autocodec.data.Data;
+import builderb0y.autocodec.data.MapData;
 import builderb0y.autocodec.decoders.AutoDecoder.NamedDecoder;
 import builderb0y.autocodec.decoders.DecodeContext;
 import builderb0y.autocodec.decoders.DecodeException;
@@ -39,7 +41,7 @@ public class MultiFieldEncoder<T_Decoded> extends NamedEncoder<T_Decoded> {
 	@OverrideOnly
 	public <T_Encoded> @NotNull Data<T_Encoded> encode(@NotNull EncodeContext<T_Encoded, T_Decoded> context) throws EncodeException {
 		if (context.object == null) return context.empty();
-		Map<Data<T_Encoded>, Data<T_Encoded>> map = new LinkedHashMap<>(this.fields.length);
+		Object2ObjectMap<Data<T_Encoded>, Data<T_Encoded>> map = new Object2ObjectLinkedOpenHashMap<>(this.fields.length);
 		for (FieldStrategy<T_Decoded, ?> field : this.fields) {
 			field.encodeOnto(context, map);
 		}
@@ -99,7 +101,17 @@ public class MultiFieldEncoder<T_Decoded> extends NamedEncoder<T_Decoded> {
 		@Override
 		@OverrideOnly
 		public <T_Encoded> @Nullable T_Member decode(@NotNull DecodeContext<T_Encoded> context) throws DecodeException {
-			return (this.inline ? context : context.getFirstMember(this.field.getAliases())).decodeWith(this.coder);
+			if (this.inline) {
+				return context.decodeWith(this.coder);
+			}
+			else {
+				MapData<T_Encoded> map = context.forceAsMap();
+				for (String alias : this.field.getAliases()) {
+					Data<T_Encoded> member = map.value.get(context.createString(alias));
+					if (member != null) return context.input(member).decodeWith(this.coder);
+				}
+				return context.input(context.empty()).decodeWith(this.coder);
+			}
 		}
 
 		public <T_Encoded> void encodeOnto(
@@ -113,9 +125,9 @@ public class MultiFieldEncoder<T_Decoded> extends NamedEncoder<T_Decoded> {
 			Data<T_Encoded> encodedMember = memberContext.encodeWith(this.coder);
 			if (!Objects.equals(encodedMember, context.ops.empty())) {
 				if (this.inline) {
-					Map<Data<T_Encoded>, Data<T_Encoded>> newMap = encodedMember.tryAsMap();
+					MapData<T_Encoded> newMap = encodedMember.tryAsMap();
 					if (newMap == null) throw new EncodeException(() -> member + " was annotated as @EncodeInline, but encodes into a value which is not a map: " + encodedMember);
-					for (Map.Entry<Data<T_Encoded>, Data<T_Encoded>> entry : newMap.entrySet()) {
+					for (Map.Entry<Data<T_Encoded>, Data<T_Encoded>> entry : newMap.value.entrySet()) {
 						if (map.putIfAbsent(entry.getKey(), entry.getValue()) != null) {
 							throw new EncodeException(() -> entry.getKey() + " is a field used for more than one object!");
 						}

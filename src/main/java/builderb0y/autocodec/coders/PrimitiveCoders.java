@@ -13,7 +13,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import builderb0y.autocodec.coders.AutoCoder.NamedCoder;
+import builderb0y.autocodec.data.AbstractNumberData;
 import builderb0y.autocodec.data.Data;
+import builderb0y.autocodec.data.StringData;
 import builderb0y.autocodec.decoders.DecodeContext;
 import builderb0y.autocodec.decoders.DecodeException;
 import builderb0y.autocodec.encoders.EncodeContext;
@@ -29,9 +31,7 @@ public class PrimitiveCoders {
 		@OverrideOnly
 		public <T_Encoded> @Nullable Byte decode(@NotNull DecodeContext<T_Encoded> context) throws DecodeException {
 			if (context.isEmpty()) return null;
-			Number number = context.forceAsNumber();
-			if (number instanceof Byte b) return b;
-			return Byte.valueOf(number.byteValue());
+			return context.forceAsByte();
 		}
 
 		@Override
@@ -47,9 +47,7 @@ public class PrimitiveCoders {
 		@OverrideOnly
 		public <T_Encoded> @Nullable Short decode(@NotNull DecodeContext<T_Encoded> context) throws DecodeException {
 			if (context.isEmpty()) return null;
-			Number number = context.forceAsNumber();
-			if (number instanceof Short s) return s;
-			return Short.valueOf(number.shortValue());
+			return context.forceAsShort();
 		}
 
 		@Override
@@ -65,9 +63,7 @@ public class PrimitiveCoders {
 		@OverrideOnly
 		public <T_Encoded> @Nullable Integer decode(@NotNull DecodeContext<T_Encoded> context) throws DecodeException {
 			if (context.isEmpty()) return null;
-			Number number = context.forceAsNumber();
-			if (number instanceof Integer i) return i;
-			return Integer.valueOf(number.intValue());
+			return context.forceAsInt();
 		}
 
 		@Override
@@ -83,9 +79,7 @@ public class PrimitiveCoders {
 		@OverrideOnly
 		public <T_Encoded> @Nullable Long decode(@NotNull DecodeContext<T_Encoded> context) throws DecodeException {
 			if (context.isEmpty()) return null;
-			Number number = context.forceAsNumber();
-			if (number instanceof Long l) return l;
-			return Long.valueOf(number.longValue());
+			return context.forceAsLong();
 		}
 
 		@Override
@@ -101,9 +95,7 @@ public class PrimitiveCoders {
 		@OverrideOnly
 		public <T_Encoded> @Nullable Float decode(@NotNull DecodeContext<T_Encoded> context) throws DecodeException {
 			if (context.isEmpty()) return null;
-			Number number = context.forceAsNumber();
-			if (number instanceof Float f) return f;
-			return Float.valueOf(number.floatValue());
+			return context.forceAsFloat();
 		}
 
 		@Override
@@ -119,9 +111,7 @@ public class PrimitiveCoders {
 		@OverrideOnly
 		public <T_Encoded> @Nullable Double decode(@NotNull DecodeContext<T_Encoded> context) throws DecodeException {
 			if (context.isEmpty()) return null;
-			Number number = context.forceAsNumber();
-			if (number instanceof Double d) return d;
-			return Double.valueOf(number.doubleValue());
+			return context.forceAsDouble();
 		}
 
 		@Override
@@ -137,7 +127,7 @@ public class PrimitiveCoders {
 		@OverrideOnly
 		public <T_Encoded> @Nullable Number decode(@NotNull DecodeContext<T_Encoded> context) throws DecodeException {
 			if (context.isEmpty()) return null;
-			return context.forceAsNumber();
+			return context.forceAsNumber().numberValue();
 		}
 
 		@Override
@@ -153,11 +143,11 @@ public class PrimitiveCoders {
 		@OverrideOnly
 		public <T_Encoded> @Nullable Character decode(@NotNull DecodeContext<T_Encoded> context) throws DecodeException {
 			if (context.isEmpty()) return null;
-			Number number = context.tryAsNumber();
+			AbstractNumberData<T_Encoded> number = context.tryAsNumber();
 			if (number != null) return (char)(number.shortValue());
-			String string = context.tryAsString();
-			if (string != null && string.length() == 1) return string.charAt(0);
-			throw new DecodeException(() -> context.pathToStringBuilder().append(" is not a char: ").append(context.input).toString());
+			StringData<T_Encoded> string = context.tryAsString();
+			if (string != null && string.value.length() == 1) return string.value.charAt(0);
+			throw context.notA("char");
 		}
 
 		@Override
@@ -177,7 +167,7 @@ public class PrimitiveCoders {
 		@OverrideOnly
 		public <T_Encoded> @Nullable String decode(@NotNull DecodeContext<T_Encoded> context) throws DecodeException {
 			if (context.isEmpty()) return null;
-			return context.forceAsString();
+			return context.forceAsString().value;
 		}
 
 		@Override
@@ -193,7 +183,7 @@ public class PrimitiveCoders {
 		@OverrideOnly
 		public <T_Encoded> @Nullable Boolean decode(@NotNull DecodeContext<T_Encoded> context) throws DecodeException {
 			if (context.isEmpty()) return null;
-			return context.forceAsBoolean();
+			return context.forceAsBoolean().value;
 		}
 
 		@Override
@@ -293,7 +283,7 @@ public class PrimitiveCoders {
 			public <T_Encoded> @Nullable T_Decoded decode(@NotNull DecodeContext<T_Encoded> context) throws DecodeException {
 				if (context.isEmpty()) return null;
 				try {
-					return constructor.apply(context.forceAsString());
+					return constructor.apply(context.forceAsString().value);
 				}
 				catch (DecodeException exception) {
 					throw exception;

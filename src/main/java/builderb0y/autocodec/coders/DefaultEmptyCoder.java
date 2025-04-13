@@ -1,8 +1,6 @@
 package builderb0y.autocodec.coders;
 
 import java.lang.reflect.Array;
-import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
 
 import com.mojang.datafixers.util.Unit;
@@ -19,6 +17,8 @@ import builderb0y.autocodec.constructors.AutoConstructor.NamedConstructor;
 import builderb0y.autocodec.constructors.ConstructContext;
 import builderb0y.autocodec.constructors.ConstructException;
 import builderb0y.autocodec.data.Data;
+import builderb0y.autocodec.data.ListData;
+import builderb0y.autocodec.data.MapData;
 import builderb0y.autocodec.decoders.DecodeContext;
 import builderb0y.autocodec.decoders.DecodeException;
 import builderb0y.autocodec.encoders.EncodeContext;
@@ -48,7 +48,7 @@ public class DefaultEmptyCoder<T_Decoded> extends NamedCoder<T_Decoded> {
 	@Override
 	@OverrideOnly
 	public <T_Encoded> @Nullable T_Decoded decode(@NotNull DecodeContext<T_Encoded> context) throws DecodeException {
-		if (context.isEmpty()) try {
+		if (context.input.isEmpty()) try {
 			return context.constructWith(this.constructor);
 		}
 		catch (ConstructException exception) {
@@ -65,14 +65,14 @@ public class DefaultEmptyCoder<T_Decoded> extends NamedCoder<T_Decoded> {
 		Data<T_Encoded> encoded = context.encodeWith(this.nonEmpty);
 		done:
 		if (!this.alwaysEncode) {
-			List<Data<T_Encoded>> list = encoded.tryAsList();
+			ListData<T_Encoded> list = encoded.tryAsList();
 			if (list != null) {
-				if (list.isEmpty()) encoded = context.empty();
+				if (list.value.isEmpty()) encoded = context.empty();
 				break done;
 			}
-			Map<Data<T_Encoded>, Data<T_Encoded>> map = encoded.tryAsMap();
+			MapData<T_Encoded> map = encoded.tryAsMap();
 			if (map != null) {
-				if (map.isEmpty()) encoded = context.empty();
+				if (map.value.isEmpty()) encoded = context.empty();
 				break done;
 			}
 		}

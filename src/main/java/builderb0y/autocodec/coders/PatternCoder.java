@@ -2,10 +2,10 @@ package builderb0y.autocodec.coders;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import org.jetbrains.annotations.ApiStatus.OverrideOnly;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -15,6 +15,8 @@ import builderb0y.autocodec.common.FactoryContext;
 import builderb0y.autocodec.common.FactoryException;
 import builderb0y.autocodec.common.PatternFlags;
 import builderb0y.autocodec.data.Data;
+import builderb0y.autocodec.data.ListData;
+import builderb0y.autocodec.data.StringData;
 import builderb0y.autocodec.decoders.DecodeContext;
 import builderb0y.autocodec.decoders.DecodeException;
 import builderb0y.autocodec.encoders.EncodeContext;
@@ -32,25 +34,31 @@ public class PatternCoder extends NamedCoder<Pattern> {
 	@Override
 	@OverrideOnly
 	public @Nullable <T_Encoded> Pattern decode(@NotNull DecodeContext<T_Encoded> context) throws DecodeException {
-		if (context.isEmpty()) return null;
-		String patternString = context.tryAsString();
+		if (context.input.isEmpty()) return null;
+		StringData<T_Encoded> patternString = context.input.tryAsString();
 		if (patternString != null) {
-			return Pattern.compile(patternString);
+			return Pattern.compile(patternString.value);
 		}
 		patternString = context.getMember("pattern").forceAsString();
 		int patternFlags = 0;
 		DecodeContext<T_Encoded> flags = context.getMember("flags");
 		if (!flags.isEmpty()) {
 			if (context.isCompressed()) {
-				patternFlags = flags.forceAsNumber().intValue();
+				patternFlags = flags.forceAsInt();
 			}
 			else {
-				for (DecodeContext<T_Encoded> flagContext : flags.forceAsList(true)) {
-					patternFlags |= flagContext.decodeWith(this.flagsCoder).flag;
+				ListData<T_Encoded> list = flags.tryAsList();
+				if (list != null) {
+					for (int index = 0, size = list.value.size(); index < size; index++) {
+						patternFlags |= context.input(index, list.value.get(index)).decodeWith(this.flagsCoder).flag;
+					}
+				}
+				else {
+					patternFlags = flags.decodeWith(this.flagsCoder).flag;
 				}
 			}
 		}
-		return Pattern.compile(patternString, patternFlags);
+		return Pattern.compile(patternString.value, patternFlags);
 	}
 
 	@Override
@@ -58,7 +66,7 @@ public class PatternCoder extends NamedCoder<Pattern> {
 	public <T_Encoded> @NotNull Data<T_Encoded> encode(@NotNull EncodeContext<T_Encoded, Pattern> context) throws EncodeException {
 		if (context.object == null) return context.empty();
 		if (context.object.flags() == 0) return context.createString(context.object.pattern());
-		Map<Data<T_Encoded>, Data<T_Encoded>> map = new Object2ObjectArrayMap<>(2);
+		Object2ObjectMap<Data<T_Encoded>, Data<T_Encoded>> map = new Object2ObjectArrayMap<>(2);
 		map.put(context.createString("pattern"), context.createString(context.object.pattern()));
 		if (context.isCompressed()) {
 			map.put(context.createString("flags"), context.createInt(context.object.flags()));

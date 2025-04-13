@@ -1,10 +1,5 @@
 package builderb0y.autocodec.decoders;
 
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Stream;
-
-import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.DynamicOps;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -14,6 +9,10 @@ import builderb0y.autocodec.common.DynamicOpsContext;
 import builderb0y.autocodec.constructors.AutoConstructor;
 import builderb0y.autocodec.constructors.ConstructContext;
 import builderb0y.autocodec.constructors.ConstructException;
+import builderb0y.autocodec.data.Data;
+import builderb0y.autocodec.data.DataReader;
+import builderb0y.autocodec.data.ListData;
+import builderb0y.autocodec.data.MapData;
 import builderb0y.autocodec.fixers.AutoFixer;
 import builderb0y.autocodec.fixers.DataFixContext;
 import builderb0y.autocodec.fixers.DataFixException;
@@ -21,26 +20,24 @@ import builderb0y.autocodec.imprinters.AutoImprinter;
 import builderb0y.autocodec.imprinters.ImprintContext;
 import builderb0y.autocodec.imprinters.ImprintException;
 import builderb0y.autocodec.logging.TaskLogger;
-import builderb0y.autocodec.util.AutoCodecUtil;
-import builderb0y.autocodec.util.DFUVersions;
 import builderb0y.autocodec.util.ObjectArrayFactory;
 import builderb0y.autocodec.verifiers.AutoVerifier;
 import builderb0y.autocodec.verifiers.VerifyContext;
 import builderb0y.autocodec.verifiers.VerifyException;
 
-public class DecodeContext<T_Encoded> extends DynamicOpsContext<T_Encoded> {
+public class DecodeContext<T_Encoded> extends DynamicOpsContext<T_Encoded> implements DataReader<T_Encoded, DecodeException> {
 
 	public static final @NotNull ObjectArrayFactory<DecodeContext<?>> ARRAY_FACTORY = new ObjectArrayFactory<>(DecodeContext.class).generic();
 
 	public final @Nullable DecodeContext<T_Encoded> parent;
 	public final @NotNull DecodePath path;
-	public final @NotNull T_Encoded input;
+	public final @NotNull Data<T_Encoded> input;
 
 	public DecodeContext(
 		@NotNull AutoCodec autoCodec,
 		@Nullable DecodeContext<T_Encoded> parent,
 		@NotNull DecodePath path,
-		@NotNull T_Encoded input,
+		@NotNull Data<T_Encoded> input,
 		@NotNull DynamicOps<T_Encoded> ops
 	) {
 		super(autoCodec, ops);
@@ -58,208 +55,52 @@ public class DecodeContext<T_Encoded> extends DynamicOpsContext<T_Encoded> {
 		return this.autoCodec.decodeLogger;
 	}
 
-	public @NotNull DecodeContext<T_Encoded> input(@NotNull T_Encoded input) {
+	public @NotNull DecodeContext<T_Encoded> input(@NotNull Data<T_Encoded> input) {
 		return this.input == input ? this : new DecodeContext<>(this.autoCodec, this.parent, this.path, input, this.ops);
 	}
 
-	public @NotNull DecodeContext<T_Encoded> input(@NotNull T_Encoded input, @NotNull DecodePath nextPath) {
+	public @NotNull DecodeContext<T_Encoded> input(@NotNull Data<T_Encoded> input, @NotNull DecodePath nextPath) {
 		return new DecodeContext<>(this.autoCodec, this, nextPath, input, this.ops);
 	}
 
-	//////////////////////////////// ops methods ////////////////////////////////
-
-	public boolean isEmpty() {
-		return Objects.equals(this.input, this.ops.empty());
+	public @NotNull DecodeContext<T_Encoded> input(@NotNull String memberName, @NotNull Data<T_Encoded> member) {
+		return this.input(member, new ObjectDecodePath(memberName));
 	}
 
+	public @NotNull DecodeContext<T_Encoded> input(int index, @NotNull Data<T_Encoded> element) {
+		return this.input(element, new ArrayDecodePath(index));
+	}
+
+	@Override
 	public @NotNull DecodeException notA(@NotNull String type) {
 		return new DecodeException(() -> this.pathToStringBuilder().append(" is not a ").append(type).append(": ").append(this.input).toString());
 	}
 
-	//////////////// map ////////////////
-
-	public boolean isMap() {
-		return DFUVersions.getResult(this.ops.getMapValues(this.input)) != null;
+	@Override
+	public @NotNull Data<T_Encoded> data() {
+		return this.input;
 	}
 
-	public @Nullable Map<@NotNull String, @NotNull DecodeContext<T_Encoded>> tryAsStringMap() {
-		Stream<Pair<T_Encoded, T_Encoded>> stream = DFUVersions.getResult(this.ops.getMapValues(this.input));
-		return stream == null ? null : (
-			stream
-			.map((Pair<T_Encoded, T_Encoded> pair) -> {
-				String key = DFUVersions.getResult(this.ops.getStringValue(pair.getFirst()));
-				if (key == null) throw AutoCodecUtil.rethrow(new DecodeException(() -> this.pathToStringBuilder().append(".<key> is not a string: ").append(pair.getFirst()).toString()));
-				DecodeContext<T_Encoded> value = this.input(pair.getSecond(), new ObjectDecodePath(key));
-				return Pair.of(key, value);
-			})
-			.collect(Pair.toMap())
-		);
+	@Override
+	public @NotNull DecodeContext<T_Encoded> getElement(int index) throws DecodeException {
+		ListData<T_Encoded> list = this.tryAsList();
+		if (list != null) {
+			Data<T_Encoded> element = list.value.get(index);
+			return this.input(element, new ArrayDecodePath(index));
+		}
+		return this.input(this.empty(), new ArrayDecodePath(index));
 	}
 
-	public @NotNull Map<@NotNull String, @NotNull DecodeContext<T_Encoded>> forceAsStringMap() throws DecodeException {
-		Map<String, DecodeContext<T_Encoded>> map = this.tryAsStringMap();
-		if (map != null) return map;
-		else throw this.notA("map");
-	}
-
-	public @NotNull Map<@NotNull String, @NotNull DecodeContext<T_Encoded>> asStringMapOrEmpty() {
-		Map<String, DecodeContext<T_Encoded>> map = this.tryAsStringMap();
-		return map != null ? map : Collections.emptyMap();
-	}
-
-	public @Nullable Map<@NotNull DecodeContext<T_Encoded>, @NotNull DecodeContext<T_Encoded>> tryAsContextMap() {
-		Stream<Pair<T_Encoded, T_Encoded>> stream = DFUVersions.getResult(this.ops.getMapValues(this.input));
-		return stream == null ? null : (
-			stream
-			.map((Pair<T_Encoded, T_Encoded> pair) -> {
-				String keyName = DFUVersions.getResult(this.ops.getStringValue(pair.getFirst()));
-				if (keyName == null) throw AutoCodecUtil.rethrow(new DecodeException(() -> this.pathToStringBuilder().append(".<key> is not a string: ").append(pair.getFirst()).toString()));
-				ObjectDecodePath path = new ObjectDecodePath(keyName);
-				return Pair.of(
-					this.input(pair.getFirst(), path),
-					this.input(pair.getSecond(), path)
-				);
-			})
-			.collect(Pair.toMap())
-		);
-	}
-
-	public @NotNull Map<@NotNull DecodeContext<T_Encoded>, @NotNull DecodeContext<T_Encoded>> forceAsContextMap() throws DecodeException {
-		Map<DecodeContext<T_Encoded>, DecodeContext<T_Encoded>> map = this.tryAsContextMap();
-		if (map != null) return map;
-		else throw this.notA("map");
-	}
-
-	public @NotNull Map<@NotNull DecodeContext<T_Encoded>, @NotNull DecodeContext<T_Encoded>> asContextMapOrEmpty() {
-		Map<DecodeContext<T_Encoded>, DecodeContext<T_Encoded>> map = this.tryAsContextMap();
-		return map != null ? map : Collections.emptyMap();
-	}
-
-	public @NotNull T_Encoded getPrimitiveMember(@NotNull String name) {
-		T_Encoded result = DFUVersions.getResult(this.ops.get(this.input, name));
-		return result != null ? result : this.ops.empty();
-	}
-
-	public boolean hasMember(String name) {
-		return !Objects.equals(this.getPrimitiveMember(name), this.empty());
-	}
-
-	public @NotNull DecodeContext<T_Encoded> getMember(@NotNull String name) {
-		return this.input(this.getPrimitiveMember(name), new ObjectDecodePath(name));
-	}
-
-	public @NotNull DecodeContext<T_Encoded> removeMember(@NotNull String name) {
-		return this.input(this.ops.remove(this.input, name));
-	}
-
-	public @NotNull DecodeContext<T_Encoded> getFirstMember(@NotNull String @NotNull ... names) {
-		DecodeContext<T_Encoded> result = this.getMember(names[0]);
-		if (result.isEmpty()) {
-			for (int index = 1, length = names.length; index < length; index++) {
-				DecodeContext<T_Encoded> alternative = this.getMember(names[index]);
-				if (!alternative.isEmpty()) return alternative;
+	@Override
+	public @NotNull DecodeContext<T_Encoded> getMember(@NotNull String key) throws DecodeException {
+		MapData<T_Encoded> map = this.tryAsMap();
+		if (map != null) {
+			Data<T_Encoded> value = map.value.get(this.createString(key));
+			if (value != null) {
+				return this.input(value, new ObjectDecodePath(key));
 			}
 		}
-		return result;
-	}
-
-	//////////////// list ////////////////
-
-	public boolean isList() {
-		return DFUVersions.getResult(this.ops.getStream(this.input)) != null;
-	}
-
-	public @Nullable List<@NotNull DecodeContext<T_Encoded>> tryAsList(boolean allowSingleton) {
-		Stream<T_Encoded> stream = DFUVersions.getResult(this.ops.getStream(this.input));
-		if (stream == null) {
-			return allowSingleton ? List.of(this) : null;
-		}
-		@SuppressWarnings("unchecked")
-		T_Encoded[] primitiveArray = (T_Encoded[])(stream.toArray());
-		int length = primitiveArray.length;
-		DecodeContext<T_Encoded>[] contextArray = ARRAY_FACTORY.applyGeneric(length);
-		for (int index = 0; index < length; index++) {
-			contextArray[index] = this.input(primitiveArray[index], new ArrayDecodePath(index));
-		}
-		return Arrays.asList(contextArray);
-	}
-
-	public @NotNull List<@NotNull DecodeContext<T_Encoded>> forceAsList(boolean allowSingleton) throws DecodeException {
-		List<DecodeContext<T_Encoded>> list = this.tryAsList(allowSingleton);
-		if (list != null) return list;
-		else throw this.notA("list");
-	}
-
-	public @Nullable Stream<@NotNull DecodeContext<T_Encoded>> tryAsStream(boolean allowSingleton) {
-		Stream<T_Encoded> stream = DFUVersions.getResult(this.ops.getStream(this.input));
-		if (stream != null) {
-			return stream.sequential().map(new Function<>() {
-
-				public int index;
-
-				@Override
-				public @NotNull DecodeContext<T_Encoded> apply(@NotNull T_Encoded encoded) {
-					return DecodeContext.this.input(encoded, new ArrayDecodePath(this.index++));
-				}
-			});
-		}
-		else {
-			return allowSingleton ? Stream.of(this) : null;
-		}
-	}
-
-	public @NotNull Stream<@NotNull DecodeContext<T_Encoded>> forceAsStream(boolean allowSingleton) throws DecodeException {
-		Stream<DecodeContext<T_Encoded>> stream = this.tryAsStream(allowSingleton);
-		if (stream != null) return stream;
-		else throw this.notA("list");
-	}
-
-	//////////////// number ////////////////
-
-	public boolean isNumber() {
-		return DFUVersions.getResult(this.ops.getNumberValue(this.input)) != null;
-	}
-
-	public @Nullable Number tryAsNumber() {
-		return DFUVersions.getResult(this.ops.getNumberValue(this.input));
-	}
-
-	public @NotNull Number forceAsNumber() throws DecodeException {
-		Number number = this.tryAsNumber();
-		if (number != null) return number;
-		else throw this.notA("number");
-	}
-
-	//////////////// boolean ////////////////
-
-	public boolean isBoolean() {
-		return DFUVersions.getResult(this.ops.getBooleanValue(this.input)) != null;
-	}
-
-	public @Nullable Boolean tryAsBoolean() {
-		return DFUVersions.getResult(this.ops.getBooleanValue(this.input));
-	}
-
-	public @NotNull Boolean forceAsBoolean() throws DecodeException {
-		Boolean value = this.tryAsBoolean();
-		if (value != null) return value;
-		else throw this.notA("boolean");
-	}
-
-	//////////////// string ////////////////
-
-	public boolean isString() {
-		return DFUVersions.getResult(this.ops.getStringValue(this.input)) != null;
-	}
-
-	public @Nullable String tryAsString() {
-		return DFUVersions.getResult(this.ops.getStringValue(this.input));
-	}
-
-	public @NotNull String forceAsString() throws DecodeException {
-		String string = this.tryAsString();
-		if (string != null) return string;
-		else throw this.notA("string");
+		return this.input(this.empty(), new ObjectDecodePath(key));
 	}
 
 	//////////////////////////////// handlers ////////////////////////////////

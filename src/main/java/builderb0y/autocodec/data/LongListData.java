@@ -5,21 +5,21 @@ import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.longs.LongList;
 import org.jetbrains.annotations.NotNull;
 
-public class LongArrayData<T_Encoded> extends Data<T_Encoded> {
+public class LongListData<T_Encoded> extends Data<T_Encoded> {
 
 	public @NotNull LongList value;
 
-	public LongArrayData(@NotNull DynamicOps<T_Encoded> ops) {
+	public LongListData(@NotNull DynamicOps<T_Encoded> ops) {
 		super(ops);
 		this.value = new LongArrayList();
 	}
 
-	public LongArrayData(@NotNull DynamicOps<T_Encoded> ops, int capacity) {
+	public LongListData(@NotNull DynamicOps<T_Encoded> ops, int capacity) {
 		super(ops);
 		this.value = new LongArrayList(capacity);
 	}
 
-	public LongArrayData(@NotNull DynamicOps<T_Encoded> ops, @NotNull LongList value) {
+	public LongListData(@NotNull DynamicOps<T_Encoded> ops, @NotNull LongList value) {
 		super(ops);
 		this.value = value;
 	}
@@ -30,18 +30,9 @@ public class LongArrayData<T_Encoded> extends Data<T_Encoded> {
 	}
 
 	@Override
-	public boolean isLongList() {
-		return true;
-	}
-
-	@Override
-	public @NotNull LongList tryAsLongList() {
-		return this.value;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		return obj instanceof LongArrayData<?> that && this.value.equals(that.value);
+	public boolean equals(Object object) {
+		LongListData<?> longList;
+		return object instanceof Data<?> data && (longList = data.tryAsLongList()) != null && this.value.equals(longList.value);
 	}
 
 	@Override
@@ -56,6 +47,6 @@ public class LongArrayData<T_Encoded> extends Data<T_Encoded> {
 
 	@Override
 	public @NotNull Data<T_Encoded> deepCopy() {
-		return new LongArrayData<>(this.ops, new LongArrayList(this.value));
+		return new LongListData<>(this.ops, new LongArrayList(this.value));
 	}
 }

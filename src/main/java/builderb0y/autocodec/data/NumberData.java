@@ -1,7 +1,6 @@
 package builderb0y.autocodec.data;
 
 import com.mojang.serialization.DynamicOps;
-import it.unimi.dsi.fastutil.HashCommon;
 import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.NotNull;
 
@@ -68,6 +67,19 @@ public class NumberData<T_Encoded> extends AbstractNumberData<T_Encoded> {
 			case LONG -> ops.createLong(this.bits);
 			case FLOAT -> ops.createFloat(Float.intBitsToFloat((int)(this.bits)));
 			case DOUBLE -> ops.createDouble(Double.longBitsToDouble(this.bits));
+			default -> throw new IllegalStateException("Invalid precision: " + this.precision);
+		};
+	}
+
+	@Override
+	public @NotNull Number numberValue() {
+		return switch (this.precision) {
+			case BYTE -> (byte)(this.bits);
+			case SHORT -> (short)(this.bits);
+			case INT -> (int)(this.bits);
+			case LONG -> this.bits;
+			case FLOAT -> Float.intBitsToFloat((int)(this.bits));
+			case DOUBLE -> Double.longBitsToDouble(this.bits);
 			default -> throw new IllegalStateException("Invalid precision: " + this.precision);
 		};
 	}
@@ -169,13 +181,30 @@ public class NumberData<T_Encoded> extends AbstractNumberData<T_Encoded> {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		return obj instanceof NumberData<?> that && this.precision == that.precision && this.bits == that.bits;
+	public boolean equals(Object object) {
+		AbstractNumberData<?> number;
+		if (object instanceof Data<?> data && (number = data.tryAsNumber()) != null) {
+			if (number instanceof NumberData<?> same) {
+				return this.precision == same.precision && this.bits == same.bits;
+			}
+			else {
+				return this.numberValue().equals(number.numberValue());
+			}
+		}
+		return false;
 	}
 
 	@Override
 	public int hashCode() {
-		return HashCommon.mix(this.precision) + Long.hashCode(HashCommon.mix(this.bits));
+		return switch (this.precision) {
+			case BYTE -> Byte.hashCode((byte)(this.bits));
+			case SHORT -> Short.hashCode((short)(this.bits));
+			case INT -> Integer.hashCode((int)(this.bits));
+			case LONG -> Long.hashCode(this.bits);
+			case FLOAT -> Float.hashCode(Float.intBitsToFloat((int)(this.bits)));
+			case DOUBLE -> Double.hashCode(Double.longBitsToDouble(this.bits));
+			default -> throw new IllegalStateException("Invalid precision: " + this.precision);
+		};
 	}
 
 	@Override

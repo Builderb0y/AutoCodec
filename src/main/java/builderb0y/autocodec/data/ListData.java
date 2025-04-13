@@ -42,54 +42,9 @@ public class ListData<T_Encoded> extends Data<T_Encoded> {
 	}
 
 	@Override
-	public boolean isList() {
-		return true;
-	}
-
-	@Override
-	public @NotNull List<@NotNull Data<T_Encoded>> tryAsList() {
-		return this.value;
-	}
-
-	public void add(boolean value) {
-		this.add(new BooleanData<>(this.ops, value));
-	}
-
-	public void add(byte value) {
-		this.add(new NumberData<>(this.ops, value));
-	}
-
-	public void add(short value) {
-		this.add(new NumberData<>(this.ops, value));
-	}
-
-	public void add(int value) {
-		this.add(new NumberData<>(this.ops, value));
-	}
-
-	public void add(long value) {
-		this.add(new NumberData<>(this.ops, value));
-	}
-
-	public void add(float value) {
-		this.add(new NumberData<>(this.ops, value));
-	}
-
-	public void add(double value) {
-		this.add(new NumberData<>(this.ops, value));
-	}
-
-	public void add(String value) {
-		this.add(new StringData<>(this.ops, value));
-	}
-
-	public void add(Data<T_Encoded> data) {
-		this.value.add(data);
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		return obj instanceof ListData<?> that && this.value.equals(that.value);
+	public boolean equals(Object object) {
+		ListData<?> list;
+		return object instanceof Data<?> data && (list = data.tryAsList()) != null && this.value.equals(list.value);
 	}
 
 	@Override
