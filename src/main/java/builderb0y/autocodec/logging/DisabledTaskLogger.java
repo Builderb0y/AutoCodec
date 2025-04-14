@@ -21,9 +21,7 @@ import builderb0y.autocodec.decoders.DecodeException;
 import builderb0y.autocodec.encoders.AutoEncoder;
 import builderb0y.autocodec.encoders.EncodeContext;
 import builderb0y.autocodec.encoders.EncodeException;
-import builderb0y.autocodec.fixers.AutoFixer;
-import builderb0y.autocodec.fixers.DataFixContext;
-import builderb0y.autocodec.fixers.DataFixException;
+import builderb0y.autocodec.fixers.*;
 import builderb0y.autocodec.imprinters.AutoImprinter;
 import builderb0y.autocodec.imprinters.ImprintContext;
 import builderb0y.autocodec.imprinters.ImprintException;
@@ -72,8 +70,13 @@ public class DisabledTaskLogger extends TaskLogger {
 	}
 
 	@Override
-	public @NotNull <T_Encoded, T_Decoded> DataFixContext<T_Encoded> fix(@NotNull AutoFixer<T_Decoded> fixer, @NotNull DataFixContext<T_Encoded> context) throws DataFixException {
-		return fixer.fix(context);
+	public @NotNull <T_Encoded, T_Decoded> DataFixContext<T_Encoded> fixData(@NotNull AutoFixer<T_Decoded> fixer, @NotNull DataFixContext<T_Encoded> context) throws DataFixException {
+		return fixer.fixData(context);
+	}
+
+	@Override
+	public @NotNull <T_Encoded, T_Decoded> DataAppendContext<T_Encoded, T_Decoded> appendData(@NotNull AutoFixer<T_Decoded> fixer, @NotNull DataAppendContext<T_Encoded, T_Decoded> context) throws DataAppendException {
+		return fixer.appendData(context);
 	}
 
 	@Override

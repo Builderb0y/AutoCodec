@@ -71,9 +71,7 @@ public class UnknownData<T_Encoded> extends Data<T_Encoded> {
 	@Override
 	public @Nullable BooleanData<T_Encoded> tryAsBoolean() {
 		if (this.resolution != null) {
-			if (this.resolution instanceof BooleanData<T_Encoded> data) {
-				return data;
-			}
+			return this.resolution.tryAsBoolean();
 		}
 		else {
 			Boolean value = DFUVersions.getResult(this.ops.getBooleanValue(this.payload));
@@ -99,9 +97,7 @@ public class UnknownData<T_Encoded> extends Data<T_Encoded> {
 	@Override
 	public @Nullable AbstractNumberData<T_Encoded> tryAsNumber() {
 		if (this.resolution != null) {
-			if (this.resolution instanceof AbstractNumberData<T_Encoded> data) {
-				return data;
-			}
+			return this.resolution.tryAsNumber();
 		}
 		else {
 			Number value = DFUVersions.getResult(this.ops.getNumberValue(this.payload));
@@ -127,9 +123,7 @@ public class UnknownData<T_Encoded> extends Data<T_Encoded> {
 	@Override
 	public @Nullable StringData<T_Encoded> tryAsString() {
 		if (this.resolution != null) {
-			if (this.resolution instanceof StringData<T_Encoded> data) {
-				return data;
-			}
+			return this.resolution.tryAsString();
 		}
 		else {
 			String value = DFUVersions.getResult(this.ops.getStringValue(this.payload));
@@ -155,9 +149,7 @@ public class UnknownData<T_Encoded> extends Data<T_Encoded> {
 	@Override
 	public @Nullable ListData<T_Encoded> tryAsList() {
 		if (this.resolution != null) {
-			if (this.resolution instanceof ListData<T_Encoded> data) {
-				return data;
-			}
+			return this.resolution.tryAsList();
 		}
 		else {
 			Stream<T_Encoded> value = DFUVersions.getResult(this.ops.getStream(this.payload));
@@ -184,9 +176,7 @@ public class UnknownData<T_Encoded> extends Data<T_Encoded> {
 	@Override
 	public @Nullable ByteListData<T_Encoded> tryAsByteList() {
 		if (this.resolution != null) {
-			if (this.resolution instanceof ByteListData<T_Encoded> data) {
-				return data;
-			}
+			return this.resolution.tryAsByteList();
 		}
 		else {
 			ByteBuffer value = DFUVersions.getResult(this.ops.getByteBuffer(this.payload));
@@ -215,9 +205,7 @@ public class UnknownData<T_Encoded> extends Data<T_Encoded> {
 	@Override
 	public @Nullable IntListData<T_Encoded> tryAsIntList() {
 		if (this.resolution != null) {
-			if (this.resolution instanceof IntListData<T_Encoded> data) {
-				return data;
-			}
+			return this.resolution.tryAsIntList();
 		}
 		else {
 			IntStream stream = DFUVersions.getResult(this.ops.getIntStream(this.payload));
@@ -244,9 +232,7 @@ public class UnknownData<T_Encoded> extends Data<T_Encoded> {
 	@Override
 	public @Nullable LongListData<T_Encoded> tryAsLongList() {
 		if (this.resolution != null) {
-			if (this.resolution instanceof LongListData<T_Encoded> data) {
-				return data;
-			}
+			return this.resolution.tryAsLongList();
 		}
 		else {
 			LongStream stream = DFUVersions.getResult(this.ops.getLongStream(this.payload));
@@ -273,9 +259,7 @@ public class UnknownData<T_Encoded> extends Data<T_Encoded> {
 	@Override
 	public @Nullable MapData<T_Encoded> tryAsMap() {
 		if (this.resolution != null) {
-			if (this.resolution instanceof MapData<T_Encoded> data) {
-				return data;
-			}
+			return this.resolution.tryAsMap();
 		}
 		else {
 			Stream<Pair<T_Encoded, T_Encoded>> stream = DFUVersions.getResult(this.ops.getMapValues(this.payload));
@@ -343,6 +327,10 @@ public class UnknownData<T_Encoded> extends Data<T_Encoded> {
 
 	@Override
 	public @NotNull Data<T_Encoded> deepCopy() {
-		return new UnknownData<>(this.ops, this.payload); //assume payload will not be modified.
+		UnknownData<T_Encoded> copy = new UnknownData<>(this.ops, this.payload);
+		if (this.resolution != null) {
+			copy.resolution = this.resolution.deepCopy();
+		}
+		return copy;
 	}
 }

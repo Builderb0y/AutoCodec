@@ -1,5 +1,8 @@
 package builderb0y.autocodec.data;
 
+import java.util.List;
+import java.util.Map;
+
 import it.unimi.dsi.fastutil.bytes.ByteList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.longs.LongList;
@@ -137,167 +140,167 @@ public interface DataWriter<T_Encoded, T_Exception extends Exception> extends Da
 		return this.forceAsLongList().value.set(index, value);
 	}
 
-	public default void setBooleanElement(int index, boolean value) throws T_Exception {
-		this.setDataElement(index, this.createBoolean(value));
+	public default @NotNull Data<T_Encoded> setBooleanElement(int index, boolean value) throws T_Exception {
+		return this.setDataElement(index, this.createBoolean(value));
 	}
 
-	public default void setByteElement(int index, byte value) throws T_Exception {
-		this.setDataElement(index, this.createByte(value));
+	public default @NotNull Data<T_Encoded> setByteElement(int index, byte value) throws T_Exception {
+		return this.setDataElement(index, this.createByte(value));
 	}
 
-	public default void setShortElement(int index, short value) throws T_Exception {
-		this.setDataElement(index, this.createShort(value));
+	public default @NotNull Data<T_Encoded> setShortElement(int index, short value) throws T_Exception {
+		return this.setDataElement(index, this.createShort(value));
 	}
 
-	public default void setIntElement(int index, int value) throws T_Exception {
-		this.setDataElement(index, this.createInt(value));
+	public default @NotNull Data<T_Encoded> setIntElement(int index, int value) throws T_Exception {
+		return this.setDataElement(index, this.createInt(value));
 	}
 
-	public default void setLongElement(int index, long value) throws T_Exception {
-		this.setDataElement(index, this.createLong(value));
+	public default @NotNull Data<T_Encoded> setLongElement(int index, long value) throws T_Exception {
+		return this.setDataElement(index, this.createLong(value));
 	}
 
-	public default void setFloatElement(int index, float value) throws T_Exception {
-		this.setDataElement(index, this.createFloat(value));
+	public default @NotNull Data<T_Encoded> setFloatElement(int index, float value) throws T_Exception {
+		return this.setDataElement(index, this.createFloat(value));
 	}
 
-	public default void setDoubleElement(int index, double value) throws T_Exception {
-		this.setDataElement(index, this.createDouble(value));
+	public default @NotNull Data<T_Encoded> setDoubleElement(int index, double value) throws T_Exception {
+		return this.setDataElement(index, this.createDouble(value));
 	}
 
-	public default void setStringElement(int index, @NotNull String value) throws T_Exception {
-		this.setDataElement(index, this.createString(value));
+	public default @NotNull Data<T_Encoded> setStringElement(int index, @NotNull String value) throws T_Exception {
+		return this.setDataElement(index, this.createString(value));
 	}
 
-	public default void setByteListElement(int index, byte @NotNull ... value) throws T_Exception {
-		this.setDataElement(index, this.createByteList(value));
+	public default @NotNull Data<T_Encoded> setByteListElement(int index, byte @NotNull ... value) throws T_Exception {
+		return this.setDataElement(index, this.createByteList(value));
 	}
 
-	public default void setByteListElement(int index, @NotNull ByteList value) throws T_Exception {
-		this.setDataElement(index, this.createByteList(value));
+	public default @NotNull Data<T_Encoded> setByteListElement(int index, @NotNull ByteList value) throws T_Exception {
+		return this.setDataElement(index, this.createByteList(value));
 	}
 
-	public default void setIntListElement(int index, int @NotNull ... value) throws T_Exception {
-		this.setDataElement(index, this.createIntList(value));
+	public default @NotNull Data<T_Encoded> setIntListElement(int index, int @NotNull ... value) throws T_Exception {
+		return this.setDataElement(index, this.createIntList(value));
 	}
 
-	public default void setIntListElement(int index, @NotNull IntList value) throws T_Exception {
-		this.setDataElement(index, this.createIntList(value));
+	public default @NotNull Data<T_Encoded> setIntListElement(int index, @NotNull IntList value) throws T_Exception {
+		return this.setDataElement(index, this.createIntList(value));
 	}
 
-	public default void setLongListElement(int index, long @NotNull ... value) throws T_Exception {
-		this.setDataElement(index, this.createLongList(value));
+	public default @NotNull Data<T_Encoded> setLongListElement(int index, long @NotNull ... value) throws T_Exception {
+		return this.setDataElement(index, this.createLongList(value));
 	}
 
-	public default void setLongListElement(int index, @NotNull LongList value) throws T_Exception {
-		this.setDataElement(index, this.createLongList(value));
+	public default @NotNull Data<T_Encoded> setLongListElement(int index, @NotNull LongList value) throws T_Exception {
+		return this.setDataElement(index, this.createLongList(value));
 	}
 
-	public default void setListElement(int index, @NotNull Data<T_Encoded> @NotNull ... value) throws T_Exception {
-		this.setDataElement(index, this.createList(value));
+	public default @NotNull Data<T_Encoded> setListElement(int index, @NotNull Data<T_Encoded> @NotNull ... value) throws T_Exception {
+		return this.setDataElement(index, this.createList(value));
 	}
 
-	public default void setListElement(int index, @NotNull ObjectList<@NotNull Data<T_Encoded>> value) throws T_Exception {
-		this.setDataElement(index, this.createList(value));
+	public default @NotNull Data<T_Encoded> setListElement(int index, @NotNull ObjectList<@NotNull Data<T_Encoded>> value) throws T_Exception {
+		return this.setDataElement(index, this.createList(value));
 	}
 
-	public default void setMapElement(int index, @NotNull Object2ObjectMap<@NotNull Data<T_Encoded>, @NotNull Data<T_Encoded>> value) throws T_Exception {
-		this.setDataElement(index, this.createMap(value));
+	public default @NotNull Data<T_Encoded> setMapElement(int index, @NotNull Object2ObjectMap<@NotNull Data<T_Encoded>, @NotNull Data<T_Encoded>> value) throws T_Exception {
+		return this.setDataElement(index, this.createMap(value));
 	}
 
-	public default void setDataElement(int index, @NotNull Data<T_Encoded> value) throws T_Exception {
-		this.forceAsList().value.set(index, value);
+	public default @NotNull Data<T_Encoded> setDataElement(int index, @NotNull Data<T_Encoded> value) throws T_Exception {
+		return this.forceAsList().set(index, value);
 	}
 
-	public default void removeByte(int index) throws T_Exception {
-		this.forceAsByteList().value.removeByte(index);
+	public default byte removeByte(int index) throws T_Exception {
+		return this.forceAsByteList().value.removeByte(index);
 	}
 
-	public default void removeInt(int index) throws T_Exception {
-		this.forceAsIntList().value.removeInt(index);
+	public default int removeInt(int index) throws T_Exception {
+		return this.forceAsIntList().value.removeInt(index);
 	}
 
-	public default void removeLong(int index) throws T_Exception {
-		this.forceAsLongList().value.removeLong(index);
+	public default long removeLong(int index) throws T_Exception {
+		return this.forceAsLongList().value.removeLong(index);
 	}
 
-	public default void removeElement(int index) throws T_Exception {
-		this.forceAsList().value.remove(index);
+	public default Data<T_Encoded> removeElement(int index) throws T_Exception {
+		return this.forceAsList().value.remove(index);
 	}
 
-	public default void putBoolean(@NotNull String key, boolean value) throws T_Exception {
-		this.putData(key, this.createBoolean(value));
+	public default @NotNull Data<T_Encoded> putBoolean(@NotNull String key, boolean value) throws T_Exception {
+		return this.putData(key, this.createBoolean(value));
 	}
 
-	public default void putByte(@NotNull String key, byte value) throws T_Exception {
-		this.putData(key, this.createByte(value));
+	public default @NotNull Data<T_Encoded> putByte(@NotNull String key, byte value) throws T_Exception {
+		return this.putData(key, this.createByte(value));
 	}
 
-	public default void putShort(@NotNull String key, short value) throws T_Exception {
-		this.putData(key, this.createShort(value));
+	public default @NotNull Data<T_Encoded> putShort(@NotNull String key, short value) throws T_Exception {
+		return this.putData(key, this.createShort(value));
 	}
 
-	public default void putInt(@NotNull String key, int value) throws T_Exception {
-		this.putData(key, this.createInt(value));
+	public default @NotNull Data<T_Encoded> putInt(@NotNull String key, int value) throws T_Exception {
+		return this.putData(key, this.createInt(value));
 	}
 
-	public default void putLong(@NotNull String key, long value) throws T_Exception {
-		this.putData(key, this.createLong(value));
+	public default @NotNull Data<T_Encoded> putLong(@NotNull String key, long value) throws T_Exception {
+		return this.putData(key, this.createLong(value));
 	}
 
-	public default void putFloat(@NotNull String key, float value) throws T_Exception {
-		this.putData(key, this.createFloat(value));
+	public default @NotNull Data<T_Encoded> putFloat(@NotNull String key, float value) throws T_Exception {
+		return this.putData(key, this.createFloat(value));
 	}
 
-	public default void putDouble(@NotNull String key, double value) throws T_Exception {
-		this.putData(key, this.createDouble(value));
+	public default @NotNull Data<T_Encoded> putDouble(@NotNull String key, double value) throws T_Exception {
+		return this.putData(key, this.createDouble(value));
 	}
 
-	public default void putString(@NotNull String key, @NotNull String value) throws T_Exception {
-		this.putData(key, this.createString(value));
+	public default @NotNull Data<T_Encoded> putString(@NotNull String key, @NotNull String value) throws T_Exception {
+		return this.putData(key, this.createString(value));
 	}
 
-	public default void putByteList(@NotNull String key, byte @NotNull ... value) throws T_Exception {
-		this.putData(key, this.createByteList(value));
+	public default @NotNull Data<T_Encoded> putByteList(@NotNull String key, byte @NotNull ... value) throws T_Exception {
+		return this.putData(key, this.createByteList(value));
 	}
 
-	public default void putByteList(@NotNull String key, @NotNull ByteList value) throws T_Exception {
-		this.putData(key, this.createByteList(value));
+	public default @NotNull Data<T_Encoded> putByteList(@NotNull String key, @NotNull ByteList value) throws T_Exception {
+		return this.putData(key, this.createByteList(value));
 	}
 
-	public default void putIntList(@NotNull String key, int @NotNull ... value) throws T_Exception {
-		this.putData(key, this.createIntList(value));
+	public default @NotNull Data<T_Encoded> putIntList(@NotNull String key, int @NotNull ... value) throws T_Exception {
+		return this.putData(key, this.createIntList(value));
 	}
 
-	public default void putIntList(@NotNull String key, @NotNull IntList value) throws T_Exception {
-		this.putData(key, this.createIntList(value));
+	public default @NotNull Data<T_Encoded> putIntList(@NotNull String key, @NotNull IntList value) throws T_Exception {
+		return this.putData(key, this.createIntList(value));
 	}
 
-	public default void putLongList(@NotNull String key, long @NotNull ... value) throws T_Exception {
-		this.putData(key, this.createLongList(value));
+	public default @NotNull Data<T_Encoded> putLongList(@NotNull String key, long @NotNull ... value) throws T_Exception {
+		return this.putData(key, this.createLongList(value));
 	}
 
-	public default void putLongList(@NotNull String key, @NotNull LongList value) throws T_Exception {
-		this.putData(key, this.createLongList(value));
+	public default @NotNull Data<T_Encoded> putLongList(@NotNull String key, @NotNull LongList value) throws T_Exception {
+		return this.putData(key, this.createLongList(value));
 	}
 
-	public default void putList(@NotNull String key, @NotNull Data<T_Encoded> @NotNull ... value) throws T_Exception {
-		this.putData(key, this.createList(value));
+	public default @NotNull Data<T_Encoded> putList(@NotNull String key, @NotNull Data<T_Encoded> @NotNull ... value) throws T_Exception {
+		return this.putData(key, this.createList(value));
 	}
 
-	public default void putList(@NotNull String key, @NotNull ObjectList<@NotNull Data<T_Encoded>> value) throws T_Exception {
-		this.putData(key, this.createList(value));
+	public default @NotNull Data<T_Encoded> putList(@NotNull String key, @NotNull List<@NotNull Data<T_Encoded>> value) throws T_Exception {
+		return this.putData(key, this.createList(value));
 	}
 
-	public default void putMap(@NotNull String key, @NotNull Object2ObjectMap<@NotNull Data<T_Encoded>, @NotNull Data<T_Encoded>> value) throws T_Exception {
-		this.putData(key, this.createMap(value));
+	public default @NotNull Data<T_Encoded> putMap(@NotNull String key, @NotNull Map<@NotNull Data<T_Encoded>, @NotNull Data<T_Encoded>> value) throws T_Exception {
+		return this.putData(key, this.createMap(value));
 	}
 
-	public default void putData(@NotNull String key, @NotNull Data<T_Encoded> value) throws T_Exception {
-		this.forceAsMap().value.put(this.createString(key), value);
+	public default @NotNull Data<T_Encoded> putData(@NotNull String key, @NotNull Data<T_Encoded> value) throws T_Exception {
+		return this.forceAsMap().put(this.createString(key), value);
 	}
 
-	public default void removeMember(@NotNull String key) throws T_Exception {
-		this.forceAsMap().value.remove(this.createString(key));
+	public default @NotNull Data<T_Encoded> removeMember(@NotNull String key) throws T_Exception {
+		return this.forceAsMap().remove(this.createString(key));
 	}
 }

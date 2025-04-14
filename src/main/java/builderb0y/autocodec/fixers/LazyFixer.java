@@ -22,7 +22,7 @@ public class LazyFixer<T> extends LazyHandler<AutoFixer<T>> implements AutoFixer
 
 	@Override
 	@OverrideOnly
-	public @NotNull <T_Encoded> DataFixContext<T_Encoded> fix(@NotNull DataFixContext<T_Encoded> context) throws DataFixException {
-		return context.fixWith(this.getDelegateHandler());
+	public @NotNull <T_Encoded> DataFixContext<T_Encoded> fixData(@NotNull DataFixContext<T_Encoded> context) throws DataFixException {
+		return context.fixDataWith(this.getDelegateHandler());
 	}
 }

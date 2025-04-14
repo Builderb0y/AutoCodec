@@ -2,6 +2,7 @@ package builderb0y.autocodec.constructors;
 
 import org.jetbrains.annotations.NotNull;
 
+import builderb0y.autocodec.common.AbstractDecodeContext;
 import builderb0y.autocodec.decoders.DecodeContext;
 import builderb0y.autocodec.util.ObjectArrayFactory;
 
@@ -9,7 +10,7 @@ public class ConstructContext<T_Encoded> extends DecodeContext<T_Encoded> {
 
 	public static final @NotNull ObjectArrayFactory<ConstructContext<?>> ARRAY_FACTORY = new ObjectArrayFactory<>(ConstructContext.class).generic();
 
-	public ConstructContext(@NotNull DecodeContext<T_Encoded> context) {
+	public ConstructContext(@NotNull AbstractDecodeContext<T_Encoded, ?> context) {
 		super(context);
 	}
 

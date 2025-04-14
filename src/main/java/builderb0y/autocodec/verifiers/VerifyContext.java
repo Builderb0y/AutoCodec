@@ -3,6 +3,7 @@ package builderb0y.autocodec.verifiers;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import builderb0y.autocodec.common.AbstractDecodeContext;
 import builderb0y.autocodec.decoders.DecodeContext;
 import builderb0y.autocodec.util.ObjectArrayFactory;
 
@@ -12,7 +13,7 @@ public class VerifyContext<T_Encoded, T_Decoded> extends DecodeContext<T_Encoded
 
 	public final @Nullable T_Decoded object;
 
-	public VerifyContext(@NotNull DecodeContext<T_Encoded> context, @Nullable T_Decoded object) {
+	public VerifyContext(@NotNull AbstractDecodeContext<T_Encoded, ?> context, @Nullable T_Decoded object) {
 		super(context);
 		this.object = object;
 	}

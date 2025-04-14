@@ -83,7 +83,7 @@ public class DuplicateFixerTest {
 
 		@Override
 		@OverrideOnly
-		public @NotNull <T_Encoded> DataFixContext<T_Encoded> fix(@NotNull DataFixContext<T_Encoded> context) throws DataFixException {
+		public @NotNull <T_Encoded> DataFixContext<T_Encoded> fixData(@NotNull DataFixContext<T_Encoded> context) throws DataFixException {
 			return context;
 		}
 	}

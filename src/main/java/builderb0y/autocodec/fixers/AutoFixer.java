@@ -23,9 +23,30 @@ public interface AutoFixer<T_Decoded> extends AutoHandler {
 	/**
 	returns a context which accounts for any changes to {@link T_Decoded}'s schema over time.
 	the returned context will be passed into the {@link AutoDecoder} instead of the provided context.
+
+	this method is annotated as {@link OverrideOnly}
+	because it performs no logging on its own.
+	use {@link DataFixContext#fixDataWith(AutoFixer)}
+	to fix data and perform logging at the same time.
 	*/
 	@OverrideOnly
-	public abstract <T_Encoded> @NotNull DataFixContext<T_Encoded> fix(@NotNull DataFixContext<T_Encoded> context) throws DataFixException;
+	public abstract <T_Encoded> @NotNull DataFixContext<T_Encoded> fixData(@NotNull DataFixContext<T_Encoded> context) throws DataFixException;
+
+	/**
+	called after encoding has been performed with a DataAppendContext containing the encoding result as its data.
+	this method can be used to modify the data before it gets used by other parts of code.
+	for example, if this fixer uses a version-based schema, this
+	method can be used to record the current version in the data.
+
+	this method is annotated with {@link OverrideOnly}
+	because it performs no logging on its own.
+	use {@link DataAppendContext#appendDataWith(AutoFixer)}
+	to append data and perform logging at the same time.
+	*/
+	@OverrideOnly
+	public default <T_Encoded> @NotNull DataAppendContext<T_Encoded, T_Decoded> appendData(@NotNull DataAppendContext<T_Encoded, T_Decoded> context) throws DataAppendException {
+		return context;
+	}
 
 	public static abstract class NamedFixer<T_Decoded> extends NamedHandler<T_Decoded> implements AutoFixer<T_Decoded> {
 

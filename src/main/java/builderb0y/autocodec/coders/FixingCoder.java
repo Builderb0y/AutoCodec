@@ -13,7 +13,7 @@ import builderb0y.autocodec.decoders.DecodeException;
 import builderb0y.autocodec.encoders.EncodeContext;
 import builderb0y.autocodec.encoders.EncodeException;
 import builderb0y.autocodec.fixers.AutoFixer;
-import builderb0y.autocodec.fixers.DataFixException;
+import builderb0y.autocodec.fixers.DataAppendContext;
 import builderb0y.autocodec.reflection.reification.ReifiedType;
 
 public class FixingCoder<T_Decoded> extends NamedCoder<T_Decoded> {
@@ -39,19 +39,13 @@ public class FixingCoder<T_Decoded> extends NamedCoder<T_Decoded> {
 	@Override
 	@OverrideOnly
 	public <T_Encoded> @Nullable T_Decoded decode(@NotNull DecodeContext<T_Encoded> context) throws DecodeException {
-		try {
-			context = new DecodeContext<>(context.fixWith(this.fixer));
-		}
-		catch (DataFixException exception) {
-			throw new DecodeException(exception);
-		}
-		return context.decodeWith(this.coder);
+		return new DecodeContext<>(context.fixDataWith(this.fixer)).decodeWith(this.coder);
 	}
 
 	@Override
 	@OverrideOnly
 	public <T_Encoded> @NotNull Data<T_Encoded> encode(@NotNull EncodeContext<T_Encoded, T_Decoded> context) throws EncodeException {
-		return context.encodeWith(this.coder);
+		return new DataAppendContext<>(context, context.encodeWith(this.coder)).appendDataWith(this.fixer).data;
 	}
 
 	@Override

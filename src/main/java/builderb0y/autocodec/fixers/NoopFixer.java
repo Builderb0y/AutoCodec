@@ -14,7 +14,7 @@ public class NoopFixer<T_Decoded> implements AutoFixer<T_Decoded> {
 
 	@Override
 	@OverrideOnly
-	public <T_Encoded> @NotNull DataFixContext<T_Encoded> fix(@NotNull DataFixContext<T_Encoded> context) throws DataFixException {
+	public <T_Encoded> @NotNull DataFixContext<T_Encoded> fixData(@NotNull DataFixContext<T_Encoded> context) throws DataFixException {
 		return context;
 	}
 

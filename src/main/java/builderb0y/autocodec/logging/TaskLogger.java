@@ -23,9 +23,7 @@ import builderb0y.autocodec.decoders.DecodeException;
 import builderb0y.autocodec.encoders.AutoEncoder;
 import builderb0y.autocodec.encoders.EncodeContext;
 import builderb0y.autocodec.encoders.EncodeException;
-import builderb0y.autocodec.fixers.AutoFixer;
-import builderb0y.autocodec.fixers.DataFixContext;
-import builderb0y.autocodec.fixers.DataFixException;
+import builderb0y.autocodec.fixers.*;
 import builderb0y.autocodec.imprinters.AutoImprinter;
 import builderb0y.autocodec.imprinters.ImprintContext;
 import builderb0y.autocodec.imprinters.ImprintException;
@@ -193,7 +191,7 @@ public abstract class TaskLogger {
 		});
 	}
 
-	public <T_Encoded, T_Decoded> @NotNull DataFixContext<T_Encoded> fix(
+	public <T_Encoded, T_Decoded> @NotNull DataFixContext<T_Encoded> fixData(
 		@NotNull AutoFixer<T_Decoded> fixer,
 		@NotNull DataFixContext<T_Encoded> context
 	)
@@ -202,12 +200,31 @@ public abstract class TaskLogger {
 
 			@Override
 			public DataFixContext<T_Encoded> run() throws DataFixException {
-				return fixer.fix(context);
+				return fixer.fixData(context);
 			}
 
 			@Override
 			public String toString() {
 				return "Fixing " + context + " with " + fixer;
+			}
+		});
+	}
+
+	public <T_Encoded, T_Decoded> @NotNull DataAppendContext<T_Encoded, T_Decoded> appendData(
+		@NotNull AutoFixer<T_Decoded> fixer,
+		@NotNull DataAppendContext<T_Encoded, T_Decoded> context
+	)
+	throws DataAppendException {
+		return this.runTask(new LoggableTask<DataAppendContext<T_Encoded, T_Decoded>, DataAppendException>() {
+
+			@Override
+			public DataAppendContext<T_Encoded, T_Decoded> run() throws DataAppendException {
+				return fixer.appendData(context);
+			}
+
+			@Override
+			public String toString() {
+				return "Appending data to " + context + " with " + fixer;
 			}
 		});
 	}

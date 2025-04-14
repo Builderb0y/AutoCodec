@@ -25,6 +25,10 @@ public class EncodeContext<T_Encoded, T_Decoded> extends DynamicOpsContext<T_Enc
 		this.object = object;
 	}
 
+	public EncodeContext(@NotNull EncodeContext<T_Encoded, T_Decoded> from) {
+		this(from.autoCodec, from.object, from.ops);
+	}
+
 	@Override
 	public @NotNull TaskLogger logger() {
 		return this.autoCodec.encodeLogger;
