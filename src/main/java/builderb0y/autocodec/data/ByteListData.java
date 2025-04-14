@@ -36,6 +36,26 @@ public class ByteListData<T_Encoded> extends Data<T_Encoded> {
 		}
 	}
 
+	public int size() {
+		return this.value.size();
+	}
+
+	public byte getByte(int index) {
+		return this.value.getByte(index);
+	}
+
+	public byte setByte(int index, byte value) {
+		return this.value.set(index, value);
+	}
+
+	public void append(byte value) {
+		this.value.add(value);
+	}
+
+	public byte remove(int index) {
+		return this.value.removeByte(index);
+	}
+
 	@Override
 	public boolean equals(Object object) {
 		ByteListData<?> byteList;

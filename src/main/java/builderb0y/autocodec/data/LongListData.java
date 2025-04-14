@@ -29,6 +29,26 @@ public class LongListData<T_Encoded> extends Data<T_Encoded> {
 		return ops.createLongList(this.value.longStream());
 	}
 
+	public int size() {
+		return this.value.size();
+	}
+
+	public long getLong(int index) {
+		return this.value.getLong(index);
+	}
+
+	public long setLong(int index, long value) {
+		return this.value.set(index, value);
+	}
+
+	public void append(long value) {
+		this.value.add(value);
+	}
+
+	public long remove(int index) {
+		return this.value.removeLong(index);
+	}
+
 	@Override
 	public boolean equals(Object object) {
 		LongListData<?> longList;

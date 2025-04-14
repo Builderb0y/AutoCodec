@@ -1,5 +1,7 @@
 package builderb0y.autocodec.data;
 
+import java.util.Map;
+
 import com.mojang.serialization.DynamicOps;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -142,4 +144,8 @@ public interface DataReader<T_Encoded, T_Exception extends Exception> extends Da
 	public abstract @NotNull DataReader<T_Encoded, T_Exception> getElement(int index) throws T_Exception;
 
 	public abstract @NotNull DataReader<T_Encoded, T_Exception> getMember(@NotNull String key) throws T_Exception;
+
+	public abstract @NotNull Iterable<? extends @NotNull DataReader<T_Encoded, T_Exception>> listIterable() throws T_Exception;
+
+	public abstract @NotNull Iterable<? extends Map.@NotNull Entry<? extends @NotNull DataReader<T_Encoded, T_Exception>, ? extends @NotNull DataReader<T_Encoded, T_Exception>>> mapIterable() throws T_Exception;
 }

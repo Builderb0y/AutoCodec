@@ -1,6 +1,9 @@
 package builderb0y.autocodec.data;
 
+import java.util.Iterator;
 import java.util.List;
+import java.util.Spliterator;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -16,7 +19,7 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import org.jetbrains.annotations.NotNull;
 
-public class ListData<T_Encoded> extends Data<T_Encoded> {
+public class ListData<T_Encoded> extends Data<T_Encoded> implements Iterable<@NotNull Data<T_Encoded>> {
 
 	public @NotNull List<@NotNull Data<T_Encoded>> value;
 
@@ -47,6 +50,25 @@ public class ListData<T_Encoded> extends Data<T_Encoded> {
 	@Override
 	public <T_NewEncoded> @NotNull T_NewEncoded convert(@NotNull DynamicOps<T_NewEncoded> ops) {
 		return ops.createList(this.streamNonEmpty().map((Data<T_Encoded> element) -> element.convert(ops)));
+	}
+
+	@Override
+	public void forEach(Consumer<? super @NotNull Data<T_Encoded>> action) {
+		this.value.forEach(action);
+	}
+
+	@Override
+	public @NotNull Iterator<@NotNull Data<T_Encoded>> iterator() {
+		return this.value.iterator();
+	}
+
+	@Override
+	public Spliterator<@NotNull Data<T_Encoded>> spliterator() {
+		return this.value.spliterator();
+	}
+
+	public int size() {
+		return this.value.size();
 	}
 
 	public @NotNull Data<T_Encoded> get(int index) {
@@ -195,6 +217,10 @@ public class ListData<T_Encoded> extends Data<T_Encoded> {
 
 	public void append(int index, @NotNull Data<T_Encoded> newData) {
 		this.value.add(index, newData);
+	}
+
+	public @NotNull Data<T_Encoded> remove(int index) {
+		return this.value.remove(index);
 	}
 
 	@Override

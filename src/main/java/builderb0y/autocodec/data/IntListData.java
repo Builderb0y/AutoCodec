@@ -29,6 +29,26 @@ public class IntListData<T_Encoded> extends Data<T_Encoded> {
 		return ops.createIntList(this.value.intStream());
 	}
 
+	public int size() {
+		return this.value.size();
+	}
+
+	public int getInt(int index) {
+		return this.value.getInt(index);
+	}
+
+	public int setInt(int index, int value) {
+		return this.value.set(index, value);
+	}
+
+	public void append(int value) {
+		this.value.add(value);
+	}
+
+	public int remove(int index) {
+		return this.value.removeInt(index);
+	}
+
 	@Override
 	public boolean equals(Object object) {
 		IntListData<?> intList;

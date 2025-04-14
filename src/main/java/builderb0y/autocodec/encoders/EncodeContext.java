@@ -36,8 +36,7 @@ public class EncodeContext<T_Encoded, T_Decoded> extends DynamicOpsContext<T_Enc
 
 	@SuppressWarnings("unchecked")
 	public <T_NewDecoded> EncodeContext<T_Encoded, T_NewDecoded> object(@Nullable T_NewDecoded newObject) {
-		if (this.object == newObject) return (EncodeContext<T_Encoded, T_NewDecoded>)(this);
-		return new EncodeContext<>(this.autoCodec, newObject, this.ops);
+		return this.object == newObject ? (EncodeContext<T_Encoded, T_NewDecoded>)(this) : new EncodeContext<>(this.autoCodec, newObject, this.ops);
 	}
 
 	//////////////// other ////////////////

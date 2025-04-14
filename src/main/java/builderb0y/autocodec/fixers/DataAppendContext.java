@@ -1,5 +1,7 @@
 package builderb0y.autocodec.fixers;
 
+import java.util.*;
+
 import com.mojang.serialization.DynamicOps;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -41,15 +43,63 @@ public class DataAppendContext<T_Encoded, T_Decoded> extends EncodeContext<T_Enc
 		return new DataAppendException(() -> "Not a " + type + ": " + this.data);
 	}
 
+	public @NotNull DataAppendContext<T_Encoded, T_Decoded> input(@NotNull Data<T_Encoded> data) {
+		return new DataAppendContext<>(this, data);
+	}
+
 	@Override
 	public @NotNull DataAppendContext<T_Encoded, T_Decoded> getElement(int index) throws EncodeException {
-		return new DataAppendContext<>(this.autoCodec, this.object, this.forceAsList().value.get(index), this.ops);
+		return this.input(this.forceAsList().value.get(index));
 	}
 
 	@Override
 	public @NotNull DataAppendContext<T_Encoded, T_Decoded> getMember(@NotNull String key) throws DataAppendException {
 		Data<T_Encoded> member = this.forceAsMap().value.get(this.createString(key));
-		return new DataAppendContext<>(this.autoCodec, this.object, member != null ? member : this.empty(), this.ops);
+		return this.input(member != null ? member : this.empty());
+	}
+
+	@Override
+	public @NotNull Iterable<@NotNull DataAppendContext<T_Encoded, T_Decoded>> listIterable() throws DataAppendException {
+		List<Data<T_Encoded>> list = this.forceAsList().value;
+		return () -> {
+			ListIterator<Data<T_Encoded>> iterator = list.listIterator();
+			return new Iterator<>() {
+
+				@Override
+				public boolean hasNext() {
+					return iterator.hasNext();
+				}
+
+				@Override
+				public @NotNull DataAppendContext<T_Encoded, T_Decoded> next() {
+					return DataAppendContext.this.input(iterator.next());
+				}
+			};
+		};
+	}
+
+	@Override
+	public @NotNull Iterable<? extends Map.Entry<@NotNull DataAppendContext<T_Encoded, T_Decoded>, @NotNull DataAppendContext<T_Encoded, T_Decoded>>> mapIterable() throws DataAppendException {
+		Set<Map.Entry<Data<T_Encoded>, Data<T_Encoded>>> entrySet = this.forceAsMap().value.entrySet();
+		return () -> {
+			Iterator<Map.Entry<Data<T_Encoded>, Data<T_Encoded>>> iterator = entrySet.iterator();
+			return new Iterator<>() {
+
+				@Override
+				public boolean hasNext() {
+					return iterator.hasNext();
+				}
+
+				@Override
+				public Map.Entry<DataAppendContext<T_Encoded, T_Decoded>, DataAppendContext<T_Encoded, T_Decoded>> next() {
+					Map.Entry<Data<T_Encoded>, Data<T_Encoded>> next = iterator.next();
+					return Map.entry(
+						DataAppendContext.this.input(next.getKey()),
+						DataAppendContext.this.input(next.getValue())
+					);
+				}
+			};
+		};
 	}
 
 	public @NotNull DataAppendContext<T_Encoded, T_Decoded> appendDataWith(@NotNull AutoFixer<T_Decoded> fixer) throws DataAppendException {

@@ -1,5 +1,8 @@
 package builderb0y.autocodec.common;
 
+import java.util.*;
+import java.util.function.Supplier;
+
 import com.mojang.serialization.DynamicOps;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -8,11 +11,12 @@ import builderb0y.autocodec.AutoCodec;
 import builderb0y.autocodec.constructors.AutoConstructor;
 import builderb0y.autocodec.constructors.ConstructContext;
 import builderb0y.autocodec.constructors.ConstructException;
-import builderb0y.autocodec.data.Data;
-import builderb0y.autocodec.data.DataReader;
+import builderb0y.autocodec.data.*;
 import builderb0y.autocodec.decoders.AutoDecoder;
 import builderb0y.autocodec.decoders.DecodeContext;
+import builderb0y.autocodec.decoders.DecodeContext.ArrayDecodePath;
 import builderb0y.autocodec.decoders.DecodeContext.DecodePath;
+import builderb0y.autocodec.decoders.DecodeContext.ObjectDecodePath;
 import builderb0y.autocodec.decoders.DecodeException;
 import builderb0y.autocodec.fixers.AutoFixer;
 import builderb0y.autocodec.fixers.DataFixContext;
@@ -21,25 +25,28 @@ import builderb0y.autocodec.imprinters.AutoImprinter;
 import builderb0y.autocodec.imprinters.ImprintContext;
 import builderb0y.autocodec.imprinters.ImprintException;
 import builderb0y.autocodec.logging.TaskLogger;
+import builderb0y.autocodec.util.ObjectArrayFactory;
 import builderb0y.autocodec.verifiers.AutoVerifier;
 import builderb0y.autocodec.verifiers.VerifyContext;
 import builderb0y.autocodec.verifiers.VerifyException;
 
-/**
-this class exists solely for {@link DataFixContext} to throw
-{@link DataFixContext} instead of {@link DecodeException},
-which it would not be able to do if it extended {@link DecodeContext}
-directly due to conflicting implements clauses.
-*/
-public abstract class AbstractDecodeContext<T_Encoded, T_Exception extends Exception> extends DynamicOpsContext<T_Encoded> implements DataReader<T_Encoded, T_Exception> {
+public abstract class AbstractDecodeContext<
+	T_Encoded,
+	T_Exception extends Exception,
+	T_Context extends AbstractDecodeContext<T_Encoded, T_Exception, T_Context>
+>
+extends DynamicOpsContext<T_Encoded>
+implements DataReader<T_Encoded, T_Exception> {
 
-	public final @Nullable AbstractDecodeContext<T_Encoded, ?> parent;
+	public static final @NotNull ObjectArrayFactory<AbstractDecodeContext<?, ?, ?>> ARRAY_FACTORY = new ObjectArrayFactory<>(AbstractDecodeContext.class).generic();
+
+	public final @Nullable AbstractDecodeContext<T_Encoded, ?, ?> parent;
 	public final @NotNull DecodePath path;
 	public final @NotNull Data<T_Encoded> input;
 
 	public AbstractDecodeContext(
 		@NotNull AutoCodec autoCodec,
-		@Nullable AbstractDecodeContext<T_Encoded, ?> parent,
+		@Nullable AbstractDecodeContext<T_Encoded, ?, ?> parent,
 		@NotNull DecodePath path,
 		@NotNull Data<T_Encoded> input,
 		@NotNull DynamicOps<T_Encoded> ops
@@ -50,7 +57,7 @@ public abstract class AbstractDecodeContext<T_Encoded, T_Exception extends Excep
 		this.input = input;
 	}
 
-	public AbstractDecodeContext(@NotNull AbstractDecodeContext<T_Encoded, ?> from) {
+	public AbstractDecodeContext(@NotNull AbstractDecodeContext<T_Encoded, ?, ?> from) {
 		this(from.autoCodec, from.parent, from.path, from.input, from.ops);
 	}
 
@@ -62,6 +69,92 @@ public abstract class AbstractDecodeContext<T_Encoded, T_Exception extends Excep
 	@Override
 	public @NotNull Data<T_Encoded> data() {
 		return this.input;
+	}
+
+	public abstract @NotNull T_Context newContext(
+		@Nullable AbstractDecodeContext<T_Encoded, ?, ?> parent,
+		@NotNull DecodePath path,
+		@NotNull Data<T_Encoded> input
+	);
+
+	@SuppressWarnings("unchecked")
+	public @NotNull T_Context input(@NotNull Data<T_Encoded> input) {
+		return this.input == input ? (T_Context)(this) : this.newContext(this.parent, this.path, input);
+	}
+
+	public @NotNull T_Context input(@NotNull Data<T_Encoded> input, @NotNull DecodeContext.DecodePath nextPath) {
+		return this.newContext(this, nextPath, input);
+	}
+
+	public @NotNull T_Context input(@NotNull String memberName, @NotNull Data<T_Encoded> member) {
+		return this.input(member, new ObjectDecodePath(memberName));
+	}
+
+	public @NotNull T_Context input(int index, @NotNull Data<T_Encoded> element) {
+		return this.input(element, new ArrayDecodePath(index));
+	}
+
+	public abstract @NotNull T_Exception newException(@NotNull Supplier<@NotNull String> messageSupplier);
+
+	@Override
+	public @NotNull T_Exception notA(@NotNull String type) {
+		return this.newException(() -> this.pathToStringBuilder().append(" is not a ").append(type).append(": ").append(this.input).toString());
+	}
+
+	@Override
+	public @NotNull T_Context getElement(int index) throws T_Exception {
+		ListData<T_Encoded> list = this.forceAsList();
+		return this.input(index, list.value.get(index));
+	}
+
+	@Override
+	public @NotNull T_Context getMember(@NotNull String key) throws T_Exception {
+		Data<T_Encoded> member = this.forceAsMap().get(key);
+		return this.input(key, member != null ? member : this.empty());
+	}
+
+	@Override
+	public @NotNull Iterable<@NotNull T_Context> listIterable() throws T_Exception {
+		List<Data<T_Encoded>> list = this.forceAsList().value;
+		return () -> {
+			ListIterator<Data<T_Encoded>> iterator = list.listIterator();
+			return new Iterator<>() {
+
+				@Override
+				public boolean hasNext() {
+					return iterator.hasNext();
+				}
+
+				@Override
+				public T_Context next() {
+					return AbstractDecodeContext.this.input(iterator.nextIndex(), iterator.next());
+				}
+			};
+		};
+	}
+
+	@Override
+	public @NotNull Iterable<Map.@NotNull Entry<@NotNull T_Context, @NotNull T_Context>> mapIterable() throws T_Exception {
+		Set<Map.Entry<Data<T_Encoded>, Data<T_Encoded>>> entrySet = this.forceAsMap().value.entrySet();
+		return () -> {
+			Iterator<Map.Entry<Data<T_Encoded>, Data<T_Encoded>>> iterator = entrySet.iterator();
+			return new Iterator<>() {
+
+				@Override
+				public boolean hasNext() {
+					return iterator.hasNext();
+				}
+
+				@Override
+				public Map.Entry<T_Context, T_Context> next() {
+					Map.Entry<Data<T_Encoded>, Data<T_Encoded>> next = iterator.next();
+					return Map.entry(
+						AbstractDecodeContext.this.input("<key>", next.getKey()),
+						AbstractDecodeContext.this.input(next.getKey().toString(), next.getValue())
+					);
+				}
+			};
+		};
 	}
 
 	//////////////////////////////// handlers ////////////////////////////////
