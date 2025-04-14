@@ -19,7 +19,7 @@ extends AbstractDecodeContext<
 	DataFixException,
 	DataFixContext<T_Encoded>
 >
-implements DataWriter<T_Encoded, DataFixException> {
+implements DataWriter<DataFixException> {
 
 	public static final @NotNull ObjectArrayFactory<DataFixContext<?>> ARRAY_FACTORY = new ObjectArrayFactory<>(DataFixContext.class).generic();
 
@@ -27,7 +27,7 @@ implements DataWriter<T_Encoded, DataFixException> {
 		@NotNull AutoCodec autoCodec,
 		@Nullable AbstractDecodeContext<T_Encoded, ?, ?> parent,
 		@NotNull DecodePath path,
-		@NotNull Data<T_Encoded> input,
+		@NotNull Data input,
 		@NotNull DynamicOps<T_Encoded> ops
 	) {
 		super(autoCodec, parent, path, input, ops);
@@ -38,7 +38,7 @@ implements DataWriter<T_Encoded, DataFixException> {
 	}
 
 	@Override
-	public @NotNull DataFixContext<T_Encoded> newContext(@Nullable AbstractDecodeContext<T_Encoded, ?, ?> parent, @NotNull DecodePath path, @NotNull Data<T_Encoded> input) {
+	public @NotNull DataFixContext<T_Encoded> newContext(@Nullable AbstractDecodeContext<T_Encoded, ?, ?> parent, @NotNull DecodePath path, @NotNull Data input) {
 		return new DataFixContext<>(this.autoCodec, parent, path, input, this.ops);
 	}
 
@@ -59,7 +59,7 @@ implements DataWriter<T_Encoded, DataFixException> {
 
 	@Override
 	public @NotNull DataFixContext<T_Encoded> getMember(@NotNull String key) throws DataFixException {
-		Data<T_Encoded> member = this.forceAsMap().value.get(this.createString(key));
+		Data member = this.forceAsMap().value.get(this.createString(key));
 		return this.input(key, member != null ? member : this.empty());
 	}
 }

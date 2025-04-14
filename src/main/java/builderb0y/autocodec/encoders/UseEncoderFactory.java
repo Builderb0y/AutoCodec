@@ -52,14 +52,7 @@ public class UseEncoderFactory extends UseHandlerFactory1<AutoEncoder<?>> implem
 							TypeVariable<?>[] typeParameters = executable.getTypeParameters();
 							if (typeParameters.length == 1) {
 								TypeVariable<?> t_encoded = typeParameters[0];
-								Type returnType = executable.getAnnotatedReturnType().getType();
-								Type[] returnParameters;
-								if (
-									returnType instanceof ParameterizedType parameterizedReturn &&
-									parameterizedReturn.getRawType() == Data.class &&
-									(returnParameters = parameterizedReturn.getActualTypeArguments()).length == 1 &&
-									returnParameters[0].equals(t_encoded)
-								) {
+								if (executable.getAnnotatedReturnType().getType() == Data.class) {
 									AnnotatedType[] parameterTypes = executable.getAnnotatedParameterTypes();
 									if (parameterTypes.length == 1 && parameterTypes[0] instanceof AnnotatedParameterizedType encodeContext) {
 										if (((ParameterizedType)(encodeContext.getType())).getRawType() == EncodeContext.class) {

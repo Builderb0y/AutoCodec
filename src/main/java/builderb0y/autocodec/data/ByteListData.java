@@ -7,27 +7,24 @@ import it.unimi.dsi.fastutil.bytes.ByteArrayList;
 import it.unimi.dsi.fastutil.bytes.ByteList;
 import org.jetbrains.annotations.NotNull;
 
-public class ByteListData<T_Encoded> extends Data<T_Encoded> {
+public class ByteListData extends Data {
 
 	public @NotNull ByteList value;
 
-	public ByteListData(@NotNull DynamicOps<T_Encoded> ops) {
-		super(ops);
+	public ByteListData() {
 		this.value = new ByteArrayList();
 	}
 
-	public ByteListData(@NotNull DynamicOps<T_Encoded> ops, int capacity) {
-		super(ops);
+	public ByteListData(int capacity) {
 		this.value = new ByteArrayList(capacity);
 	}
 
-	public ByteListData(@NotNull DynamicOps<T_Encoded> ops, @NotNull ByteList value) {
-		super(ops);
+	public ByteListData(@NotNull ByteList value) {
 		this.value = value;
 	}
 
 	@Override
-	public <T_NewEncoded> @NotNull T_NewEncoded convert(@NotNull DynamicOps<T_NewEncoded> ops) {
+	public <T_Encoded> @NotNull T_Encoded convert(@NotNull DynamicOps<T_Encoded> ops) {
 		if (this.value instanceof ByteArrayList arrayList) {
 			return ops.createByteList(ByteBuffer.wrap(arrayList.elements(), 0, arrayList.size()));
 		}
@@ -58,8 +55,8 @@ public class ByteListData<T_Encoded> extends Data<T_Encoded> {
 
 	@Override
 	public boolean equals(Object object) {
-		ByteListData<?> byteList;
-		return object instanceof Data<?> data && (byteList = data.tryAsByteList()) != null && this.value.equals(byteList.value);
+		ByteListData byteList;
+		return object instanceof Data data && (byteList = data.tryAsByteList()) != null && this.value.equals(byteList.value);
 	}
 
 	@Override
@@ -73,7 +70,7 @@ public class ByteListData<T_Encoded> extends Data<T_Encoded> {
 	}
 
 	@Override
-	public @NotNull Data<T_Encoded> deepCopy() {
-		return new ByteListData<>(this.ops, new ByteArrayList(this.value));
+	public @NotNull Data deepCopy() {
+		return new ByteListData(new ByteArrayList(this.value));
 	}
 }

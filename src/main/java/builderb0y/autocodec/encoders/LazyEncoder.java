@@ -25,7 +25,7 @@ public class LazyEncoder<T> extends LazyHandler<AutoEncoder<T>> implements AutoE
 
 	@Override
 	@OverrideOnly
-	public <T_Encoded> @NotNull Data<T_Encoded> encode(@NotNull EncodeContext<T_Encoded, T> context) throws EncodeException {
+	public <T_Encoded> @NotNull Data encode(@NotNull EncodeContext<T_Encoded, T> context) throws EncodeException {
 		return context.encodeWith(this.getDelegateHandler());
 	}
 

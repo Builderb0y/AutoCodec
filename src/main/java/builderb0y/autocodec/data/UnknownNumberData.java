@@ -3,12 +3,11 @@ package builderb0y.autocodec.data;
 import com.mojang.serialization.DynamicOps;
 import org.jetbrains.annotations.NotNull;
 
-public class UnknownNumberData<T_Encoded> extends AbstractNumberData<T_Encoded> {
+public class UnknownNumberData extends AbstractNumberData {
 
 	public @NotNull Number value;
 
-	public UnknownNumberData(@NotNull DynamicOps<T_Encoded> ops, @NotNull Number value) {
-		super(ops);
+	public UnknownNumberData(@NotNull Number value) {
 		this.value = value;
 	}
 
@@ -84,8 +83,8 @@ public class UnknownNumberData<T_Encoded> extends AbstractNumberData<T_Encoded> 
 
 	@Override
 	public boolean equals(Object object) {
-		AbstractNumberData<?> number;
-		return object instanceof Data<?> data && (number = data.tryAsNumber()) != null && this.numberValue().equals(number.numberValue());
+		AbstractNumberData number;
+		return object instanceof Data data && (number = data.tryAsNumber()) != null && this.numberValue().equals(number.numberValue());
 	}
 
 	@Override
@@ -99,7 +98,7 @@ public class UnknownNumberData<T_Encoded> extends AbstractNumberData<T_Encoded> 
 	}
 
 	@Override
-	public @NotNull AbstractNumberData<T_Encoded> deepCopy() {
-		return new UnknownNumberData<>(this.ops, this.value); //assume Number instances are immutable.
+	public @NotNull AbstractNumberData deepCopy() {
+		return new UnknownNumberData(this.value); //assume Number instances are immutable.
 	}
 }

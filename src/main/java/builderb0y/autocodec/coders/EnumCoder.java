@@ -43,7 +43,7 @@ public class EnumCoder<T_DecodedEnum extends Enum<T_DecodedEnum>> extends NamedC
 	public <T_Encoded> @Nullable T_DecodedEnum decode(@NotNull DecodeContext<T_Encoded> context) throws DecodeException {
 		if (context.input.isEmpty()) return null;
 		//note: check ordinal first, as some ops will implicitly convert numbers to strings.
-		AbstractNumberData<T_Encoded> ordinal = context.input.tryAsNumber();
+		AbstractNumberData ordinal = context.input.tryAsNumber();
 		if (ordinal != null) {
 			int actualOrdinal = ordinal.intValue();
 			int length = this.valueArray.length;
@@ -54,7 +54,7 @@ public class EnumCoder<T_DecodedEnum extends Enum<T_DecodedEnum>> extends NamedC
 				throw new DecodeException(() -> "Ordinal out of bounds: " + ordinal + " (there are only " + length + " enums to choose from)");
 			}
 		}
-		StringData<T_Encoded> name = context.input.tryAsString();
+		StringData name = context.input.tryAsString();
 		if (name != null) {
 			T_DecodedEnum value = this.valueMap.get(name.value);
 			if (value != null) return value;
@@ -64,7 +64,7 @@ public class EnumCoder<T_DecodedEnum extends Enum<T_DecodedEnum>> extends NamedC
 	}
 
 	@Override
-	public <T_Encoded> @NotNull Data<T_Encoded> encode(@NotNull EncodeContext<T_Encoded, T_DecodedEnum> context) throws EncodeException {
+	public <T_Encoded> @NotNull Data encode(@NotNull EncodeContext<T_Encoded, T_DecodedEnum> context) throws EncodeException {
 		if (context.object == null) return context.empty();
 		return (
 			context.isCompressed()

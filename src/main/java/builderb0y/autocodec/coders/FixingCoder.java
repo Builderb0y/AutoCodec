@@ -44,7 +44,7 @@ public class FixingCoder<T_Decoded> extends NamedCoder<T_Decoded> {
 
 	@Override
 	@OverrideOnly
-	public <T_Encoded> @NotNull Data<T_Encoded> encode(@NotNull EncodeContext<T_Encoded, T_Decoded> context) throws EncodeException {
+	public <T_Encoded> @NotNull Data encode(@NotNull EncodeContext<T_Encoded, T_Decoded> context) throws EncodeException {
 		return new DataAppendContext<>(context, context.encodeWith(this.coder)).appendDataWith(this.fixer).data;
 	}
 

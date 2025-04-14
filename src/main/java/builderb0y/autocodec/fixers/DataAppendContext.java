@@ -12,14 +12,14 @@ import builderb0y.autocodec.data.DataWriter;
 import builderb0y.autocodec.encoders.EncodeContext;
 import builderb0y.autocodec.encoders.EncodeException;
 
-public class DataAppendContext<T_Encoded, T_Decoded> extends EncodeContext<T_Encoded, T_Decoded> implements DataWriter<T_Encoded, DataAppendException> {
+public class DataAppendContext<T_Encoded, T_Decoded> extends EncodeContext<T_Encoded, T_Decoded> implements DataWriter<DataAppendException> {
 
-	public /* non-final */ @NotNull Data<T_Encoded> data;
+	public /* non-final */ @NotNull Data data;
 
 	public DataAppendContext(
 		@NotNull AutoCodec codec,
 		@Nullable T_Decoded object,
-		@NotNull Data<T_Encoded> data,
+		@NotNull Data data,
 		@NotNull DynamicOps<T_Encoded> ops
 	) {
 		super(codec, object, ops);
@@ -28,13 +28,13 @@ public class DataAppendContext<T_Encoded, T_Decoded> extends EncodeContext<T_Enc
 
 	public DataAppendContext(
 		@NotNull EncodeContext<T_Encoded, T_Decoded> encodeContext,
-		@NotNull Data<T_Encoded> data
+		@NotNull Data data
 	) {
 		this(encodeContext.autoCodec, encodeContext.object, data, encodeContext.ops);
 	}
 
 	@Override
-	public @NotNull Data<T_Encoded> data() {
+	public @NotNull Data data() {
 		return this.data;
 	}
 
@@ -43,7 +43,7 @@ public class DataAppendContext<T_Encoded, T_Decoded> extends EncodeContext<T_Enc
 		return new DataAppendException(() -> "Not a " + type + ": " + this.data);
 	}
 
-	public @NotNull DataAppendContext<T_Encoded, T_Decoded> input(@NotNull Data<T_Encoded> data) {
+	public @NotNull DataAppendContext<T_Encoded, T_Decoded> input(@NotNull Data data) {
 		return new DataAppendContext<>(this, data);
 	}
 
@@ -54,15 +54,15 @@ public class DataAppendContext<T_Encoded, T_Decoded> extends EncodeContext<T_Enc
 
 	@Override
 	public @NotNull DataAppendContext<T_Encoded, T_Decoded> getMember(@NotNull String key) throws DataAppendException {
-		Data<T_Encoded> member = this.forceAsMap().value.get(this.createString(key));
+		Data member = this.forceAsMap().value.get(this.createString(key));
 		return this.input(member != null ? member : this.empty());
 	}
 
 	@Override
 	public @NotNull Iterable<@NotNull DataAppendContext<T_Encoded, T_Decoded>> listIterable() throws DataAppendException {
-		List<Data<T_Encoded>> list = this.forceAsList().value;
+		List<Data> list = this.forceAsList().value;
 		return () -> {
-			ListIterator<Data<T_Encoded>> iterator = list.listIterator();
+			ListIterator<Data> iterator = list.listIterator();
 			return new Iterator<>() {
 
 				@Override
@@ -80,9 +80,9 @@ public class DataAppendContext<T_Encoded, T_Decoded> extends EncodeContext<T_Enc
 
 	@Override
 	public @NotNull Iterable<? extends Map.Entry<@NotNull DataAppendContext<T_Encoded, T_Decoded>, @NotNull DataAppendContext<T_Encoded, T_Decoded>>> mapIterable() throws DataAppendException {
-		Set<Map.Entry<Data<T_Encoded>, Data<T_Encoded>>> entrySet = this.forceAsMap().value.entrySet();
+		Set<Map.Entry<Data, Data>> entrySet = this.forceAsMap().value.entrySet();
 		return () -> {
-			Iterator<Map.Entry<Data<T_Encoded>, Data<T_Encoded>>> iterator = entrySet.iterator();
+			Iterator<Map.Entry<Data, Data>> iterator = entrySet.iterator();
 			return new Iterator<>() {
 
 				@Override
@@ -92,7 +92,7 @@ public class DataAppendContext<T_Encoded, T_Decoded> extends EncodeContext<T_Enc
 
 				@Override
 				public Map.Entry<DataAppendContext<T_Encoded, T_Decoded>, DataAppendContext<T_Encoded, T_Decoded>> next() {
-					Map.Entry<Data<T_Encoded>, Data<T_Encoded>> next = iterator.next();
+					Map.Entry<Data, Data> next = iterator.next();
 					return Map.entry(
 						DataAppendContext.this.input(next.getKey()),
 						DataAppendContext.this.input(next.getValue())

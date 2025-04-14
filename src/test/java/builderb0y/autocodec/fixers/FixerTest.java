@@ -59,7 +59,7 @@ public class FixerTest {
 
 			public <T_Encoded> void fixV0(DataFixContext<T_Encoded> context) throws DataFixException {
 				for (String search : new String[] { "foo", "bar" }) {
-					Data<T_Encoded> removed = context.removeMember(search);
+					Data removed = context.removeMember(search);
 					if (!removed.isEmpty()) {
 						int value = context.input(search, removed).forceAsInt();
 						context.putString("type", search);

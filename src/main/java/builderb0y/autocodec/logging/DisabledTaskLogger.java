@@ -65,7 +65,7 @@ public class DisabledTaskLogger extends TaskLogger {
 	//////////////// handlers ////////////////
 
 	@Override
-	public <T_Encoded, T_Decoded> @NotNull Data<T_Encoded> encode(@NotNull AutoEncoder<T_Decoded> encoder, @NotNull EncodeContext<T_Encoded, T_Decoded> context) throws EncodeException {
+	public <T_Encoded, T_Decoded> @NotNull Data encode(@NotNull AutoEncoder<T_Decoded> encoder, @NotNull EncodeContext<T_Encoded, T_Decoded> context) throws EncodeException {
 		return encoder.encode(context);
 	}
 

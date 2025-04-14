@@ -34,7 +34,7 @@ public class CollectionImprinter<T_Element, T_Collection extends Collection<T_El
 	@OverrideOnly
 	public <T_Encoded> void imprint(@NotNull ImprintContext<T_Encoded, T_Collection> context) throws ImprintException {
 		try {
-			ListData<T_Encoded> array = context.forceAsListMaybeSingleton(this.singleton);
+			ListData array = context.forceAsListMaybeSingleton(this.singleton);
 			for (int index = 0, size = array.value.size(); index < size; index++) {
 				context.object.add(context.input(index, array.value.get(index)).decodeWith(this.elementDecoder));
 			}

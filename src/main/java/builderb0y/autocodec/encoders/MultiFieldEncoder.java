@@ -39,9 +39,9 @@ public class MultiFieldEncoder<T_Decoded> extends NamedEncoder<T_Decoded> {
 
 	@Override
 	@OverrideOnly
-	public <T_Encoded> @NotNull Data<T_Encoded> encode(@NotNull EncodeContext<T_Encoded, T_Decoded> context) throws EncodeException {
+	public <T_Encoded> @NotNull Data encode(@NotNull EncodeContext<T_Encoded, T_Decoded> context) throws EncodeException {
 		if (context.object == null) return context.empty();
-		Object2ObjectMap<Data<T_Encoded>, Data<T_Encoded>> map = new Object2ObjectLinkedOpenHashMap<>(this.fields.length);
+		Object2ObjectMap<Data, Data> map = new Object2ObjectLinkedOpenHashMap<>(this.fields.length);
 		for (FieldStrategy<T_Decoded, ?> field : this.fields) {
 			field.encodeOnto(context, map);
 		}
@@ -105,9 +105,9 @@ public class MultiFieldEncoder<T_Decoded> extends NamedEncoder<T_Decoded> {
 				return context.decodeWith(this.coder);
 			}
 			else {
-				MapData<T_Encoded> map = context.forceAsMap();
+				MapData map = context.forceAsMap();
 				for (String alias : this.field.getAliases()) {
-					Data<T_Encoded> member = map.value.get(context.createString(alias));
+					Data member = map.value.get(context.createString(alias));
 					if (member != null) return context.input(alias, member).decodeWith(this.coder);
 				}
 				return context.input(context.empty()).decodeWith(this.coder);
@@ -116,18 +116,18 @@ public class MultiFieldEncoder<T_Decoded> extends NamedEncoder<T_Decoded> {
 
 		public <T_Encoded> void encodeOnto(
 			@NotNull EncodeContext<T_Encoded, T_Record> context,
-			@NotNull Map<@NotNull Data<T_Encoded>, @NotNull Data<T_Encoded>> map
+			@NotNull Map<@NotNull Data, @NotNull Data> map
 		)
 		throws EncodeException {
 			T_Member member = this.getter.get(context.object);
 			if (member == null) return;
 			EncodeContext<T_Encoded, T_Member> memberContext = context.object(member);
-			Data<T_Encoded> encodedMember = memberContext.encodeWith(this.coder);
+			Data encodedMember = memberContext.encodeWith(this.coder);
 			if (!Objects.equals(encodedMember, context.ops.empty())) {
 				if (this.inline) {
-					MapData<T_Encoded> newMap = encodedMember.tryAsMap();
+					MapData newMap = encodedMember.tryAsMap();
 					if (newMap == null) throw new EncodeException(() -> member + " was annotated as @EncodeInline, but encodes into a value which is not a map: " + encodedMember);
-					for (Map.Entry<Data<T_Encoded>, Data<T_Encoded>> entry : newMap.value.entrySet()) {
+					for (Map.Entry<Data, Data> entry : newMap.value.entrySet()) {
 						if (map.putIfAbsent(entry.getKey(), entry.getValue()) != null) {
 							throw new EncodeException(() -> entry.getKey() + " is a field used for more than one object!");
 						}

@@ -35,7 +35,7 @@ public class VerifyingCoder<T_Decoded> extends NamedCoder<T_Decoded> {
 	}
 
 	@Override
-	public <T_Encoded> @NotNull Data<T_Encoded> encode(@NotNull EncodeContext<T_Encoded, T_Decoded> context) throws EncodeException {
+	public <T_Encoded> @NotNull Data encode(@NotNull EncodeContext<T_Encoded, T_Decoded> context) throws EncodeException {
 		return context.encodeWith(this.coder);
 	}
 

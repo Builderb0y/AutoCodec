@@ -78,7 +78,7 @@ implements AutoCoder<T_Decoded> {
 	public <T_Encoded> @Nullable T_Decoded decode(@NotNull DecodeContext<T_Encoded> context) throws DecodeException {
 		if (context.isEmpty() && !this.nullSafe) return null;
 		return context.logger().unwrapLazy(
-			this.codec.parse(context.ops, context.input.encode()),
+			this.codec.parse(context.ops, context.input.convert(context.ops)),
 			this.allowPartial,
 			DecodeException::new
 		);
@@ -86,9 +86,10 @@ implements AutoCoder<T_Decoded> {
 
 	@Override
 	@OverrideOnly
-	public <T_Encoded> @NotNull Data<T_Encoded> encode(@NotNull EncodeContext<T_Encoded, T_Decoded> context) throws EncodeException {
+	public <T_Encoded> @NotNull Data encode(@NotNull EncodeContext<T_Encoded, T_Decoded> context) throws EncodeException {
 		if (context.object == null && !this.nullSafe) return context.empty();
 		return context.createUnknown(
+			context.ops,
 			context.logger().unwrapLazy(
 				this.codec.encodeStart(context.ops, context.object),
 				this.allowPartial,

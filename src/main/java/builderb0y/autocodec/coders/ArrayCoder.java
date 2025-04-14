@@ -45,7 +45,7 @@ public class ArrayCoder<T_DecodedElement, T_DecodedArray> extends NamedCoder<T_D
 	@OverrideOnly
 	public <T_Encoded> @Nullable T_DecodedArray decode(@NotNull DecodeContext<T_Encoded> context) throws DecodeException {
 		if (context.isEmpty()) return null;
-		ListData<T_Encoded> from = context.forceAsListMaybeSingleton(this.singleton);
+		ListData from = context.forceAsListMaybeSingleton(this.singleton);
 		int length = from.value.size();
 		T_DecodedArray to = this.arrayFactory.apply(length);
 		for (int index = 0; index < length; index++) {
@@ -57,7 +57,7 @@ public class ArrayCoder<T_DecodedElement, T_DecodedArray> extends NamedCoder<T_D
 	@Override
 	@OverrideOnly
 	@SuppressWarnings("unchecked")
-	public <T_Encoded> @NotNull Data<T_Encoded> encode(@NotNull EncodeContext<T_Encoded, T_DecodedArray> context) throws EncodeException {
+	public <T_Encoded> @NotNull Data encode(@NotNull EncodeContext<T_Encoded, T_DecodedArray> context) throws EncodeException {
 		T_DecodedArray from = context.object;
 		if (from == null) return context.empty();
 		int length = Array.getLength(from);
@@ -65,7 +65,7 @@ public class ArrayCoder<T_DecodedElement, T_DecodedArray> extends NamedCoder<T_D
 			T_DecodedElement decodedElement = (T_DecodedElement)(Array.get(from, 0));
 			return context.object(decodedElement).encodeWith(this.elementCoder);
 		}
-		List<Data<T_Encoded>> to = new ArrayList<>(length);
+		List<Data> to = new ArrayList<>(length);
 		for (int index = 0; index < length; index++) {
 			T_DecodedElement decodedElement = (T_DecodedElement)(Array.get(from, index));
 			to.add(context.object(decodedElement).encodeWith(this.elementCoder));

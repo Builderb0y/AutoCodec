@@ -31,9 +31,8 @@ public record DefaultSpec(
 	boolean alwaysEncode
 ) {
 
-	@SuppressWarnings("unchecked")
-	public <T_Encoded> Data<T_Encoded> getEncodedDefaultValue(@NotNull DynamicOpsContext<T_Encoded> context) throws Exception {
-		if (this.mode == DefaultMode.ENCODED) return (Data<T_Encoded>)(this.getter.get(context));
+	public <T_Encoded> Data getEncodedDefaultValue(@NotNull DynamicOpsContext<T_Encoded> context) throws Exception {
+		if (this.mode == DefaultMode.ENCODED) return (Data)(this.getter.get(context));
 		else throw new IllegalStateException("requested encoded value from non-encoded DefaultSpec");
 	}
 
@@ -205,13 +204,9 @@ public record DefaultSpec(
 											TypeVariable<?>[] typeParameters = actualMethod.getTypeParameters();
 											if (typeParameters.length != 1) return false;
 											TypeVariable<?> t_encoded = typeParameters[0];
-											Type[] returnParameters;
 											if (
 												//check return type.
-												actualMethod.getGenericReturnType() instanceof ParameterizedType parameterizedReturn &&
-												parameterizedReturn.getRawType() == Data.class &&
-												(returnParameters = parameterizedReturn.getActualTypeArguments()).length == 1 &&
-												returnParameters[0].equals(t_encoded) &&
+												actualMethod.getReturnType() == Data.class &&
 
 												//check parameter type.
 												actualMethod.getGenericParameterTypes()[0] instanceof ParameterizedType parameterized &&

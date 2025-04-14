@@ -42,8 +42,8 @@ public abstract class VersionedFixer<T_Decoded> extends NamedFixer<T_Decoded> {
 	@Override
 	@OverrideOnly
 	public <T_Encoded> @NotNull DataFixContext<T_Encoded> fixData(@NotNull DataFixContext<T_Encoded> context) throws DataFixException {
-		MapData<T_Encoded> map = context.forceAsMap();
-		Data<T_Encoded> versionData = map.value.remove(context.createString(this.versionKey));
+		MapData map = context.forceAsMap();
+		Data versionData = map.value.remove(context.createString(this.versionKey));
 		if (versionData == null) throw new DataFixException(() -> "Missing version!");
 		return this.fixData(context, context.input(this.versionKey, versionData).forceAsInt());
 	}

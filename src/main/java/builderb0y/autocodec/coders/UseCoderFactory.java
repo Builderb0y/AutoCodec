@@ -46,10 +46,9 @@ public class UseCoderFactory extends UseHandlerFactory0<AutoCoder<?>> implements
 
 			@Override
 			@OverrideOnly
-			@SuppressWarnings("unchecked")
-			public <T_Encoded> @NotNull Data<T_Encoded> encode(@NotNull EncodeContext<T_Encoded, Object> context) throws EncodeException {
+			public <T_Encoded> @NotNull Data encode(@NotNull EncodeContext<T_Encoded, Object> context) throws EncodeException {
 				try {
-					return (Data<T_Encoded>)(encoderHandle.invokeExact(context));
+					return (Data)(encoderHandle.invokeExact(context));
 				}
 				catch (EncodeException | Error normal) {
 					throw normal;

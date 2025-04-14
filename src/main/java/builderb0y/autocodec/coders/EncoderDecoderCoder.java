@@ -38,7 +38,7 @@ public record EncoderDecoderCoder<T_Decoded>(@NotNull AutoEncoder<T_Decoded> enc
 
 	@Override
 	@OverrideOnly
-	public <T_Encoded> @NotNull Data<T_Encoded> encode(@NotNull EncodeContext<T_Encoded, T_Decoded> context) throws EncodeException {
+	public <T_Encoded> @NotNull Data encode(@NotNull EncodeContext<T_Encoded, T_Decoded> context) throws EncodeException {
 		return context.encodeWith(this.encoder);
 	}
 

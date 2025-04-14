@@ -5,22 +5,19 @@ import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import org.jetbrains.annotations.NotNull;
 
-public class IntListData<T_Encoded> extends Data<T_Encoded> {
+public class IntListData extends Data {
 
 	public @NotNull IntList value;
 
-	public IntListData(@NotNull DynamicOps<T_Encoded> ops) {
-		super(ops);
+	public IntListData() {
 		this.value = new IntArrayList();
 	}
 
-	public IntListData(@NotNull DynamicOps<T_Encoded> ops, int capacity) {
-		super(ops);
+	public IntListData(int capacity) {
 		this.value = new IntArrayList(capacity);
 	}
 
-	public IntListData(@NotNull DynamicOps<T_Encoded> ops, @NotNull IntList value) {
-		super(ops);
+	public IntListData(@NotNull IntList value) {
 		this.value = value;
 	}
 
@@ -51,8 +48,8 @@ public class IntListData<T_Encoded> extends Data<T_Encoded> {
 
 	@Override
 	public boolean equals(Object object) {
-		IntListData<?> intList;
-		return object instanceof IntListData<?> data && (intList = data.tryAsIntList()) != null && this.value.equals(intList.value);
+		IntListData intList;
+		return object instanceof IntListData data && (intList = data.tryAsIntList()) != null && this.value.equals(intList.value);
 	}
 
 	@Override
@@ -66,7 +63,7 @@ public class IntListData<T_Encoded> extends Data<T_Encoded> {
 	}
 
 	@Override
-	public @NotNull Data<T_Encoded> deepCopy() {
-		return new IntListData<>(this.ops, new IntArrayList(this.value));
+	public @NotNull Data deepCopy() {
+		return new IntListData(new IntArrayList(this.value));
 	}
 }

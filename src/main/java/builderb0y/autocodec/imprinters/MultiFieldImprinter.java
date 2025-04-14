@@ -162,10 +162,10 @@ public class MultiFieldImprinter<T_Decoded> extends NamedImprinter<T_Decoded> {
 		@OverrideOnly
 		public <T_Encoded> void imprint(@NotNull ImprintContext<T_Encoded, T_Owner> context) throws ImprintException {
 			try {
-				MapData<T_Encoded> map = context.tryAsMap();
+				MapData map = context.tryAsMap();
 				if (map != null) {
 					for (String alias : this.field.getAliases()) {
-						Data<T_Encoded> member = map.value.get(context.createString(alias));
+						Data member = map.value.get(context.createString(alias));
 						if (member != null) {
 							T_Member decodedMember = context.input(alias, member).decodeWith(this.coder);
 							if (decodedMember != null) {
@@ -257,15 +257,13 @@ public class MultiFieldImprinter<T_Decoded> extends NamedImprinter<T_Decoded> {
 		public <T_Encoded> void imprint(@NotNull ImprintContext<T_Encoded, T_Owner> context) throws ImprintException {
 			T_Member object = this.reader.get(context.object);
 			if (object != null) {
-				MapData<T_Encoded> map = context.tryAsMap();
+				MapData map = context.tryAsMap();
 				if (map != null) {
-					if (object != null) {
-						for (String alias : this.field.getAliases()) {
-							Data<T_Encoded> member = map.value.get(context.createString(alias));
-							if (member != null) {
-								context.input(alias, member).imprintWith(this.imprinter, object);
-								return;
-							}
+					for (String alias : this.field.getAliases()) {
+						Data member = map.value.get(context.createString(alias));
+						if (member != null) {
+							context.input(alias, member).imprintWith(this.imprinter, object);
+							return;
 						}
 					}
 				}

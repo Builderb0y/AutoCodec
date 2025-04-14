@@ -53,12 +53,12 @@ public class DefaultCoder<T_Decoded> extends NamedCoder<T_Decoded> {
 
 	@Override
 	@OverrideOnly
-	public <T_Encoded> @NotNull Data<T_Encoded> encode(@NotNull EncodeContext<T_Encoded, T_Decoded> context) throws EncodeException {
+	public <T_Encoded> @NotNull Data encode(@NotNull EncodeContext<T_Encoded, T_Decoded> context) throws EncodeException {
 		try {
 			if (!this.spec.alwaysEncode()) {
 				switch (this.spec.mode()) {
 					case ENCODED -> {
-						Data<T_Encoded> encoded = context.encodeWith(this.fallback);
+						Data encoded = context.encodeWith(this.fallback);
 						if (Objects.equals(this.spec.getEncodedDefaultValue(context), encoded)) {
 							encoded = context.empty();
 						}

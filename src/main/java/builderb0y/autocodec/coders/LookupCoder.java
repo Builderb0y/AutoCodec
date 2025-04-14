@@ -82,7 +82,7 @@ public class LookupCoder<T_Key, T_Value> extends NamedCoder<T_Value> {
 	}
 
 	@Override
-	public <T_Encoded> @NotNull Data<T_Encoded> encode(@NotNull EncodeContext<T_Encoded, T_Value> context) throws EncodeException {
+	public <T_Encoded> @NotNull Data encode(@NotNull EncodeContext<T_Encoded, T_Value> context) throws EncodeException {
 		T_Value object = context.object;
 		if (object == null) return context.empty();
 		T_Key key = this.encode.get(object);

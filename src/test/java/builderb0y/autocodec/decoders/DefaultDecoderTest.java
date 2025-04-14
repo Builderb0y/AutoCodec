@@ -80,7 +80,7 @@ public class DefaultDecoderTest {
 			return DEFAULT;
 		}
 
-		public static <T_Encoded> Data<T_Encoded> getDefaultEncoded(DynamicOpsContext<T_Encoded> context) {
+		public static <T_Encoded> Data getDefaultEncoded(DynamicOpsContext<T_Encoded> context) {
 			return context.createMap(Object2ObjectMaps.singleton(context.createString("value"), context.createString("")));
 		}
 

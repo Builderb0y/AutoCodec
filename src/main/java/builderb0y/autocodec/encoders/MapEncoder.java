@@ -30,7 +30,7 @@ public class MapEncoder<T_Key, T_Value, T_Map extends Map<T_Key, T_Value>> exten
 
 	@Override
 	@OverrideOnly
-	public <T_Encoded> @NotNull Data<T_Encoded> encode(@NotNull EncodeContext<T_Encoded, T_Map> context) throws EncodeException {
+	public <T_Encoded> @NotNull Data encode(@NotNull EncodeContext<T_Encoded, T_Map> context) throws EncodeException {
 		T_Map object = context.object;
 		if (object == null) return context.empty();
 		return context.createMap(

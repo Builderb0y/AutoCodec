@@ -1,13 +1,8 @@
 package builderb0y.autocodec.data;
 
-import com.mojang.serialization.DynamicOps;
 import org.jetbrains.annotations.NotNull;
 
-public abstract class AbstractNumberData<T_Encoded> extends Data<T_Encoded> {
-
-	public AbstractNumberData(@NotNull DynamicOps<T_Encoded> ops) {
-		super(ops);
-	}
+public abstract class AbstractNumberData extends Data {
 
 	public abstract @NotNull Number numberValue();
 
@@ -26,5 +21,5 @@ public abstract class AbstractNumberData<T_Encoded> extends Data<T_Encoded> {
 	public abstract void set(double value);
 
 	@Override
-	public abstract @NotNull AbstractNumberData<T_Encoded> deepCopy();
+	public abstract @NotNull AbstractNumberData deepCopy();
 }

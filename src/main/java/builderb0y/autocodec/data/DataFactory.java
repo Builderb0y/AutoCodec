@@ -19,111 +19,105 @@ import org.jetbrains.annotations.NotNull;
 
 import builderb0y.autocodec.util.AutoCodecUtil;
 
-public interface DataFactory<T_Encoded> {
+public interface DataFactory {
 
-	public static <T_Encoded> @NotNull DataFactory<T_Encoded> forOps(@NotNull DynamicOps<T_Encoded> ops) {
-		return () -> ops;
+	public default @NotNull EmptyData empty() {
+		return EmptyData.INSTANCE;
 	}
 
-	public abstract @NotNull DynamicOps<T_Encoded> ops();
-
-	public default @NotNull EmptyData<T_Encoded> empty() {
-		return EmptyData.forOps(this.ops());
+	public default @NotNull BooleanData createBoolean(boolean value) {
+		return new BooleanData(value);
 	}
 
-	public default @NotNull BooleanData<T_Encoded> createBoolean(boolean value) {
-		return new BooleanData<>(this.ops(), value);
+	public default @NotNull UnknownNumberData createNumber(@NotNull Number value) {
+		return new UnknownNumberData(value);
 	}
 
-	public default @NotNull UnknownNumberData<T_Encoded> createNumber(@NotNull Number value) {
-		return new UnknownNumberData<>(this.ops(), value);
+	public default @NotNull NumberData createByte(byte value) {
+		return new NumberData(value);
 	}
 
-	public default @NotNull NumberData<T_Encoded> createByte(byte value) {
-		return new NumberData<>(this.ops(), value);
+	public default @NotNull NumberData createShort(short value) {
+		return new NumberData(value);
 	}
 
-	public default @NotNull NumberData<T_Encoded> createShort(short value) {
-		return new NumberData<>(this.ops(), value);
+	public default @NotNull NumberData createInt(int value) {
+		return new NumberData(value);
 	}
 
-	public default @NotNull NumberData<T_Encoded> createInt(int value) {
-		return new NumberData<>(this.ops(), value);
+	public default @NotNull NumberData createLong(long value) {
+		return new NumberData(value);
 	}
 
-	public default @NotNull NumberData<T_Encoded> createLong(long value) {
-		return new NumberData<>(this.ops(), value);
+	public default @NotNull NumberData createFloat(float value) {
+		return new NumberData(value);
 	}
 
-	public default @NotNull NumberData<T_Encoded> createFloat(float value) {
-		return new NumberData<>(this.ops(), value);
+	public default @NotNull NumberData createDouble(double value) {
+		return new NumberData(value);
 	}
 
-	public default @NotNull NumberData<T_Encoded> createDouble(double value) {
-		return new NumberData<>(this.ops(), value);
+	public default @NotNull StringData createString(@NotNull String value) {
+		return new StringData(value);
 	}
 
-	public default @NotNull StringData<T_Encoded> createString(@NotNull String value) {
-		return new StringData<>(this.ops(), value);
+	public default @NotNull ByteListData createByteList(@NotNull ByteList value) {
+		return new ByteListData(value);
 	}
 
-	public default @NotNull ByteListData<T_Encoded> createByteList(@NotNull ByteList value) {
-		return new ByteListData<>(this.ops(), value);
-	}
-
-	public default @NotNull ByteListData<T_Encoded> createByteList(byte @NotNull ... value) {
+	public default @NotNull ByteListData createByteList(byte @NotNull ... value) {
 		return this.createByteList(ByteArrayList.wrap(value));
 	}
 
-	public default @NotNull IntListData<T_Encoded> createIntList(@NotNull IntList value) {
-		return new IntListData<>(this.ops(), value);
+	public default @NotNull IntListData createIntList(@NotNull IntList value) {
+		return new IntListData(value);
 	}
 
-	public default @NotNull IntListData<T_Encoded> createIntList(int @NotNull ... value) {
+	public default @NotNull IntListData createIntList(int @NotNull ... value) {
 		return this.createIntList(IntArrayList.wrap(value));
 	}
 
-	public default @NotNull LongListData<T_Encoded> createLongList(@NotNull LongList value) {
-		return new LongListData<>(this.ops(), value);
+	public default @NotNull LongListData createLongList(@NotNull LongList value) {
+		return new LongListData(value);
 	}
 
-	public default @NotNull LongListData<T_Encoded> createLongList(long @NotNull ... value) {
+	public default @NotNull LongListData createLongList(long @NotNull ... value) {
 		return this.createLongList(LongArrayList.wrap(value));
 	}
 
-	public default @NotNull ListData<T_Encoded> emptyList() {
-		return new ListData<>(this.ops());
+	public default @NotNull ListData emptyList() {
+		return new ListData();
 	}
 
-	public default @NotNull ListData<T_Encoded> createList(@NotNull List<@NotNull Data<T_Encoded>> values) {
-		return new ListData<>(this.ops(), values);
+	public default @NotNull ListData createList(@NotNull List<@NotNull Data> values) {
+		return new ListData(values);
 	}
 
-	public default @NotNull ListData<T_Encoded> createList(@NotNull Stream<@NotNull Data<T_Encoded>> stream) {
-		return new ListData<>(this.ops(), stream.collect(Collectors.toCollection(ObjectArrayList::new)));
+	public default @NotNull ListData createList(@NotNull Stream<@NotNull Data> stream) {
+		return new ListData(stream.collect(Collectors.toCollection(ObjectArrayList::new)));
 	}
 
-	public default @NotNull ListData<T_Encoded> createList(@NotNull Data<T_Encoded> @NotNull ... values) {
-		return new ListData<>(this.ops(), ObjectArrayList.wrap(values));
+	public default @NotNull ListData createList(@NotNull Data @NotNull ... values) {
+		return new ListData(ObjectArrayList.wrap(values));
 	}
 
-	public default @NotNull MapData<T_Encoded> emptyMap() {
-		return new MapData<>(this.ops());
+	public default @NotNull MapData emptyMap() {
+		return new MapData();
 	}
 
-	public default @NotNull MapData<T_Encoded> createMap(@NotNull Map<@NotNull Data<T_Encoded>, @NotNull Data<T_Encoded>> map) {
-		return new MapData<>(this.ops(), map);
+	public default @NotNull MapData createMap(@NotNull Map<@NotNull Data, @NotNull Data> map) {
+		return new MapData(map);
 	}
 
-	public default <T> @NotNull MapData<T_Encoded> createMap(
+	public default <T> @NotNull MapData createMap(
 		@NotNull Stream<? extends T> stream,
-		@NotNull Function<? super T, ? extends @NotNull Data<T_Encoded>> keyExtractor,
-		@NotNull Function<? super T, ? extends @NotNull Data<T_Encoded>> valueExtractor
+		@NotNull Function<? super T, ? extends @NotNull Data> keyExtractor,
+		@NotNull Function<? super T, ? extends @NotNull Data> valueExtractor
 	) {
 		return this.createMap(stream.collect(AutoCodecUtil.collectToMap(keyExtractor, valueExtractor, Object2ObjectLinkedOpenHashMap::new)));
 	}
 
-	public default @NotNull UnknownData<T_Encoded> createUnknown(@NotNull T_Encoded payload) {
-		return new UnknownData<>(this.ops(), payload);
+	public default <T_Encoded> @NotNull UnknownData<T_Encoded> createUnknown(@NotNull DynamicOps<T_Encoded> ops, @NotNull T_Encoded payload) {
+		return new UnknownData<>(ops, payload);
 	}
 }

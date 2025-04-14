@@ -2,19 +2,13 @@ package builderb0y.autocodec.data;
 
 import java.util.Map;
 
-import com.mojang.serialization.DynamicOps;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface DataReader<T_Encoded, T_Exception extends Exception> extends DataFactory<T_Encoded> {
+public interface DataReader<T_Exception extends Exception> extends DataFactory {
 
-	@Override
-	public default @NotNull DynamicOps<T_Encoded> ops() {
-		return this.data().ops;
-	}
-
-	public abstract @NotNull Data<T_Encoded> data();
+	public abstract @NotNull Data data();
 
 	public abstract @NotNull T_Exception notA(@NotNull String type);
 
@@ -28,28 +22,28 @@ public interface DataReader<T_Encoded, T_Exception extends Exception> extends Da
 	public default boolean isList    () { return this.data().isList    (); }
 	public default boolean isMap     () { return this.data().isMap     (); }
 
-	public default @Nullable        BooleanData<T_Encoded> tryAsBoolean () { return this.data().tryAsBoolean (); }
-	public default @Nullable AbstractNumberData<T_Encoded> tryAsNumber  () { return this.data().tryAsNumber  (); }
-	public default @Nullable         StringData<T_Encoded> tryAsString  () { return this.data().tryAsString  (); }
-	public default @Nullable       ByteListData<T_Encoded> tryAsByteList() { return this.data().tryAsByteList(); }
-	public default @Nullable        IntListData<T_Encoded> tryAsIntList () { return this.data().tryAsIntList (); }
-	public default @Nullable       LongListData<T_Encoded> tryAsLongList() { return this.data().tryAsLongList(); }
-	public default @Nullable           ListData<T_Encoded> tryAsList    () { return this.data().tryAsList    (); }
-	public default @Nullable            MapData<T_Encoded> tryAsMap     () { return this.data().tryAsMap     (); }
+	public default @Nullable        BooleanData tryAsBoolean () { return this.data().tryAsBoolean (); }
+	public default @Nullable AbstractNumberData tryAsNumber  () { return this.data().tryAsNumber  (); }
+	public default @Nullable         StringData tryAsString  () { return this.data().tryAsString  (); }
+	public default @Nullable       ByteListData tryAsByteList() { return this.data().tryAsByteList(); }
+	public default @Nullable        IntListData tryAsIntList () { return this.data().tryAsIntList (); }
+	public default @Nullable       LongListData tryAsLongList() { return this.data().tryAsLongList(); }
+	public default @Nullable           ListData tryAsList    () { return this.data().tryAsList    (); }
+	public default @Nullable            MapData tryAsMap     () { return this.data().tryAsMap     (); }
 
-	public default @NotNull ListData<T_Encoded> asListOrSingleton() {
-		ListData<T_Encoded> list = this.tryAsList();
+	public default @NotNull ListData asListOrSingleton() {
+		ListData list = this.tryAsList();
 		if (list == null) list = this.createList(this.data());
 		return list;
 	}
 
 	@Contract("true -> !null")
-	public default @Nullable ListData<T_Encoded> tryAsListMaybeSingleton(boolean singleton) {
+	public default @Nullable ListData tryAsListMaybeSingleton(boolean singleton) {
 		return singleton ? this.asListOrSingleton() : this.tryAsList();
 	}
 
-	public default @NotNull ListData<T_Encoded> forceAsListMaybeSingleton(boolean singleton) throws T_Exception {
-		ListData<T_Encoded> list = this.tryAsList();
+	public default @NotNull ListData forceAsListMaybeSingleton(boolean singleton) throws T_Exception {
+		ListData list = this.tryAsList();
 		if (list == null) {
 			if (singleton) list = this.createList(this.data());
 			else throw this.notA("list");
@@ -57,50 +51,50 @@ public interface DataReader<T_Encoded, T_Exception extends Exception> extends Da
 		return list;
 	}
 
-	public default @NotNull BooleanData<T_Encoded> forceAsBoolean() throws T_Exception {
-		BooleanData<T_Encoded> data = this.tryAsBoolean();
+	public default @NotNull BooleanData forceAsBoolean() throws T_Exception {
+		BooleanData data = this.tryAsBoolean();
 		if (data != null) return data;
 		else throw this.notA("boolean");
 	}
 
-	public default @NotNull AbstractNumberData<T_Encoded> forceAsNumber() throws T_Exception {
-		AbstractNumberData<T_Encoded> data = this.tryAsNumber();
+	public default @NotNull AbstractNumberData forceAsNumber() throws T_Exception {
+		AbstractNumberData data = this.tryAsNumber();
 		if (data != null) return data;
 		else throw this.notA("number");
 	}
 
-	public default @NotNull StringData<T_Encoded> forceAsString() throws T_Exception {
-		StringData<T_Encoded> data = this.tryAsString();
+	public default @NotNull StringData forceAsString() throws T_Exception {
+		StringData data = this.tryAsString();
 		if (data != null) return data;
 		else throw this.notA("string");
 	}
 
-	public default @NotNull ByteListData<T_Encoded> forceAsByteList() throws T_Exception {
-		ByteListData<T_Encoded> data = this.tryAsByteList();
+	public default @NotNull ByteListData forceAsByteList() throws T_Exception {
+		ByteListData data = this.tryAsByteList();
 		if (data != null) return data;
 		else throw this.notA("byte list");
 	}
 
-	public default @NotNull IntListData<T_Encoded> forceAsIntList() throws T_Exception {
-		IntListData<T_Encoded> data = this.tryAsIntList();
+	public default @NotNull IntListData forceAsIntList() throws T_Exception {
+		IntListData data = this.tryAsIntList();
 		if (data != null) return data;
 		else throw this.notA("int list");
 	}
 
-	public default @NotNull LongListData<T_Encoded> forceAsLongList() throws T_Exception {
-		LongListData<T_Encoded> data = this.tryAsLongList();
+	public default @NotNull LongListData forceAsLongList() throws T_Exception {
+		LongListData data = this.tryAsLongList();
 		if (data != null) return data;
 		else throw this.notA("long list");
 	}
 
-	public default @NotNull ListData<T_Encoded> forceAsList() throws T_Exception {
-		ListData<T_Encoded> data = this.tryAsList();
+	public default @NotNull ListData forceAsList() throws T_Exception {
+		ListData data = this.tryAsList();
 		if (data != null) return data;
 		else throw this.notA("list");
 	}
 
-	public default @NotNull MapData<T_Encoded> forceAsMap() throws T_Exception {
-		MapData<T_Encoded> data = this.tryAsMap();
+	public default @NotNull MapData forceAsMap() throws T_Exception {
+		MapData data = this.tryAsMap();
 		if (data != null) return data;
 		else throw this.notA("map");
 	}
@@ -141,11 +135,11 @@ public interface DataReader<T_Encoded, T_Exception extends Exception> extends Da
 		return this.forceAsLongList().value.getLong(index);
 	}
 
-	public abstract @NotNull DataReader<T_Encoded, T_Exception> getElement(int index) throws T_Exception;
+	public abstract @NotNull DataReader<T_Exception> getElement(int index) throws T_Exception;
 
-	public abstract @NotNull DataReader<T_Encoded, T_Exception> getMember(@NotNull String key) throws T_Exception;
+	public abstract @NotNull DataReader<T_Exception> getMember(@NotNull String key) throws T_Exception;
 
-	public abstract @NotNull Iterable<? extends @NotNull DataReader<T_Encoded, T_Exception>> listIterable() throws T_Exception;
+	public abstract @NotNull Iterable<? extends @NotNull DataReader<T_Exception>> listIterable() throws T_Exception;
 
-	public abstract @NotNull Iterable<? extends Map.@NotNull Entry<? extends @NotNull DataReader<T_Encoded, T_Exception>, ? extends @NotNull DataReader<T_Encoded, T_Exception>>> mapIterable() throws T_Exception;
+	public abstract @NotNull Iterable<? extends Map.@NotNull Entry<? extends @NotNull DataReader<T_Exception>, ? extends @NotNull DataReader<T_Exception>>> mapIterable() throws T_Exception;
 }

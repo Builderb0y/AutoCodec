@@ -24,7 +24,7 @@ extends AbstractDecodeContext<
 		@NotNull AutoCodec autoCodec,
 		@Nullable AbstractDecodeContext<T_Encoded, ?, ?> parent,
 		@NotNull DecodePath path,
-		@NotNull Data<T_Encoded> input,
+		@NotNull Data input,
 		@NotNull DynamicOps<T_Encoded> ops
 	) {
 		super(autoCodec, parent, path, input, ops);
@@ -38,7 +38,7 @@ extends AbstractDecodeContext<
 	public @NotNull DecodeContext<T_Encoded> newContext(
 		@Nullable AbstractDecodeContext<T_Encoded, ?, ?> parent,
 		@NotNull DecodePath path,
-		@NotNull Data<T_Encoded> input
+		@NotNull Data input
 	) {
 		return new DecodeContext<>(this.autoCodec, parent, path, input, this.ops);
 	}

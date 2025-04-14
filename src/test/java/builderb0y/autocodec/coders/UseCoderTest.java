@@ -75,7 +75,7 @@ public class UseCoderTest {
 
 			@Override
 			@OverrideOnly
-			public <T_Encoded> Data<T_Encoded> encode(@NotNull EncodeContext<T_Encoded, Empty> context) throws EncodeException {
+			public <T_Encoded> @NotNull Data encode(@NotNull EncodeContext<T_Encoded, Empty> context) throws EncodeException {
 				actualSuccesses++;
 				return context.empty();
 			}
@@ -103,7 +103,7 @@ public class UseCoderTest {
 			return FACTORY;
 		}
 
-		public static <T_Encoded> Data<T_Encoded> code(EncodeContext<T_Encoded, Empty> context) {
+		public static <T_Encoded> Data code(EncodeContext<T_Encoded, Empty> context) {
 			return context.encodeWith(CODER);
 		}
 
@@ -119,7 +119,7 @@ public class UseCoderTest {
 
 			@Override
 			@OverrideOnly
-			public <T_Encoded> @NotNull Data<T_Encoded> encode(@NotNull EncodeContext<T_Encoded, Object> context) throws EncodeException {
+			public <T_Encoded> @NotNull Data encode(@NotNull EncodeContext<T_Encoded, Object> context) throws EncodeException {
 				actualSuccesses++;
 				return context.empty();
 			}
@@ -147,7 +147,7 @@ public class UseCoderTest {
 			return WILDCARD_FACTORY;
 		}
 
-		public static <T_Encoded> Data<?> wildcardCode(EncodeContext<T_Encoded, ?> context) {
+		public static <T_Encoded> Data wildcardCode(EncodeContext<T_Encoded, ?> context) {
 			actualSuccesses++;
 			return context.empty();
 		}

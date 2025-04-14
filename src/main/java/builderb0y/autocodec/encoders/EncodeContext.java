@@ -41,7 +41,7 @@ public class EncodeContext<T_Encoded, T_Decoded> extends DynamicOpsContext<T_Enc
 
 	//////////////// other ////////////////
 
-	public @NotNull Data<T_Encoded> encodeWith(@NotNull AutoEncoder<T_Decoded> encoder) throws EncodeException {
+	public @NotNull Data encodeWith(@NotNull AutoEncoder<T_Decoded> encoder) throws EncodeException {
 		return this.logger().encode(encoder, this);
 	}
 

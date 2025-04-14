@@ -71,7 +71,7 @@ public class WrapperCoder<T_Wrapper, T_Wrapped> extends NamedCoder<T_Wrapper> {
 
 	@Override
 	@OverrideOnly
-	public <T_Encoded> @NotNull Data<T_Encoded> encode(@NotNull EncodeContext<T_Encoded, T_Wrapper> context) throws EncodeException {
+	public <T_Encoded> @NotNull Data encode(@NotNull EncodeContext<T_Encoded, T_Wrapper> context) throws EncodeException {
 		T_Wrapper wrapper = context.object;
 		if (wrapper == null) return context.empty();
 		return context.object(this.getter.get(wrapper)).encodeWith(this.wrappedCoder);

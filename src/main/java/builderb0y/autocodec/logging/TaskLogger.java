@@ -172,15 +172,15 @@ public abstract class TaskLogger {
 
 
 
-	public <T_Encoded, T_Decoded> @NotNull Data<T_Encoded> encode(
+	public <T_Encoded, T_Decoded> @NotNull Data encode(
 		@NotNull AutoEncoder<T_Decoded> encoder,
 		@NotNull EncodeContext<T_Encoded, T_Decoded> context
 	)
 	throws EncodeException {
-		return this.runTask(new LoggableTask<Data<T_Encoded>, EncodeException>() {
+		return this.runTask(new LoggableTask<Data, EncodeException>() {
 
 			@Override
-			public @NotNull Data<T_Encoded> run() throws EncodeException {
+			public @NotNull Data run() throws EncodeException {
 				return encoder.encode(context);
 			}
 

@@ -33,7 +33,7 @@ public class MultiLineStringCoder extends NamedCoder<@MultiLine String> {
 	@Override
 	public <T_Encoded> @Nullable @MultiLine String decode(@NotNull DecodeContext<T_Encoded> context) throws DecodeException {
 		if (context.isEmpty()) return null;
-		ListData<T_Encoded> list = context.tryAsList();
+		ListData list = context.tryAsList();
 		if (list != null) {
 			StringJoiner joiner = new StringJoiner(this.lineSeparator);
 			for (int index = 0, size = list.value.size(); index < size; index++) {
@@ -47,7 +47,7 @@ public class MultiLineStringCoder extends NamedCoder<@MultiLine String> {
 	}
 
 	@Override
-	public <T_Encoded> @NotNull Data<T_Encoded> encode(@NotNull EncodeContext<T_Encoded, @MultiLine String> context) throws EncodeException {
+	public <T_Encoded> @NotNull Data encode(@NotNull EncodeContext<T_Encoded, @MultiLine String> context) throws EncodeException {
 		String string = context.object;
 		if (string == null) return context.empty();
 		int index = string.indexOf(this.lineSeparator);

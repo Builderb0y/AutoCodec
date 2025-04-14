@@ -36,7 +36,7 @@ public interface AutoEncoder<T_Decoded> extends AutoHandler, KeyHolder {
 	to encode and log what is being encoded.
 	*/
 	@OverrideOnly
-	public abstract <T_Encoded> @NotNull Data<T_Encoded> encode(@NotNull EncodeContext<T_Encoded, T_Decoded> context) throws EncodeException;
+	public abstract <T_Encoded> @NotNull Data encode(@NotNull EncodeContext<T_Encoded, T_Decoded> context) throws EncodeException;
 
 	/**
 	if this AutoEncoder encodes into an object with known keys,

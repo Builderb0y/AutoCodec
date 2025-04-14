@@ -19,51 +19,43 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import org.jetbrains.annotations.NotNull;
 
-public class ListData<T_Encoded> extends Data<T_Encoded> implements Iterable<@NotNull Data<T_Encoded>> {
+public class ListData extends Data implements Iterable<@NotNull Data> {
 
-	public @NotNull List<@NotNull Data<T_Encoded>> value;
+	public @NotNull List<@NotNull Data> value;
 
-	public ListData(@NotNull DynamicOps<T_Encoded> ops) {
-		super(ops);
+	public ListData() {
 		this.value = new ObjectArrayList<>();
 	}
 
-	public ListData(@NotNull DynamicOps<T_Encoded> ops, int capacity) {
-		super(ops);
+	public ListData(int capacity) {
 		this.value = new ObjectArrayList<>(capacity);
 	}
 
-	public ListData(@NotNull DynamicOps<T_Encoded> ops, @NotNull List<@NotNull Data<T_Encoded>> value) {
-		super(ops);
+	public ListData(@NotNull List<@NotNull Data> value) {
 		this.value = value;
 	}
 
-	public @NotNull Stream<@NotNull Data<@NotNull T_Encoded>> streamNonEmpty() {
-		return this.value.stream().filter((Data<T_Encoded> data) -> data != null && !data.isEmpty());
-	}
-
-	@Override
-	public @NotNull T_Encoded encode() {
-		return this.ops.createList(this.streamNonEmpty().map(Data<T_Encoded>::encode));
+	public @NotNull Stream<@NotNull Data> streamNonEmpty() {
+		return this.value.stream().filter((Data data) -> data != null && !data.isEmpty());
 	}
 
 	@Override
 	public <T_NewEncoded> @NotNull T_NewEncoded convert(@NotNull DynamicOps<T_NewEncoded> ops) {
-		return ops.createList(this.streamNonEmpty().map((Data<T_Encoded> element) -> element.convert(ops)));
+		return ops.createList(this.streamNonEmpty().map((Data element) -> element.convert(ops)));
 	}
 
 	@Override
-	public void forEach(Consumer<? super @NotNull Data<T_Encoded>> action) {
+	public void forEach(Consumer<? super @NotNull Data> action) {
 		this.value.forEach(action);
 	}
 
 	@Override
-	public @NotNull Iterator<@NotNull Data<T_Encoded>> iterator() {
+	public @NotNull Iterator<@NotNull Data> iterator() {
 		return this.value.iterator();
 	}
 
 	@Override
-	public Spliterator<@NotNull Data<T_Encoded>> spliterator() {
+	public Spliterator<@NotNull Data> spliterator() {
 		return this.value.spliterator();
 	}
 
@@ -71,162 +63,162 @@ public class ListData<T_Encoded> extends Data<T_Encoded> implements Iterable<@No
 		return this.value.size();
 	}
 
-	public @NotNull Data<T_Encoded> get(int index) {
+	public @NotNull Data get(int index) {
 		return this.value.get(index);
 	}
 
-	public @NotNull Data<T_Encoded> set(int index, boolean value) {
-		return this.set(index, new BooleanData<>(this.ops, value));
+	public @NotNull Data set(int index, boolean value) {
+		return this.set(index, new BooleanData(value));
 	}
 
-	public @NotNull Data<T_Encoded> set(int index, byte value) {
-		return this.set(index, new NumberData<>(this.ops, value));
+	public @NotNull Data set(int index, byte value) {
+		return this.set(index, new NumberData(value));
 	}
 
-	public @NotNull Data<T_Encoded> set(int index, short value) {
-		return this.set(index, new NumberData<>(this.ops, value));
+	public @NotNull Data set(int index, short value) {
+		return this.set(index, new NumberData(value));
 	}
 
-	public @NotNull Data<T_Encoded> set(int index, int value) {
-		return this.set(index, new NumberData<>(this.ops, value));
+	public @NotNull Data set(int index, int value) {
+		return this.set(index, new NumberData(value));
 	}
 
-	public @NotNull Data<T_Encoded> set(int index, long value) {
-		return this.set(index, new NumberData<>(this.ops, value));
+	public @NotNull Data set(int index, long value) {
+		return this.set(index, new NumberData(value));
 	}
 
-	public @NotNull Data<T_Encoded> set(int index, float value) {
-		return this.set(index, new NumberData<>(this.ops, value));
+	public @NotNull Data set(int index, float value) {
+		return this.set(index, new NumberData(value));
 	}
 
-	public @NotNull Data<T_Encoded> set(int index, double value) {
-		return this.set(index, new NumberData<>(this.ops, value));
+	public @NotNull Data set(int index, double value) {
+		return this.set(index, new NumberData(value));
 	}
 
-	public @NotNull Data<T_Encoded> set(int index, String value) {
-		return this.set(index, new StringData<>(this.ops, value));
+	public @NotNull Data set(int index, String value) {
+		return this.set(index, new StringData(value));
 	}
 
-	public @NotNull Data<T_Encoded> setByteList(int index, byte @NotNull ... value) {
-		return this.set(index, new ByteListData<>(this.ops, ByteArrayList.wrap(value)));
+	public @NotNull Data setByteList(int index, byte @NotNull ... value) {
+		return this.set(index, new ByteListData(ByteArrayList.wrap(value)));
 	}
 
-	public @NotNull Data<T_Encoded> setByteList(int index, @NotNull ByteList value) {
-		return this.set(index, new ByteListData<>(this.ops, value));
+	public @NotNull Data setByteList(int index, @NotNull ByteList value) {
+		return this.set(index, new ByteListData(value));
 	}
 
-	public @NotNull Data<T_Encoded> setIntList(int index, int @NotNull ... value) {
-		return this.set(index, new IntListData<>(this.ops, IntArrayList.wrap(value)));
+	public @NotNull Data setIntList(int index, int @NotNull ... value) {
+		return this.set(index, new IntListData(IntArrayList.wrap(value)));
 	}
 
-	public @NotNull Data<T_Encoded> setIntList(int index, @NotNull IntList value) {
-		return this.set(index, new IntListData<>(this.ops, value));
+	public @NotNull Data setIntList(int index, @NotNull IntList value) {
+		return this.set(index, new IntListData(value));
 	}
 
-	public @NotNull Data<T_Encoded> setLongList(int index, long @NotNull ... value) {
-		return this.set(index, new LongListData<>(this.ops, LongArrayList.wrap(value)));
+	public @NotNull Data setLongList(int index, long @NotNull ... value) {
+		return this.set(index, new LongListData(LongArrayList.wrap(value)));
 	}
 
-	public @NotNull Data<T_Encoded> setLongList(int index, @NotNull LongList value) {
-		return this.set(index, new LongListData<>(this.ops, value));
+	public @NotNull Data setLongList(int index, @NotNull LongList value) {
+		return this.set(index, new LongListData(value));
 	}
 
-	public @NotNull Data<T_Encoded> setList(int index, @NotNull Data<T_Encoded> @NotNull ... value) {
-		return this.set(index, new ListData<>(this.ops, ObjectArrayList.wrap(value)));
+	public @NotNull Data setList(int index, @NotNull Data @NotNull ... value) {
+		return this.set(index, new ListData(ObjectArrayList.wrap(value)));
 	}
 
-	public @NotNull Data<T_Encoded> setList(int index, @NotNull ObjectList<@NotNull Data<T_Encoded>> value) {
-		return this.set(index, new ListData<>(this.ops, value));
+	public @NotNull Data setList(int index, @NotNull ObjectList<@NotNull Data> value) {
+		return this.set(index, new ListData(value));
 	}
 
-	public @NotNull Data<T_Encoded> setMap(int index, @NotNull Object2ObjectMap<@NotNull Data<T_Encoded>, @NotNull Data<T_Encoded>> value) {
-		return this.set(index, new MapData<>(this.ops, value));
+	public @NotNull Data setMap(int index, @NotNull Object2ObjectMap<@NotNull Data, @NotNull Data> value) {
+		return this.set(index, new MapData(value));
 	}
 
-	public @NotNull Data<T_Encoded> set(int index, @NotNull Data<T_Encoded> newData) {
+	public @NotNull Data set(int index, @NotNull Data newData) {
 		return this.value.set(index, newData);
 	}
 
 	public void append(int index, boolean value) {
-		this.append(index, new BooleanData<>(this.ops, value));
+		this.append(index, new BooleanData(value));
 	}
 
 	public void append(int index, byte value) {
-		this.append(index, new NumberData<>(this.ops, value));
+		this.append(index, new NumberData(value));
 	}
 
 	public void append(int index, short value) {
-		this.append(index, new NumberData<>(this.ops, value));
+		this.append(index, new NumberData(value));
 	}
 
 	public void append(int index, int value) {
-		this.append(index, new NumberData<>(this.ops, value));
+		this.append(index, new NumberData(value));
 	}
 
 	public void append(int index, long value) {
-		this.append(index, new NumberData<>(this.ops, value));
+		this.append(index, new NumberData(value));
 	}
 
 	public void append(int index, float value) {
-		this.append(index, new NumberData<>(this.ops, value));
+		this.append(index, new NumberData(value));
 	}
 
 	public void append(int index, double value) {
-		this.append(index, new NumberData<>(this.ops, value));
+		this.append(index, new NumberData(value));
 	}
 
 	public void append(int index, String value) {
-		this.append(index, new StringData<>(this.ops, value));
+		this.append(index, new StringData(value));
 	}
 
 	public void appendByteList(int index, byte @NotNull ... value) {
-		this.append(index, new ByteListData<>(this.ops, ByteArrayList.wrap(value)));
+		this.append(index, new ByteListData(ByteArrayList.wrap(value)));
 	}
 
 	public void appendByteList(int index, @NotNull ByteList value) {
-		this.append(index, new ByteListData<>(this.ops, value));
+		this.append(index, new ByteListData(value));
 	}
 
 	public void appendIntList(int index, int @NotNull ... value) {
-		this.append(index, new IntListData<>(this.ops, IntArrayList.wrap(value)));
+		this.append(index, new IntListData(IntArrayList.wrap(value)));
 	}
 
 	public void appendIntList(int index, @NotNull IntList value) {
-		this.append(index, new IntListData<>(this.ops, value));
+		this.append(index, new IntListData(value));
 	}
 
 	public void appendLongList(int index, long @NotNull ... value) {
-		this.append(index, new LongListData<>(this.ops, LongArrayList.wrap(value)));
+		this.append(index, new LongListData(LongArrayList.wrap(value)));
 	}
 
 	public void appendLongList(int index, @NotNull LongList value) {
-		this.append(index, new LongListData<>(this.ops, value));
+		this.append(index, new LongListData(value));
 	}
 
-	public void appendList(int index, @NotNull Data<T_Encoded> @NotNull ... value) {
-		this.append(index, new ListData<>(this.ops, ObjectArrayList.wrap(value)));
+	public void appendList(int index, @NotNull Data @NotNull ... value) {
+		this.append(index, new ListData(ObjectArrayList.wrap(value)));
 	}
 
-	public void appendList(int index, @NotNull ObjectList<@NotNull Data<T_Encoded>> value) {
-		this.append(index, new ListData<>(this.ops, value));
+	public void appendList(int index, @NotNull ObjectList<@NotNull Data> value) {
+		this.append(index, new ListData(value));
 	}
 
-	public void appendMap(int index, @NotNull Object2ObjectMap<@NotNull Data<T_Encoded>, @NotNull Data<T_Encoded>> value) {
-		this.append(index, new MapData<>(this.ops, value));
+	public void appendMap(int index, @NotNull Object2ObjectMap<@NotNull Data, @NotNull Data> value) {
+		this.append(index, new MapData(value));
 	}
 
-	public void append(int index, @NotNull Data<T_Encoded> newData) {
+	public void append(int index, @NotNull Data newData) {
 		this.value.add(index, newData);
 	}
 
-	public @NotNull Data<T_Encoded> remove(int index) {
+	public @NotNull Data remove(int index) {
 		return this.value.remove(index);
 	}
 
 	@Override
 	public boolean equals(Object object) {
-		ListData<?> list;
-		return object instanceof Data<?> data && (list = data.tryAsList()) != null && this.value.equals(list.value);
+		ListData list;
+		return object instanceof Data data && (list = data.tryAsList()) != null && this.value.equals(list.value);
 	}
 
 	@Override
@@ -240,7 +232,7 @@ public class ListData<T_Encoded> extends Data<T_Encoded> implements Iterable<@No
 	}
 
 	@Override
-	public @NotNull Data<T_Encoded> deepCopy() {
-		return new ListData<>(this.ops, this.value.stream().map(Data<T_Encoded>::deepCopy).collect(Collectors.toCollection(ObjectArrayList::new)));
+	public @NotNull Data deepCopy() {
+		return new ListData(this.value.stream().map(Data::deepCopy).collect(Collectors.toCollection(ObjectArrayList::new)));
 	}
 }

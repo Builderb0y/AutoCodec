@@ -3,17 +3,15 @@ package builderb0y.autocodec.data;
 import com.mojang.serialization.DynamicOps;
 import org.jetbrains.annotations.NotNull;
 
-public class StringData<T_Encoded> extends Data<T_Encoded> {
+public class StringData extends Data {
 
 	public @NotNull String value;
 
-	public StringData(@NotNull DynamicOps<T_Encoded> ops) {
-		super(ops);
+	public StringData() {
 		this.value = "";
 	}
 
-	public StringData(@NotNull DynamicOps<T_Encoded> ops, @NotNull String value) {
-		super(ops);
+	public StringData(@NotNull String value) {
 		this.value = value;
 	}
 
@@ -24,8 +22,8 @@ public class StringData<T_Encoded> extends Data<T_Encoded> {
 
 	@Override
 	public boolean equals(Object object) {
-		StringData<?> string;
-		return object instanceof Data<?> data && (string = data.tryAsString()) != null && this.value.equals(string.value);
+		StringData string;
+		return object instanceof Data data && (string = data.tryAsString()) != null && this.value.equals(string.value);
 	}
 
 	@Override
@@ -39,7 +37,7 @@ public class StringData<T_Encoded> extends Data<T_Encoded> {
 	}
 
 	@Override
-	public @NotNull Data<T_Encoded> deepCopy() {
-		return new StringData<>(this.ops, this.value);
+	public @NotNull Data deepCopy() {
+		return new StringData(this.value);
 	}
 }

@@ -27,7 +27,7 @@ extends AbstractDecodeContext<
 		@NotNull AutoCodec autoCodec,
 		@Nullable AbstractDecodeContext<T_Encoded, ?, ?> parent,
 		@NotNull DecodePath path,
-		@NotNull Data<T_Encoded> input,
+		@NotNull Data input,
 		@NotNull DynamicOps<T_Encoded> ops,
 		@Nullable T_Decoded object
 	) {
@@ -41,7 +41,7 @@ extends AbstractDecodeContext<
 	}
 
 	@Override
-	public @NotNull VerifyContext<T_Encoded, T_Decoded> newContext(@Nullable AbstractDecodeContext<T_Encoded, ?, ?> parent, @NotNull DecodePath path, @NotNull Data<T_Encoded> input) {
+	public @NotNull VerifyContext<T_Encoded, T_Decoded> newContext(@Nullable AbstractDecodeContext<T_Encoded, ?, ?> parent, @NotNull DecodePath path, @NotNull Data input) {
 		return new VerifyContext<>(
 			this.autoCodec,
 			parent,

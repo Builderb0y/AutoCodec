@@ -36,19 +36,19 @@ public abstract class AbstractDecodeContext<
 	T_Context extends AbstractDecodeContext<T_Encoded, T_Exception, T_Context>
 >
 extends DynamicOpsContext<T_Encoded>
-implements DataReader<T_Encoded, T_Exception> {
+implements DataReader<T_Exception> {
 
 	public static final @NotNull ObjectArrayFactory<AbstractDecodeContext<?, ?, ?>> ARRAY_FACTORY = new ObjectArrayFactory<>(AbstractDecodeContext.class).generic();
 
 	public final @Nullable AbstractDecodeContext<T_Encoded, ?, ?> parent;
 	public final @NotNull DecodePath path;
-	public final @NotNull Data<T_Encoded> input;
+	public final @NotNull Data input;
 
 	public AbstractDecodeContext(
 		@NotNull AutoCodec autoCodec,
 		@Nullable AbstractDecodeContext<T_Encoded, ?, ?> parent,
 		@NotNull DecodePath path,
-		@NotNull Data<T_Encoded> input,
+		@NotNull Data input,
 		@NotNull DynamicOps<T_Encoded> ops
 	) {
 		super(autoCodec, ops);
@@ -67,30 +67,30 @@ implements DataReader<T_Encoded, T_Exception> {
 	}
 
 	@Override
-	public @NotNull Data<T_Encoded> data() {
+	public @NotNull Data data() {
 		return this.input;
 	}
 
 	public abstract @NotNull T_Context newContext(
 		@Nullable AbstractDecodeContext<T_Encoded, ?, ?> parent,
 		@NotNull DecodePath path,
-		@NotNull Data<T_Encoded> input
+		@NotNull Data input
 	);
 
 	@SuppressWarnings("unchecked")
-	public @NotNull T_Context input(@NotNull Data<T_Encoded> input) {
+	public @NotNull T_Context input(@NotNull Data input) {
 		return this.input == input ? (T_Context)(this) : this.newContext(this.parent, this.path, input);
 	}
 
-	public @NotNull T_Context input(@NotNull Data<T_Encoded> input, @NotNull DecodeContext.DecodePath nextPath) {
+	public @NotNull T_Context input(@NotNull Data input, @NotNull DecodeContext.DecodePath nextPath) {
 		return this.newContext(this, nextPath, input);
 	}
 
-	public @NotNull T_Context input(@NotNull String memberName, @NotNull Data<T_Encoded> member) {
+	public @NotNull T_Context input(@NotNull String memberName, @NotNull Data member) {
 		return this.input(member, new ObjectDecodePath(memberName));
 	}
 
-	public @NotNull T_Context input(int index, @NotNull Data<T_Encoded> element) {
+	public @NotNull T_Context input(int index, @NotNull Data element) {
 		return this.input(element, new ArrayDecodePath(index));
 	}
 
@@ -103,21 +103,21 @@ implements DataReader<T_Encoded, T_Exception> {
 
 	@Override
 	public @NotNull T_Context getElement(int index) throws T_Exception {
-		ListData<T_Encoded> list = this.forceAsList();
+		ListData list = this.forceAsList();
 		return this.input(index, list.value.get(index));
 	}
 
 	@Override
 	public @NotNull T_Context getMember(@NotNull String key) throws T_Exception {
-		Data<T_Encoded> member = this.forceAsMap().get(key);
+		Data member = this.forceAsMap().get(key);
 		return this.input(key, member != null ? member : this.empty());
 	}
 
 	@Override
 	public @NotNull Iterable<@NotNull T_Context> listIterable() throws T_Exception {
-		List<Data<T_Encoded>> list = this.forceAsList().value;
+		List<Data> list = this.forceAsList().value;
 		return () -> {
-			ListIterator<Data<T_Encoded>> iterator = list.listIterator();
+			ListIterator<Data> iterator = list.listIterator();
 			return new Iterator<>() {
 
 				@Override
@@ -135,9 +135,9 @@ implements DataReader<T_Encoded, T_Exception> {
 
 	@Override
 	public @NotNull Iterable<Map.@NotNull Entry<@NotNull T_Context, @NotNull T_Context>> mapIterable() throws T_Exception {
-		Set<Map.Entry<Data<T_Encoded>, Data<T_Encoded>>> entrySet = this.forceAsMap().value.entrySet();
+		Set<Map.Entry<Data, Data>> entrySet = this.forceAsMap().value.entrySet();
 		return () -> {
-			Iterator<Map.Entry<Data<T_Encoded>, Data<T_Encoded>>> iterator = entrySet.iterator();
+			Iterator<Map.Entry<Data, Data>> iterator = entrySet.iterator();
 			return new Iterator<>() {
 
 				@Override
@@ -147,7 +147,7 @@ implements DataReader<T_Encoded, T_Exception> {
 
 				@Override
 				public Map.Entry<T_Context, T_Context> next() {
-					Map.Entry<Data<T_Encoded>, Data<T_Encoded>> next = iterator.next();
+					Map.Entry<Data, Data> next = iterator.next();
 					return Map.entry(
 						AbstractDecodeContext.this.input("<key>", next.getKey()),
 						AbstractDecodeContext.this.input(next.getKey().toString(), next.getValue())

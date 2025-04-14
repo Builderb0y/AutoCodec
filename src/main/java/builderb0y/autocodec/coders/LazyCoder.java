@@ -35,7 +35,7 @@ public class LazyCoder<T> extends LazyHandler<AutoCoder<T>> implements AutoCoder
 
 	@Override
 	@OverrideOnly
-	public <T_Encoded> @NotNull Data<T_Encoded> encode(@NotNull EncodeContext<T_Encoded, T> context) throws EncodeException {
+	public <T_Encoded> @NotNull Data encode(@NotNull EncodeContext<T_Encoded, T> context) throws EncodeException {
 		return context.encodeWith(this.getDelegateHandler());
 	}
 

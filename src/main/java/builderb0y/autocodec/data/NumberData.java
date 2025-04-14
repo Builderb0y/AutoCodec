@@ -4,7 +4,7 @@ import com.mojang.serialization.DynamicOps;
 import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.NotNull;
 
-public class NumberData<T_Encoded> extends AbstractNumberData<T_Encoded> {
+public class NumberData extends AbstractNumberData{
 
 	public static final byte
 		BYTE = 0,
@@ -18,45 +18,18 @@ public class NumberData<T_Encoded> extends AbstractNumberData<T_Encoded> {
 	@MagicConstant(valuesFromClass = NumberData.class)
 	public byte precision;
 
-	public NumberData(@NotNull DynamicOps<T_Encoded> ops, long bits, @MagicConstant(valuesFromClass = NumberData.class) byte precision) {
-		super(ops);
+	public NumberData(long bits, @MagicConstant(valuesFromClass = NumberData.class) byte precision) {
 		this.bits = bits;
 		this.precision = precision;
 	}
 
-	public NumberData(@NotNull DynamicOps<T_Encoded> ops) {
-		super(ops);
-	}
-
-	public NumberData(@NotNull DynamicOps<T_Encoded> ops, byte value) {
-		super(ops);
-		this.set(value);
-	}
-
-	public NumberData(@NotNull DynamicOps<T_Encoded> ops, short value) {
-		super(ops);
-		this.set(value);
-	}
-
-	public NumberData(@NotNull DynamicOps<T_Encoded> ops, int value) {
-		super(ops);
-		this.set(value);
-	}
-
-	public NumberData(@NotNull DynamicOps<T_Encoded> ops, long value) {
-		super(ops);
-		this.set(value);
-	}
-
-	public NumberData(@NotNull DynamicOps<T_Encoded> ops, float value) {
-		super(ops);
-		this.set(value);
-	}
-
-	public NumberData(@NotNull DynamicOps<T_Encoded> ops, double value) {
-		super(ops);
-		this.set(value);
-	}
+	public NumberData() {}
+	public NumberData(byte   value) { this.set(value); }
+	public NumberData(short  value) { this.set(value); }
+	public NumberData(int    value) { this.set(value); }
+	public NumberData(long   value) { this.set(value); }
+	public NumberData(float  value) { this.set(value); }
+	public NumberData(double value) { this.set(value); }
 
 	@Override
 	public <T_NewEncoded> @NotNull T_NewEncoded convert(@NotNull DynamicOps<T_NewEncoded> ops) {
@@ -182,9 +155,9 @@ public class NumberData<T_Encoded> extends AbstractNumberData<T_Encoded> {
 
 	@Override
 	public boolean equals(Object object) {
-		AbstractNumberData<?> number;
-		if (object instanceof Data<?> data && (number = data.tryAsNumber()) != null) {
-			if (number instanceof NumberData<?> same) {
+		AbstractNumberData number;
+		if (object instanceof Data data && (number = data.tryAsNumber()) != null) {
+			if (number instanceof NumberData same) {
 				return this.precision == same.precision && this.bits == same.bits;
 			}
 			else {
@@ -221,7 +194,7 @@ public class NumberData<T_Encoded> extends AbstractNumberData<T_Encoded> {
 	}
 
 	@Override
-	public @NotNull AbstractNumberData<T_Encoded> deepCopy() {
-		return new NumberData<>(this.ops, this.bits, this.precision);
+	public @NotNull AbstractNumberData deepCopy() {
+		return new NumberData(this.bits, this.precision);
 	}
 }

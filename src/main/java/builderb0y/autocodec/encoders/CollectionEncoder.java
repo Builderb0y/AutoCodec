@@ -31,7 +31,7 @@ public class CollectionEncoder<T_Element, T_Collection extends Collection<T_Elem
 
 	@Override
 	@OverrideOnly
-	public <T_Encoded> @NotNull Data<T_Encoded> encode(@NotNull EncodeContext<T_Encoded, T_Collection> context) throws EncodeException {
+	public <T_Encoded> @NotNull Data encode(@NotNull EncodeContext<T_Encoded, T_Collection> context) throws EncodeException {
 		if (context.object == null) return context.empty();
 		AutoCoder<T_Element> coder = this.elementCoder;
 		return context.createList(context.object.stream().map((T_Element element) -> context.object(element).encodeWith(coder)));

@@ -61,16 +61,16 @@ public class DefaultEmptyCoder<T_Decoded> extends NamedCoder<T_Decoded> {
 
 	@Override
 	@OverrideOnly
-	public <T_Encoded> @NotNull Data<T_Encoded> encode(@NotNull EncodeContext<T_Encoded, T_Decoded> context) throws EncodeException {
-		Data<T_Encoded> encoded = context.encodeWith(this.nonEmpty);
+	public <T_Encoded> @NotNull Data encode(@NotNull EncodeContext<T_Encoded, T_Decoded> context) throws EncodeException {
+		Data encoded = context.encodeWith(this.nonEmpty);
 		done:
 		if (!this.alwaysEncode) {
-			ListData<T_Encoded> list = encoded.tryAsList();
+			ListData list = encoded.tryAsList();
 			if (list != null) {
 				if (list.value.isEmpty()) encoded = context.empty();
 				break done;
 			}
-			MapData<T_Encoded> map = encoded.tryAsMap();
+			MapData map = encoded.tryAsMap();
 			if (map != null) {
 				if (map.value.isEmpty()) encoded = context.empty();
 				break done;

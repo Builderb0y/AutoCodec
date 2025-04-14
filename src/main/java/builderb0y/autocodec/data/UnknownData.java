@@ -24,19 +24,15 @@ import org.jetbrains.annotations.Nullable;
 import builderb0y.autocodec.util.AutoCodecUtil;
 import builderb0y.autocodec.util.DFUVersions;
 
-public class UnknownData<T_Encoded> extends Data<T_Encoded> {
+public class UnknownData<T_Encoded> extends Data {
 
+	public final DynamicOps<T_Encoded> ops;
 	public @NotNull T_Encoded payload;
-	public @Nullable Data<T_Encoded> resolution;
+	public @Nullable Data resolution;
 
 	public UnknownData(@NotNull DynamicOps<T_Encoded> ops, @NotNull T_Encoded payload) {
-		super(ops);
+		this.ops = ops;
 		this.payload = payload;
-	}
-
-	@Override
-	public @NotNull T_Encoded encode() {
-		return this.payload;
 	}
 
 	@Override
@@ -69,14 +65,14 @@ public class UnknownData<T_Encoded> extends Data<T_Encoded> {
 	}
 
 	@Override
-	public @Nullable BooleanData<T_Encoded> tryAsBoolean() {
+	public @Nullable BooleanData tryAsBoolean() {
 		if (this.resolution != null) {
 			return this.resolution.tryAsBoolean();
 		}
 		else {
 			Boolean value = DFUVersions.getResult(this.ops.getBooleanValue(this.payload));
 			if (value != null) {
-				BooleanData<T_Encoded> resolution = new BooleanData<>(this.ops, value);
+				BooleanData resolution = new BooleanData(value);
 				this.resolution = resolution;
 				return resolution;
 			}
@@ -95,14 +91,14 @@ public class UnknownData<T_Encoded> extends Data<T_Encoded> {
 	}
 
 	@Override
-	public @Nullable AbstractNumberData<T_Encoded> tryAsNumber() {
+	public @Nullable AbstractNumberData tryAsNumber() {
 		if (this.resolution != null) {
 			return this.resolution.tryAsNumber();
 		}
 		else {
 			Number value = DFUVersions.getResult(this.ops.getNumberValue(this.payload));
 			if (value != null) {
-				UnknownNumberData<T_Encoded> numberData = new UnknownNumberData<>(this.ops, value);
+				UnknownNumberData numberData = new UnknownNumberData(value);
 				this.resolution = numberData;
 				return numberData;
 			}
@@ -121,14 +117,14 @@ public class UnknownData<T_Encoded> extends Data<T_Encoded> {
 	}
 
 	@Override
-	public @Nullable StringData<T_Encoded> tryAsString() {
+	public @Nullable StringData tryAsString() {
 		if (this.resolution != null) {
 			return this.resolution.tryAsString();
 		}
 		else {
 			String value = DFUVersions.getResult(this.ops.getStringValue(this.payload));
 			if (value != null) {
-				StringData<T_Encoded> resolution = new StringData<>(this.ops, value);
+				StringData resolution = new StringData(value);
 				this.resolution = resolution;
 				return resolution;
 			}
@@ -147,15 +143,15 @@ public class UnknownData<T_Encoded> extends Data<T_Encoded> {
 	}
 
 	@Override
-	public @Nullable ListData<T_Encoded> tryAsList() {
+	public @Nullable ListData tryAsList() {
 		if (this.resolution != null) {
 			return this.resolution.tryAsList();
 		}
 		else {
 			Stream<T_Encoded> value = DFUVersions.getResult(this.ops.getStream(this.payload));
 			if (value != null) {
-				ObjectArrayList<Data<T_Encoded>> listValue = value.map((T_Encoded encoded) -> new UnknownData<>(this.ops, encoded)).collect(Collectors.toCollection(ObjectArrayList::new));
-				ListData<T_Encoded> resolution = new ListData<>(this.ops, listValue);
+				ObjectArrayList<Data> listValue = value.map((T_Encoded encoded) -> new UnknownData<>(this.ops, encoded)).collect(Collectors.toCollection(ObjectArrayList::new));
+				ListData resolution = new ListData(listValue);
 				this.resolution = resolution;
 				return resolution;
 			}
@@ -174,7 +170,7 @@ public class UnknownData<T_Encoded> extends Data<T_Encoded> {
 	}
 
 	@Override
-	public @Nullable ByteListData<T_Encoded> tryAsByteList() {
+	public @Nullable ByteListData tryAsByteList() {
 		if (this.resolution != null) {
 			return this.resolution.tryAsByteList();
 		}
@@ -184,7 +180,7 @@ public class UnknownData<T_Encoded> extends Data<T_Encoded> {
 				byte[] bytes = new byte[value.limit()];
 				value.get(0, bytes);
 				ByteList list = ByteArrayList.wrap(bytes);
-				ByteListData<T_Encoded> resolution = new ByteListData<>(this.ops, list);
+				ByteListData resolution = new ByteListData(list);
 				this.resolution = resolution;
 				return resolution;
 			}
@@ -203,7 +199,7 @@ public class UnknownData<T_Encoded> extends Data<T_Encoded> {
 	}
 
 	@Override
-	public @Nullable IntListData<T_Encoded> tryAsIntList() {
+	public @Nullable IntListData tryAsIntList() {
 		if (this.resolution != null) {
 			return this.resolution.tryAsIntList();
 		}
@@ -211,7 +207,7 @@ public class UnknownData<T_Encoded> extends Data<T_Encoded> {
 			IntStream stream = DFUVersions.getResult(this.ops.getIntStream(this.payload));
 			if (stream != null) {
 				IntList list = IntArrayList.wrap(stream.toArray());
-				IntListData<T_Encoded> resolution = new IntListData<>(this.ops, list);
+				IntListData resolution = new IntListData(list);
 				this.resolution = resolution;
 				return resolution;
 			}
@@ -230,7 +226,7 @@ public class UnknownData<T_Encoded> extends Data<T_Encoded> {
 	}
 
 	@Override
-	public @Nullable LongListData<T_Encoded> tryAsLongList() {
+	public @Nullable LongListData tryAsLongList() {
 		if (this.resolution != null) {
 			return this.resolution.tryAsLongList();
 		}
@@ -238,7 +234,7 @@ public class UnknownData<T_Encoded> extends Data<T_Encoded> {
 			LongStream stream = DFUVersions.getResult(this.ops.getLongStream(this.payload));
 			if (stream != null) {
 				LongList list = LongArrayList.wrap(stream.toArray());
-				LongListData<T_Encoded> resolution = new LongListData<>(this.ops, list);
+				LongListData resolution = new LongListData(list);
 				this.resolution = resolution;
 				return resolution;
 			}
@@ -257,21 +253,21 @@ public class UnknownData<T_Encoded> extends Data<T_Encoded> {
 	}
 
 	@Override
-	public @Nullable MapData<T_Encoded> tryAsMap() {
+	public @Nullable MapData tryAsMap() {
 		if (this.resolution != null) {
 			return this.resolution.tryAsMap();
 		}
 		else {
 			Stream<Pair<T_Encoded, T_Encoded>> stream = DFUVersions.getResult(this.ops.getMapValues(this.payload));
 			if (stream != null) {
-				Object2ObjectMap<Data<T_Encoded>, Data<T_Encoded>> map = stream.collect(
+				Object2ObjectMap<Data, Data> map = stream.collect(
 					AutoCodecUtil.collectToMap(
 						(Pair<T_Encoded, T_Encoded> pair) -> new UnknownData<>(this.ops, pair.getFirst()),
 						(Pair<T_Encoded, T_Encoded> pair) -> new UnknownData<>(this.ops, pair.getSecond()),
 						Object2ObjectOpenHashMap::new
 					)
 				);
-				MapData<T_Encoded> resolution = new MapData<>(this.ops, map);
+				MapData resolution = new MapData(map);
 				this.resolution = resolution;
 				return resolution;
 			}
@@ -279,12 +275,12 @@ public class UnknownData<T_Encoded> extends Data<T_Encoded> {
 		return null;
 	}
 
-	public @Nullable Data<T_Encoded> resolve() {
-		Data<T_Encoded> resolution = this.resolution;
+	public @Nullable Data resolve() {
+		Data resolution = this.resolution;
 		notDone:
 		if (resolution == null) {
 			done: {
-				if (this.isEmpty()) { resolution = EmptyData.forOps(this.ops); break done; }
+				if (this.isEmpty()) { resolution = EmptyData.INSTANCE; break done; }
 				if ((resolution = this.tryAsMap     ()) != null) break done;
 				if ((resolution = this.tryAsByteList()) != null) break done;
 				if ((resolution = this.tryAsIntList ()) != null) break done;
@@ -302,13 +298,13 @@ public class UnknownData<T_Encoded> extends Data<T_Encoded> {
 
 	@Override
 	public boolean equals(Object object) {
-		if (object instanceof Data<?> data) {
-			Data<T_Encoded> resolution = this.resolve();
+		if (object instanceof Data data) {
+			Data resolution = this.resolve();
 			if (resolution != null) {
 				return resolution.equals(data);
 			}
 			else {
-				return this.encode().equals(data.encode()); //future-proof unknown value types.
+				return this.payload.equals(data.convert(this.ops)); //future-proof unknown value types.
 			}
 		}
 		return false;
@@ -316,7 +312,7 @@ public class UnknownData<T_Encoded> extends Data<T_Encoded> {
 
 	@Override
 	public int hashCode() {
-		Data<T_Encoded> resolution = this.resolve();
+		Data resolution = this.resolve();
 		return (resolution != null ? resolution : this.payload).hashCode();
 	}
 
@@ -326,7 +322,7 @@ public class UnknownData<T_Encoded> extends Data<T_Encoded> {
 	}
 
 	@Override
-	public @NotNull Data<T_Encoded> deepCopy() {
+	public @NotNull Data deepCopy() {
 		UnknownData<T_Encoded> copy = new UnknownData<>(this.ops, this.payload);
 		if (this.resolution != null) {
 			copy.resolution = this.resolution.deepCopy();
