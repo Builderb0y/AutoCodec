@@ -26,10 +26,10 @@ extends AbstractDecodeContext<
 		@NotNull AutoCodec autoCodec,
 		@Nullable AbstractDecodeContext<T_Encoded, ?, ?> parent,
 		@NotNull DecodePath path,
-		@NotNull Data input,
+		@NotNull Data data,
 		@NotNull DynamicOps<T_Encoded> ops
 	) {
-		super(autoCodec, parent, path, input, ops);
+		super(autoCodec, parent, path, data, ops);
 	}
 
 	public ConstructContext(@NotNull AbstractDecodeContext<T_Encoded, ?, ?> context) {

@@ -30,8 +30,8 @@ public class PatternCoder extends NamedCoder<Pattern> {
 	@Override
 	@OverrideOnly
 	public @Nullable <T_Encoded> Pattern decode(@NotNull DecodeContext<T_Encoded> context) throws DecodeException {
-		if (context.input.isEmpty()) return null;
-		StringData patternString = context.input.tryAsString();
+		if (context.data.isEmpty()) return null;
+		StringData patternString = context.data.tryAsString();
 		if (patternString != null) {
 			return Pattern.compile(patternString.value);
 		}

@@ -27,11 +27,11 @@ extends AbstractDecodeContext<
 		@NotNull AutoCodec autoCodec,
 		@Nullable AbstractDecodeContext<T_Encoded, ?, ?> parent,
 		@NotNull DecodePath path,
-		@NotNull Data input,
+		@NotNull Data data,
 		@NotNull DynamicOps<T_Encoded> ops,
 		@Nullable T_Decoded object
 	) {
-		super(autoCodec, parent, path, input, ops);
+		super(autoCodec, parent, path, data, ops);
 		this.object = object;
 	}
 
@@ -67,6 +67,6 @@ extends AbstractDecodeContext<
 
 	@Override
 	public String toString() {
-		return this.getClass().getSimpleName() + ": { path: " + this.pathToString() + ", input: " + this.input + ", ops: " + this.ops + ", object: " + this.object + " }";
+		return this.getClass().getSimpleName() + ": { path: " + this.pathToString() + ", input: " + this.data + ", ops: " + this.ops + ", object: " + this.object + " }";
 	}
 }

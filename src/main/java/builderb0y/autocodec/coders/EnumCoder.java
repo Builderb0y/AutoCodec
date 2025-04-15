@@ -39,9 +39,9 @@ public class EnumCoder<T_DecodedEnum extends Enum<T_DecodedEnum>> extends NamedC
 
 	@Override
 	public <T_Encoded> @Nullable T_DecodedEnum decode(@NotNull DecodeContext<T_Encoded> context) throws DecodeException {
-		if (context.input.isEmpty()) return null;
+		if (context.data.isEmpty()) return null;
 		//note: check ordinal first, as some ops will implicitly convert numbers to strings.
-		AbstractNumberData ordinal = context.input.tryAsNumber();
+		AbstractNumberData ordinal = context.data.tryAsNumber();
 		if (ordinal != null) {
 			int actualOrdinal = ordinal.intValue();
 			int length = this.valueArray.length;
@@ -52,7 +52,7 @@ public class EnumCoder<T_DecodedEnum extends Enum<T_DecodedEnum>> extends NamedC
 				throw new DecodeException(() -> "Ordinal out of bounds: " + ordinal + " (there are only " + length + " enums to choose from)");
 			}
 		}
-		StringData name = context.input.tryAsString();
+		StringData name = context.data.tryAsString();
 		if (name != null) {
 			T_DecodedEnum value = this.valueMap.get(name.value);
 			if (value != null) return value;

@@ -76,7 +76,7 @@ public class LookupCoder<T_Key, T_Value> extends NamedCoder<T_Value> {
 	public <T_Encoded> @Nullable T_Value decode(@NotNull DecodeContext<T_Encoded> context) throws DecodeException {
 		if (context.isEmpty()) return null;
 		T_Key key = context.decodeWith(this.keyCoder);
-		if (key == null) throw new DecodeException(() -> "Unknown key: " + context.input);
+		if (key == null) throw new DecodeException(() -> "Unknown key: " + context.data);
 		T_Value value = this.decode.get(key);
 		if (value == null) throw new DecodeException(() -> "Unknown key: " + key);
 		return value;

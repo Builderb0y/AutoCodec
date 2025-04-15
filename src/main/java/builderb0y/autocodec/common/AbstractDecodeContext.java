@@ -42,23 +42,23 @@ implements DataReader<T_Exception> {
 
 	public final @Nullable AbstractDecodeContext<T_Encoded, ?, ?> parent;
 	public final @NotNull DecodePath path;
-	public final @NotNull Data input;
+	public final @NotNull Data data;
 
 	public AbstractDecodeContext(
 		@NotNull AutoCodec autoCodec,
 		@Nullable AbstractDecodeContext<T_Encoded, ?, ?> parent,
 		@NotNull DecodePath path,
-		@NotNull Data input,
+		@NotNull Data data,
 		@NotNull DynamicOps<T_Encoded> ops
 	) {
 		super(autoCodec, ops);
 		this.parent = parent;
 		this.path = path;
-		this.input = input;
+		this.data = data;
 	}
 
 	public AbstractDecodeContext(@NotNull AbstractDecodeContext<T_Encoded, ?, ?> from) {
-		this(from.autoCodec, from.parent, from.path, from.input, from.ops);
+		this(from.autoCodec, from.parent, from.path, from.data, from.ops);
 	}
 
 	@Override
@@ -68,7 +68,7 @@ implements DataReader<T_Exception> {
 
 	@Override
 	public @NotNull Data data() {
-		return this.input;
+		return this.data;
 	}
 
 	public abstract @NotNull T_Context newContext(
@@ -79,7 +79,7 @@ implements DataReader<T_Exception> {
 
 	@SuppressWarnings("unchecked")
 	public @NotNull T_Context input(@NotNull Data input) {
-		return this.input == input ? (T_Context)(this) : this.newContext(this.parent, this.path, input);
+		return this.data == input ? (T_Context)(this) : this.newContext(this.parent, this.path, input);
 	}
 
 	public @NotNull T_Context input(@NotNull Data input, @NotNull DecodeContext.DecodePath nextPath) {
@@ -98,7 +98,7 @@ implements DataReader<T_Exception> {
 
 	@Override
 	public @NotNull T_Exception notA(@NotNull String type) {
-		return this.newException(() -> this.pathToStringBuilder().append(" is not a ").append(type).append(": ").append(this.input).toString());
+		return this.newException(() -> this.pathToStringBuilder().append(" is not a ").append(type).append(": ").append(this.data).toString());
 	}
 
 	@Override
@@ -198,6 +198,6 @@ implements DataReader<T_Exception> {
 
 	@Override
 	public String toString() {
-		return this.getClass().getSimpleName() + ": { path: " + this.pathToString() + ", input: " + this.input + ", ops: " + this.ops + " }";
+		return this.getClass().getSimpleName() + ": { path: " + this.pathToString() + ", input: " + this.data + ", ops: " + this.ops + " }";
 	}
 }

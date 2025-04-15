@@ -21,7 +21,7 @@ public interface AutoDecoder<T_Decoded> extends AutoHandler, KeyHolder {
 	public static final @NotNull ObjectArrayFactory<AutoDecoder<?>> ARRAY_FACTORY = new ObjectArrayFactory<>(AutoDecoder.class).generic();
 
 	/**
-	takes some data stored on {@link DecodeContext#input},
+	takes some data stored on {@link DecodeContext#data},
 	and decodes it into an instances of {@link T_Decoded}.
 	throws {@link DecodeException} if the input data is malformed.
 	note that the decoder should not make assumptions about

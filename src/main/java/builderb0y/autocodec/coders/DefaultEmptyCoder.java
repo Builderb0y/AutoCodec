@@ -49,7 +49,7 @@ public class DefaultEmptyCoder<T_Decoded> extends NamedCoder<T_Decoded> {
 	@Override
 	@OverrideOnly
 	public <T_Encoded> @Nullable T_Decoded decode(@NotNull DecodeContext<T_Encoded> context) throws DecodeException {
-		if (context.input.isEmpty()) try {
+		if (context.data.isEmpty()) try {
 			return context.constructWith(this.constructor);
 		}
 		catch (ConstructException exception) {

@@ -24,14 +24,14 @@ extends AbstractDecodeContext<
 		@NotNull AutoCodec autoCodec,
 		@Nullable AbstractDecodeContext<T_Encoded, ?, ?> parent,
 		@NotNull DecodePath path,
-		@NotNull Data input,
+		@NotNull Data data,
 		@NotNull DynamicOps<T_Encoded> ops
 	) {
-		super(autoCodec, parent, path, input, ops);
+		super(autoCodec, parent, path, data, ops);
 	}
 
 	public DecodeContext(@NotNull AbstractDecodeContext<T_Encoded, ?, ?> context) {
-		this(context.autoCodec, context.parent, context.path, context.input, context.ops);
+		this(context.autoCodec, context.parent, context.path, context.data, context.ops);
 	}
 
 	@Override

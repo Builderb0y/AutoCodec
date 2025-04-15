@@ -24,7 +24,7 @@ public interface AutoConstructor<T_Decoded> extends AutoHandler {
 	occurred while constructing the object.
 
 	the instance does not need to be initialized with
-	the data stored in {@link ConstructContext#input};
+	the data stored in {@link ConstructContext#data};
 	that task will be performed by the {@link AutoImprinter},
 	which will run immediately after the new instance is created.
 	see also: {@link ConstructImprintDecoder}.

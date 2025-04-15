@@ -67,7 +67,7 @@ public abstract class KeyDispatchCoder<T_Key, T_Decoded> extends NamedCoder<T_De
 
 	@Override
 	public <T_Encoded> @Nullable T_Decoded decode(@NotNull DecodeContext<T_Encoded> context) throws DecodeException {
-		if (context.input.isEmpty()) return null;
+		if (context.data.isEmpty()) return null;
 		Data type = context.forceAsMap().value.remove(new StringData(this.keyName));
 		if (type == null) throw new DecodeException(() -> "Missing key " + this.keyName);
 		T_Key key = context.input(type).decodeWith(this.keyCoder);

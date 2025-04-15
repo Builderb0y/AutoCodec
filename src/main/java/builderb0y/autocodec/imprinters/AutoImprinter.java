@@ -23,7 +23,7 @@ public interface AutoImprinter<T_Decoded> extends AutoHandler, KeyHolder {
 
 	/**
 	mutates the instance of {@link T_Decoded} stored on {@link ImprintContext#object}
-	using the data in {@link ImprintContext#input}.
+	using the data in {@link ImprintContext#data}.
 	throws {@link ImprintException} if that data is malformed.
 	note that the imprinter should not make assumptions about
 	whether or not the object it just decoded is "valid".
