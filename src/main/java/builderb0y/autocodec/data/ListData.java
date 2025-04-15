@@ -35,6 +35,14 @@ public class ListData extends Data implements Iterable<@NotNull Data> {
 		this.value = value;
 	}
 
+	public static @NotNull ListData wrap(@NotNull Data @NotNull ... elements) {
+		return new ListData(ObjectArrayList.wrap(elements));
+	}
+
+	public static @NotNull ListData collect(@NotNull Stream<@NotNull Data> stream) {
+		return new ListData(stream.collect(Collectors.toCollection(ObjectArrayList::new)));
+	}
+
 	public @NotNull Stream<@NotNull Data> streamNonEmpty() {
 		return this.value.stream().filter((Data data) -> data != null && !data.isEmpty());
 	}

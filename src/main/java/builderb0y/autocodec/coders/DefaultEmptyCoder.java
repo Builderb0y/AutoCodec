@@ -17,6 +17,7 @@ import builderb0y.autocodec.constructors.AutoConstructor.NamedConstructor;
 import builderb0y.autocodec.constructors.ConstructContext;
 import builderb0y.autocodec.constructors.ConstructException;
 import builderb0y.autocodec.data.Data;
+import builderb0y.autocodec.data.EmptyData;
 import builderb0y.autocodec.data.ListData;
 import builderb0y.autocodec.data.MapData;
 import builderb0y.autocodec.decoders.DecodeContext;
@@ -67,12 +68,12 @@ public class DefaultEmptyCoder<T_Decoded> extends NamedCoder<T_Decoded> {
 		if (!this.alwaysEncode) {
 			ListData list = encoded.tryAsList();
 			if (list != null) {
-				if (list.value.isEmpty()) encoded = context.empty();
+				if (list.value.isEmpty()) encoded = EmptyData.INSTANCE;
 				break done;
 			}
 			MapData map = encoded.tryAsMap();
 			if (map != null) {
-				if (map.value.isEmpty()) encoded = context.empty();
+				if (map.value.isEmpty()) encoded = EmptyData.INSTANCE;
 				break done;
 			}
 		}

@@ -6,7 +6,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface DataReader<T_Exception extends Exception> extends DataFactory {
+public interface DataReader<T_Exception extends Exception> {
 
 	public abstract @NotNull Data data();
 
@@ -33,7 +33,7 @@ public interface DataReader<T_Exception extends Exception> extends DataFactory {
 
 	public default @NotNull ListData asListOrSingleton() {
 		ListData list = this.tryAsList();
-		if (list == null) list = this.createList(this.data());
+		if (list == null) list = ListData.wrap(this.data());
 		return list;
 	}
 
@@ -45,7 +45,7 @@ public interface DataReader<T_Exception extends Exception> extends DataFactory {
 	public default @NotNull ListData forceAsListMaybeSingleton(boolean singleton) throws T_Exception {
 		ListData list = this.tryAsList();
 		if (list == null) {
-			if (singleton) list = this.createList(this.data());
+			if (singleton) list = ListData.wrap(this.data());
 			else throw this.notA("list");
 		}
 		return list;

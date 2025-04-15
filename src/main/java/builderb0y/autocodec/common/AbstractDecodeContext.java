@@ -110,7 +110,7 @@ implements DataReader<T_Exception> {
 	@Override
 	public @NotNull T_Context getMember(@NotNull String key) throws T_Exception {
 		Data member = this.forceAsMap().get(key);
-		return this.input(key, member != null ? member : this.empty());
+		return this.input(key, member != null ? member : EmptyData.INSTANCE);
 	}
 
 	@Override

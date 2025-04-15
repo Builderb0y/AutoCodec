@@ -15,7 +15,9 @@ import builderb0y.autocodec.common.AutoHandler;
 import builderb0y.autocodec.common.FactoryContext;
 import builderb0y.autocodec.common.FactoryException;
 import builderb0y.autocodec.data.Data;
+import builderb0y.autocodec.data.EmptyData;
 import builderb0y.autocodec.data.MapData;
+import builderb0y.autocodec.data.StringData;
 import builderb0y.autocodec.decoders.DecodeException;
 import builderb0y.autocodec.imprinters.AutoImprinter.NamedImprinter;
 import builderb0y.autocodec.reflection.FieldPredicate;
@@ -165,7 +167,7 @@ public class MultiFieldImprinter<T_Decoded> extends NamedImprinter<T_Decoded> {
 				MapData map = context.tryAsMap();
 				if (map != null) {
 					for (String alias : this.field.getAliases()) {
-						Data member = map.value.get(context.createString(alias));
+						Data member = map.value.get(new StringData(alias));
 						if (member != null) {
 							T_Member decodedMember = context.input(alias, member).decodeWith(this.coder);
 							if (decodedMember != null) {
@@ -178,7 +180,7 @@ public class MultiFieldImprinter<T_Decoded> extends NamedImprinter<T_Decoded> {
 				//if we didn't return from the loop, then no aliases were specified in the data.
 				//attempt to call the decoder on empty data, to see if it turns it into something useful.
 				//the @Default<type> annotations can do this.
-				T_Member decodedMember = context.input(this.field.getSerializedName(), context.empty()).decodeWith(this.coder);
+				T_Member decodedMember = context.input(this.field.getSerializedName(), EmptyData.INSTANCE).decodeWith(this.coder);
 				if (decodedMember != null) {
 					this.writer.set(context.object, decodedMember);
 				}
@@ -260,7 +262,7 @@ public class MultiFieldImprinter<T_Decoded> extends NamedImprinter<T_Decoded> {
 				MapData map = context.tryAsMap();
 				if (map != null) {
 					for (String alias : this.field.getAliases()) {
-						Data member = map.value.get(context.createString(alias));
+						Data member = map.value.get(new StringData(alias));
 						if (member != null) {
 							context.input(alias, member).imprintWith(this.imprinter, object);
 							return;
@@ -269,7 +271,7 @@ public class MultiFieldImprinter<T_Decoded> extends NamedImprinter<T_Decoded> {
 				}
 				//if we didn't return from the loop, then no aliases were specified in the data.
 				//attempt to call the decoder on empty data, to see if it does anything useful with it.
-				context.input(this.field.getSerializedName(), context.empty()).imprintWith(this.imprinter, object);
+				context.input(this.field.getSerializedName(), EmptyData.INSTANCE).imprintWith(this.imprinter, object);
 			}
 		}
 

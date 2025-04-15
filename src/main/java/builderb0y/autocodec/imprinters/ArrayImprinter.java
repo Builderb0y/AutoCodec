@@ -47,11 +47,7 @@ public abstract class ArrayImprinter<T_DecodedElement, T_DecodedArray> extends N
 			try {
 				T_DecodedArray to = context.object;
 				int length = Array.getLength(to);
-				ListData from = context.input.tryAsList();
-				if (from == null) {
-					if (this.singleton) from = context.createList(context.input);
-					else throw context.notA("list");
-				}
+				ListData from = context.forceAsListMaybeSingleton(this.singleton);
 				int size = from.value.size();
 				if (size != length) {
 					throw new ImprintException(() -> context.pathToStringBuilder().append(" should have a length of ").append(length).append(", but it was length ").append(size).toString());

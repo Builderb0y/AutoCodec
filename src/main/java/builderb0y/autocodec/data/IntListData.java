@@ -21,6 +21,10 @@ public class IntListData extends Data {
 		this.value = value;
 	}
 
+	public static IntListData wrap(int @NotNull ... ints) {
+		return new IntListData(IntArrayList.wrap(ints));
+	}
+
 	@Override
 	public <T_NewEncoded> @NotNull T_NewEncoded convert(@NotNull DynamicOps<T_NewEncoded> ops) {
 		return ops.createIntList(this.value.intStream());

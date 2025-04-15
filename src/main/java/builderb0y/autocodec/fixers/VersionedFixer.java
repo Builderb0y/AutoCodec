@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 
 import builderb0y.autocodec.data.Data;
 import builderb0y.autocodec.data.MapData;
+import builderb0y.autocodec.data.StringData;
 import builderb0y.autocodec.fixers.AutoFixer.NamedFixer;
 import builderb0y.autocodec.reflection.reification.ReifiedType;
 
@@ -43,7 +44,7 @@ public abstract class VersionedFixer<T_Decoded> extends NamedFixer<T_Decoded> {
 	@OverrideOnly
 	public <T_Encoded> @NotNull DataFixContext<T_Encoded> fixData(@NotNull DataFixContext<T_Encoded> context) throws DataFixException {
 		MapData map = context.forceAsMap();
-		Data versionData = map.value.remove(context.createString(this.versionKey));
+		Data versionData = map.value.remove(new StringData(this.versionKey));
 		if (versionData == null) throw new DataFixException(() -> "Missing version!");
 		return this.fixData(context, context.input(this.versionKey, versionData).forceAsInt());
 	}

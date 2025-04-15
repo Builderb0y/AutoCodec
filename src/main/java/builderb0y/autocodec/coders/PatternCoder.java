@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import org.jetbrains.annotations.ApiStatus.OverrideOnly;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -14,9 +12,7 @@ import builderb0y.autocodec.coders.AutoCoder.NamedCoder;
 import builderb0y.autocodec.common.FactoryContext;
 import builderb0y.autocodec.common.FactoryException;
 import builderb0y.autocodec.common.PatternFlags;
-import builderb0y.autocodec.data.Data;
-import builderb0y.autocodec.data.ListData;
-import builderb0y.autocodec.data.StringData;
+import builderb0y.autocodec.data.*;
 import builderb0y.autocodec.decoders.DecodeContext;
 import builderb0y.autocodec.decoders.DecodeException;
 import builderb0y.autocodec.encoders.EncodeContext;
@@ -64,12 +60,12 @@ public class PatternCoder extends NamedCoder<Pattern> {
 	@Override
 	@OverrideOnly
 	public <T_Encoded> @NotNull Data encode(@NotNull EncodeContext<T_Encoded, Pattern> context) throws EncodeException {
-		if (context.object == null) return context.empty();
-		if (context.object.flags() == 0) return context.createString(context.object.pattern());
-		Object2ObjectMap<Data, Data> map = new Object2ObjectArrayMap<>(2);
-		map.put(context.createString("pattern"), context.createString(context.object.pattern()));
+		if (context.object == null) return EmptyData.INSTANCE;
+		if (context.object.flags() == 0) return new StringData(context.object.pattern());
+		MapData map = new MapData();
+		map.putString("pattern", context.object.pattern());
 		if (context.isCompressed()) {
-			map.put(context.createString("flags"), context.createInt(context.object.flags()));
+			map.putInt("flags", context.object.flags());
 		}
 		else {
 			int flags = context.object.flags();
@@ -79,9 +75,9 @@ public class PatternCoder extends NamedCoder<Pattern> {
 					list.add(context.object(flag).encodeWith(this.flagsCoder));
 				}
 			}
-			map.put(context.createString("flags"), context.createList(list));
+			map.putList("flags", list);
 		}
-		return context.createMap(map);
+		return map;
 	}
 
 	@Override

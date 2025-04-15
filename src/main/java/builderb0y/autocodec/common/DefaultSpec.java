@@ -13,7 +13,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import builderb0y.autocodec.annotations.*;
+import builderb0y.autocodec.data.BooleanData;
 import builderb0y.autocodec.data.Data;
+import builderb0y.autocodec.data.NumberData;
+import builderb0y.autocodec.data.StringData;
 import builderb0y.autocodec.reflection.FieldPredicate;
 import builderb0y.autocodec.reflection.MemberCollector;
 import builderb0y.autocodec.reflection.MethodPredicate;
@@ -66,7 +69,7 @@ public record DefaultSpec(
 			valueClass = byte.class;
 			byte value = defaultByte.value();
 			getter = switch (defaultByte.mode()) {
-				case ENCODED -> (DynamicOpsContext<?> c) -> c.createByte(value);
+				case ENCODED -> constant(new NumberData(value));
 				case DECODED -> constant(value);
 			};
 			mode = defaultByte.mode();
@@ -76,7 +79,7 @@ public record DefaultSpec(
 			valueClass = short.class;
 			short value = defaultShort.value();
 			getter = switch (defaultShort.mode()) {
-				case ENCODED -> (DynamicOpsContext<?> c) -> c.createShort(value);
+				case ENCODED -> constant(new NumberData(value));
 				case DECODED -> constant(value);
 			};
 			mode = defaultShort.mode();
@@ -86,7 +89,7 @@ public record DefaultSpec(
 			valueClass = int.class;
 			int value = defaultInt.value();
 			getter = switch (defaultInt.mode()) {
-				case ENCODED -> (DynamicOpsContext<?> c) -> c.createInt(value);
+				case ENCODED -> constant(new NumberData(value));
 				case DECODED -> constant(value);
 			};
 			mode = defaultInt.mode();
@@ -96,7 +99,7 @@ public record DefaultSpec(
 			valueClass = long.class;
 			long value = defaultLong.value();
 			getter = switch (defaultLong.mode()) {
-				case ENCODED -> (DynamicOpsContext<?> c) -> c.createLong(value);
+				case ENCODED -> constant(new NumberData(value));
 				case DECODED -> constant(value);
 			};
 			mode = defaultLong.mode();
@@ -106,7 +109,7 @@ public record DefaultSpec(
 			valueClass = float.class;
 			float value = defaultFloat.value();
 			getter = switch (defaultFloat.mode()) {
-				case ENCODED -> (DynamicOpsContext<?> c) -> c.createFloat(value);
+				case ENCODED -> constant(new NumberData(value));
 				case DECODED -> constant(value);
 			};
 			mode = defaultFloat.mode();
@@ -116,7 +119,7 @@ public record DefaultSpec(
 			valueClass = double.class;
 			double value = defaultDouble.value();
 			getter = switch (defaultDouble.mode()) {
-				case ENCODED -> (DynamicOpsContext<?> c) -> c.createDouble(value);
+				case ENCODED -> constant(new NumberData(value));
 				case DECODED -> constant(value);
 			};
 			mode = defaultDouble.mode();
@@ -126,7 +129,7 @@ public record DefaultSpec(
 			valueClass = boolean.class;
 			boolean value = defaultBoolean.value();
 			getter = switch (defaultBoolean.mode()) {
-				case ENCODED -> (DynamicOpsContext<?> c) -> c.createBoolean(value);
+				case ENCODED -> constant(new BooleanData(value));
 				case DECODED -> constant(value);
 			};
 			mode = defaultBoolean.mode();
@@ -136,7 +139,7 @@ public record DefaultSpec(
 			valueClass = String.class;
 			String value = defaultString.value();
 			getter = switch (defaultString.mode()) {
-				case ENCODED -> (DynamicOpsContext<?> c) -> c.createString(value);
+				case ENCODED -> constant(new StringData(value));
 				case DECODED -> constant(value);
 			};
 			mode = defaultString.mode();

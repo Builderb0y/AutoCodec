@@ -2,7 +2,6 @@ package builderb0y.autocodec.encoders;
 
 import java.util.Arrays;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -17,7 +16,9 @@ import builderb0y.autocodec.coders.AutoCoder;
 import builderb0y.autocodec.common.FactoryContext;
 import builderb0y.autocodec.common.FactoryException;
 import builderb0y.autocodec.data.Data;
+import builderb0y.autocodec.data.EmptyData;
 import builderb0y.autocodec.data.MapData;
+import builderb0y.autocodec.data.StringData;
 import builderb0y.autocodec.decoders.AutoDecoder.NamedDecoder;
 import builderb0y.autocodec.decoders.DecodeContext;
 import builderb0y.autocodec.decoders.DecodeException;
@@ -40,12 +41,12 @@ public class MultiFieldEncoder<T_Decoded> extends NamedEncoder<T_Decoded> {
 	@Override
 	@OverrideOnly
 	public <T_Encoded> @NotNull Data encode(@NotNull EncodeContext<T_Encoded, T_Decoded> context) throws EncodeException {
-		if (context.object == null) return context.empty();
+		if (context.object == null) return EmptyData.INSTANCE;
 		Object2ObjectMap<Data, Data> map = new Object2ObjectLinkedOpenHashMap<>(this.fields.length);
 		for (FieldStrategy<T_Decoded, ?> field : this.fields) {
 			field.encodeOnto(context, map);
 		}
-		return context.createMap(map);
+		return new MapData(map);
 	}
 
 	@Override
@@ -107,10 +108,10 @@ public class MultiFieldEncoder<T_Decoded> extends NamedEncoder<T_Decoded> {
 			else {
 				MapData map = context.forceAsMap();
 				for (String alias : this.field.getAliases()) {
-					Data member = map.value.get(context.createString(alias));
+					Data member = map.value.get(new StringData(alias));
 					if (member != null) return context.input(alias, member).decodeWith(this.coder);
 				}
-				return context.input(context.empty()).decodeWith(this.coder);
+				return context.input(EmptyData.INSTANCE).decodeWith(this.coder);
 			}
 		}
 
@@ -123,7 +124,7 @@ public class MultiFieldEncoder<T_Decoded> extends NamedEncoder<T_Decoded> {
 			if (member == null) return;
 			EncodeContext<T_Encoded, T_Member> memberContext = context.object(member);
 			Data encodedMember = memberContext.encodeWith(this.coder);
-			if (!Objects.equals(encodedMember, context.ops.empty())) {
+			if (!encodedMember.isEmpty()) {
 				if (this.inline) {
 					MapData newMap = encodedMember.tryAsMap();
 					if (newMap == null) throw new EncodeException(() -> member + " was annotated as @EncodeInline, but encodes into a value which is not a map: " + encodedMember);
@@ -134,7 +135,7 @@ public class MultiFieldEncoder<T_Decoded> extends NamedEncoder<T_Decoded> {
 					}
 				}
 				else {
-					if (map.putIfAbsent(context.createString(this.field.getSerializedName()), encodedMember) != null) {
+					if (map.putIfAbsent(new StringData(this.field.getSerializedName()), encodedMember) != null) {
 						throw new EncodeException(() -> this.field.getSerializedName() + " is a field used for more than one object!");
 					}
 				}

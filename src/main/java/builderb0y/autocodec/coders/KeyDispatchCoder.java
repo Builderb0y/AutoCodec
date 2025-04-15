@@ -8,7 +8,9 @@ import org.jetbrains.annotations.Nullable;
 
 import builderb0y.autocodec.coders.AutoCoder.NamedCoder;
 import builderb0y.autocodec.data.Data;
+import builderb0y.autocodec.data.EmptyData;
 import builderb0y.autocodec.data.MapData;
+import builderb0y.autocodec.data.StringData;
 import builderb0y.autocodec.decoders.DecodeContext;
 import builderb0y.autocodec.decoders.DecodeException;
 import builderb0y.autocodec.encoders.EncodeContext;
@@ -66,7 +68,7 @@ public abstract class KeyDispatchCoder<T_Key, T_Decoded> extends NamedCoder<T_De
 	@Override
 	public <T_Encoded> @Nullable T_Decoded decode(@NotNull DecodeContext<T_Encoded> context) throws DecodeException {
 		if (context.input.isEmpty()) return null;
-		Data type = context.forceAsMap().value.remove(context.createString(this.keyName));
+		Data type = context.forceAsMap().value.remove(new StringData(this.keyName));
 		if (type == null) throw new DecodeException(() -> "Missing key " + this.keyName);
 		T_Key key = context.input(type).decodeWith(this.keyCoder);
 		if (key == null) throw new DecodeException(() -> "Key " + this.keyName + ' ' + type + " decoded into null");
@@ -78,7 +80,7 @@ public abstract class KeyDispatchCoder<T_Key, T_Decoded> extends NamedCoder<T_De
 	@Override
 	public <T_Encoded> @NotNull Data encode(@NotNull EncodeContext<T_Encoded, T_Decoded> context) throws EncodeException {
 		T_Decoded object = context.object;
-		if (object == null) return context.empty();
+		if (object == null) return EmptyData.INSTANCE;
 		T_Key key = this.getKey(object);
 		if (key == null) throw new EncodeException(() -> "No such key for " + object);
 		@SuppressWarnings("unchecked")
@@ -87,7 +89,7 @@ public abstract class KeyDispatchCoder<T_Key, T_Decoded> extends NamedCoder<T_De
 		Data data = context.encodeWith(coder);
 		MapData map = data.tryAsMap();
 		if (map == null) throw new EncodeException(() -> object + " encoded into non-map " + data + " and " + this.keyName + " cannot be stored.");
-		map.value.put(context.createString(this.keyName), context.object(key).encodeWith(this.keyCoder));
+		map.value.put(new StringData(this.keyName), context.object(key).encodeWith(this.keyCoder));
 		return data;
 	}
 

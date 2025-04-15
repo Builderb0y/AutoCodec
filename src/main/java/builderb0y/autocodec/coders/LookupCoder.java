@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 
 import builderb0y.autocodec.coders.AutoCoder.NamedCoder;
 import builderb0y.autocodec.data.Data;
+import builderb0y.autocodec.data.EmptyData;
 import builderb0y.autocodec.decoders.DecodeContext;
 import builderb0y.autocodec.decoders.DecodeException;
 import builderb0y.autocodec.encoders.EncodeContext;
@@ -84,7 +85,7 @@ public class LookupCoder<T_Key, T_Value> extends NamedCoder<T_Value> {
 	@Override
 	public <T_Encoded> @NotNull Data encode(@NotNull EncodeContext<T_Encoded, T_Value> context) throws EncodeException {
 		T_Value object = context.object;
-		if (object == null) return context.empty();
+		if (object == null) return EmptyData.INSTANCE;
 		T_Key key = this.encode.get(object);
 		if (key == null) throw new EncodeException(() -> "Unknown value: " + object);
 		return context.object(key).encodeWith(this.keyCoder);

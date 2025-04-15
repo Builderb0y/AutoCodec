@@ -57,71 +57,71 @@ public interface DataWriter<T_Exception extends Exception> extends DataReader<T_
 	}
 
 	public default void appendBooleanElement(boolean value) throws T_Exception {
-		this.appendDataElement(this.createBoolean(value));
+		this.appendDataElement(new BooleanData(value));
 	}
 
 	public default void appendByteElement(byte value) throws T_Exception {
-		this.appendDataElement(this.createByte(value));
+		this.appendDataElement(new NumberData(value));
 	}
 
 	public default void appendShortElement(short value) throws T_Exception {
-		this.appendDataElement(this.createShort(value));
+		this.appendDataElement(new NumberData(value));
 	}
 
 	public default void appendIntElement(int value) throws T_Exception {
-		this.appendDataElement(this.createInt(value));
+		this.appendDataElement(new NumberData(value));
 	}
 
 	public default void appendLongElement(long value) throws T_Exception {
-		this.appendDataElement(this.createLong(value));
+		this.appendDataElement(new NumberData(value));
 	}
 
 	public default void appendFloatElement(float value) throws T_Exception {
-		this.appendDataElement(this.createFloat(value));
+		this.appendDataElement(new NumberData(value));
 	}
 
 	public default void appendDoubleElement(double value) throws T_Exception {
-		this.appendDataElement(this.createDouble(value));
+		this.appendDataElement(new NumberData(value));
 	}
 
 	public default void appendStringElement(@NotNull String value) throws T_Exception {
-		this.appendDataElement(this.createString(value));
+		this.appendDataElement(new StringData(value));
 	}
 
 	public default void appendByteListElement(byte @NotNull ... value) throws T_Exception {
-		this.appendDataElement(this.createByteList(value));
+		this.appendDataElement(ByteListData.wrap(value));
 	}
 
 	public default void appendByteListElement(@NotNull ByteList value) throws T_Exception {
-		this.appendDataElement(this.createByteList(value));
+		this.appendDataElement(new ByteListData(value));
 	}
 
 	public default void appendIntListElement(int @NotNull ... value) throws T_Exception {
-		this.appendDataElement(this.createIntList(value));
+		this.appendDataElement(IntListData.wrap(value));
 	}
 
 	public default void appendIntListElement(@NotNull IntList value) throws T_Exception {
-		this.appendDataElement(this.createIntList(value));
+		this.appendDataElement(new IntListData(value));
 	}
 
 	public default void appendLongListElement(long @NotNull ... value) throws T_Exception {
-		this.appendDataElement(this.createLongList(value));
+		this.appendDataElement(LongListData.wrap(value));
 	}
 
 	public default void appendLongListElement(@NotNull LongList value) throws T_Exception {
-		this.appendDataElement(this.createLongList(value));
+		this.appendDataElement(new LongListData(value));
 	}
 
 	public default void appendListElement(@NotNull Data @NotNull ... value) throws T_Exception {
-		this.appendDataElement(this.createList(value));
+		this.appendDataElement(ListData.wrap(value));
 	}
 
 	public default void appendListElement(@NotNull ObjectList<@NotNull Data> value) throws T_Exception {
-		this.appendDataElement(this.createList(value));
+		this.appendDataElement(new ListData(value));
 	}
 
 	public default void appendMapElement(@NotNull Object2ObjectMap<@NotNull Data, @NotNull Data> value) throws T_Exception {
-		this.appendDataElement(this.createMap(value));
+		this.appendDataElement(new MapData(value));
 	}
 
 	public default void appendDataElement(@NotNull Data value) throws T_Exception {
@@ -141,71 +141,71 @@ public interface DataWriter<T_Exception extends Exception> extends DataReader<T_
 	}
 
 	public default @NotNull Data setBooleanElement(int index, boolean value) throws T_Exception {
-		return this.setDataElement(index, this.createBoolean(value));
+		return this.setDataElement(index, new BooleanData(value));
 	}
 
 	public default @NotNull Data setByteElement(int index, byte value) throws T_Exception {
-		return this.setDataElement(index, this.createByte(value));
+		return this.setDataElement(index, new NumberData(value));
 	}
 
 	public default @NotNull Data setShortElement(int index, short value) throws T_Exception {
-		return this.setDataElement(index, this.createShort(value));
+		return this.setDataElement(index, new NumberData(value));
 	}
 
 	public default @NotNull Data setIntElement(int index, int value) throws T_Exception {
-		return this.setDataElement(index, this.createInt(value));
+		return this.setDataElement(index, new NumberData(value));
 	}
 
 	public default @NotNull Data setLongElement(int index, long value) throws T_Exception {
-		return this.setDataElement(index, this.createLong(value));
+		return this.setDataElement(index, new NumberData(value));
 	}
 
 	public default @NotNull Data setFloatElement(int index, float value) throws T_Exception {
-		return this.setDataElement(index, this.createFloat(value));
+		return this.setDataElement(index, new NumberData(value));
 	}
 
 	public default @NotNull Data setDoubleElement(int index, double value) throws T_Exception {
-		return this.setDataElement(index, this.createDouble(value));
+		return this.setDataElement(index, new NumberData(value));
 	}
 
 	public default @NotNull Data setStringElement(int index, @NotNull String value) throws T_Exception {
-		return this.setDataElement(index, this.createString(value));
+		return this.setDataElement(index, new StringData(value));
 	}
 
 	public default @NotNull Data setByteListElement(int index, byte @NotNull ... value) throws T_Exception {
-		return this.setDataElement(index, this.createByteList(value));
+		return this.setDataElement(index, ByteListData.wrap(value));
 	}
 
 	public default @NotNull Data setByteListElement(int index, @NotNull ByteList value) throws T_Exception {
-		return this.setDataElement(index, this.createByteList(value));
+		return this.setDataElement(index, new ByteListData(value));
 	}
 
 	public default @NotNull Data setIntListElement(int index, int @NotNull ... value) throws T_Exception {
-		return this.setDataElement(index, this.createIntList(value));
+		return this.setDataElement(index, IntListData.wrap(value));
 	}
 
 	public default @NotNull Data setIntListElement(int index, @NotNull IntList value) throws T_Exception {
-		return this.setDataElement(index, this.createIntList(value));
+		return this.setDataElement(index, new IntListData(value));
 	}
 
 	public default @NotNull Data setLongListElement(int index, long @NotNull ... value) throws T_Exception {
-		return this.setDataElement(index, this.createLongList(value));
+		return this.setDataElement(index, LongListData.wrap(value));
 	}
 
 	public default @NotNull Data setLongListElement(int index, @NotNull LongList value) throws T_Exception {
-		return this.setDataElement(index, this.createLongList(value));
+		return this.setDataElement(index, new LongListData(value));
 	}
 
 	public default @NotNull Data setListElement(int index, @NotNull Data @NotNull ... value) throws T_Exception {
-		return this.setDataElement(index, this.createList(value));
+		return this.setDataElement(index, ListData.wrap(value));
 	}
 
 	public default @NotNull Data setListElement(int index, @NotNull ObjectList<@NotNull Data> value) throws T_Exception {
-		return this.setDataElement(index, this.createList(value));
+		return this.setDataElement(index, new ListData(value));
 	}
 
 	public default @NotNull Data setMapElement(int index, @NotNull Object2ObjectMap<@NotNull Data, @NotNull Data> value) throws T_Exception {
-		return this.setDataElement(index, this.createMap(value));
+		return this.setDataElement(index, new MapData(value));
 	}
 
 	public default @NotNull Data setDataElement(int index, @NotNull Data value) throws T_Exception {
@@ -229,78 +229,78 @@ public interface DataWriter<T_Exception extends Exception> extends DataReader<T_
 	}
 
 	public default @NotNull Data putBoolean(@NotNull String key, boolean value) throws T_Exception {
-		return this.putData(key, this.createBoolean(value));
+		return this.putData(key, new BooleanData(value));
 	}
 
 	public default @NotNull Data putByte(@NotNull String key, byte value) throws T_Exception {
-		return this.putData(key, this.createByte(value));
+		return this.putData(key, new NumberData(value));
 	}
 
 	public default @NotNull Data putShort(@NotNull String key, short value) throws T_Exception {
-		return this.putData(key, this.createShort(value));
+		return this.putData(key, new NumberData(value));
 	}
 
 	public default @NotNull Data putInt(@NotNull String key, int value) throws T_Exception {
-		return this.putData(key, this.createInt(value));
+		return this.putData(key, new NumberData(value));
 	}
 
 	public default @NotNull Data putLong(@NotNull String key, long value) throws T_Exception {
-		return this.putData(key, this.createLong(value));
+		return this.putData(key, new NumberData(value));
 	}
 
 	public default @NotNull Data putFloat(@NotNull String key, float value) throws T_Exception {
-		return this.putData(key, this.createFloat(value));
+		return this.putData(key, new NumberData(value));
 	}
 
 	public default @NotNull Data putDouble(@NotNull String key, double value) throws T_Exception {
-		return this.putData(key, this.createDouble(value));
+		return this.putData(key, new NumberData(value));
 	}
 
 	public default @NotNull Data putString(@NotNull String key, @NotNull String value) throws T_Exception {
-		return this.putData(key, this.createString(value));
+		return this.putData(key, new StringData(value));
 	}
 
 	public default @NotNull Data putByteList(@NotNull String key, byte @NotNull ... value) throws T_Exception {
-		return this.putData(key, this.createByteList(value));
+		return this.putData(key, ByteListData.wrap(value));
 	}
 
 	public default @NotNull Data putByteList(@NotNull String key, @NotNull ByteList value) throws T_Exception {
-		return this.putData(key, this.createByteList(value));
+		return this.putData(key, new ByteListData(value));
 	}
 
 	public default @NotNull Data putIntList(@NotNull String key, int @NotNull ... value) throws T_Exception {
-		return this.putData(key, this.createIntList(value));
+		return this.putData(key, IntListData.wrap(value));
 	}
 
 	public default @NotNull Data putIntList(@NotNull String key, @NotNull IntList value) throws T_Exception {
-		return this.putData(key, this.createIntList(value));
+		return this.putData(key, new IntListData(value));
 	}
 
 	public default @NotNull Data putLongList(@NotNull String key, long @NotNull ... value) throws T_Exception {
-		return this.putData(key, this.createLongList(value));
+		return this.putData(key, LongListData.wrap(value));
 	}
 
 	public default @NotNull Data putLongList(@NotNull String key, @NotNull LongList value) throws T_Exception {
-		return this.putData(key, this.createLongList(value));
+		return this.putData(key, new LongListData(value));
 	}
 
 	public default @NotNull Data putList(@NotNull String key, @NotNull Data @NotNull ... value) throws T_Exception {
-		return this.putData(key, this.createList(value));
+		return this.putData(key, ListData.wrap(value));
 	}
 
 	public default @NotNull Data putList(@NotNull String key, @NotNull List<@NotNull Data> value) throws T_Exception {
-		return this.putData(key, this.createList(value));
+		return this.putData(key, new ListData(value));
 	}
 
 	public default @NotNull Data putMap(@NotNull String key, @NotNull Map<@NotNull Data, @NotNull Data> value) throws T_Exception {
-		return this.putData(key, this.createMap(value));
+		return this.putData(key, new MapData(value));
 	}
 
 	public default @NotNull Data putData(@NotNull String key, @NotNull Data value) throws T_Exception {
-		return this.forceAsMap().put(this.createString(key), value);
+		return this.forceAsMap().put(new StringData(key), value);
 	}
 
 	public default @NotNull Data removeMember(@NotNull String key) throws T_Exception {
-		return this.forceAsMap().remove(this.createString(key));
+		return this.forceAsMap().remove(new StringData(key));
 	}
 }

@@ -23,6 +23,10 @@ public class ByteListData extends Data {
 		this.value = value;
 	}
 
+	public static @NotNull ByteListData wrap(byte @NotNull ... bytes) {
+		return new ByteListData(ByteArrayList.wrap(bytes));
+	}
+
 	@Override
 	public <T_Encoded> @NotNull T_Encoded convert(@NotNull DynamicOps<T_Encoded> ops) {
 		if (this.value instanceof ByteArrayList arrayList) {

@@ -9,6 +9,8 @@ import org.jetbrains.annotations.Nullable;
 import builderb0y.autocodec.AutoCodec;
 import builderb0y.autocodec.data.Data;
 import builderb0y.autocodec.data.DataWriter;
+import builderb0y.autocodec.data.EmptyData;
+import builderb0y.autocodec.data.StringData;
 import builderb0y.autocodec.encoders.EncodeContext;
 import builderb0y.autocodec.encoders.EncodeException;
 
@@ -54,8 +56,8 @@ public class DataAppendContext<T_Encoded, T_Decoded> extends EncodeContext<T_Enc
 
 	@Override
 	public @NotNull DataAppendContext<T_Encoded, T_Decoded> getMember(@NotNull String key) throws DataAppendException {
-		Data member = this.forceAsMap().value.get(this.createString(key));
-		return this.input(member != null ? member : this.empty());
+		Data member = this.forceAsMap().value.get(new StringData(key));
+		return this.input(member != null ? member : EmptyData.INSTANCE);
 	}
 
 	@Override

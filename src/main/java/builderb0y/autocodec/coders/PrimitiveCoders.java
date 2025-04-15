@@ -13,9 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import builderb0y.autocodec.coders.AutoCoder.NamedCoder;
-import builderb0y.autocodec.data.AbstractNumberData;
-import builderb0y.autocodec.data.Data;
-import builderb0y.autocodec.data.StringData;
+import builderb0y.autocodec.data.*;
 import builderb0y.autocodec.decoders.DecodeContext;
 import builderb0y.autocodec.decoders.DecodeException;
 import builderb0y.autocodec.encoders.EncodeContext;
@@ -37,7 +35,7 @@ public class PrimitiveCoders {
 		@Override
 		@OverrideOnly
 		public <T_Encoded> @NotNull Data encode(@NotNull EncodeContext<T_Encoded, Byte> context) throws EncodeException {
-			return context.object == null ? context.empty() : context.createByte(context.object.byteValue());
+			return context.object == null ? EmptyData.INSTANCE : new NumberData(context.object.byteValue());
 		}
 	};
 
@@ -53,7 +51,7 @@ public class PrimitiveCoders {
 		@Override
 		@OverrideOnly
 		public <T_Encoded> @NotNull Data encode(@NotNull EncodeContext<T_Encoded, Short> context) throws EncodeException {
-			return context.object == null ? context.empty() : context.createShort(context.object.shortValue());
+			return context.object == null ? EmptyData.INSTANCE : new NumberData(context.object.shortValue());
 		}
 	};
 
@@ -69,7 +67,7 @@ public class PrimitiveCoders {
 		@Override
 		@OverrideOnly
 		public <T_Encoded> @NotNull Data encode(@NotNull EncodeContext<T_Encoded, Integer> context) throws EncodeException {
-			return context.object == null ? context.empty() : context.createInt(context.object.intValue());
+			return context.object == null ? EmptyData.INSTANCE : new NumberData(context.object.intValue());
 		}
 	};
 
@@ -85,7 +83,7 @@ public class PrimitiveCoders {
 		@Override
 		@OverrideOnly
 		public <T_Encoded> @NotNull Data encode(@NotNull EncodeContext<T_Encoded, Long> context) throws EncodeException {
-			return context.object == null ? context.empty() : context.createLong(context.object.longValue());
+			return context.object == null ? EmptyData.INSTANCE : new NumberData(context.object.longValue());
 		}
 	};
 
@@ -101,7 +99,7 @@ public class PrimitiveCoders {
 		@Override
 		@OverrideOnly
 		public <T_Encoded> @NotNull Data encode(@NotNull EncodeContext<T_Encoded, Float> context) throws EncodeException {
-			return context.object == null ? context.empty() : context.createFloat(context.object.floatValue());
+			return context.object == null ? EmptyData.INSTANCE : new NumberData(context.object.floatValue());
 		}
 	};
 
@@ -117,7 +115,7 @@ public class PrimitiveCoders {
 		@Override
 		@OverrideOnly
 		public <T_Encoded> @NotNull Data encode(@NotNull EncodeContext<T_Encoded, Double> context) throws EncodeException {
-			return context.object == null ? context.empty() : context.createDouble(context.object.doubleValue());
+			return context.object == null ? EmptyData.INSTANCE : new NumberData(context.object.doubleValue());
 		}
 	};
 
@@ -133,7 +131,7 @@ public class PrimitiveCoders {
 		@Override
 		@OverrideOnly
 		public <T_Encoded> @NotNull Data encode(@NotNull EncodeContext<T_Encoded, Number> context) throws EncodeException {
-			return context.object == null ? context.empty() : context.createNumber(context.object);
+			return context.object == null ? EmptyData.INSTANCE : new UnknownNumberData(context.object);
 		}
 	};
 
@@ -153,10 +151,12 @@ public class PrimitiveCoders {
 		@Override
 		@OverrideOnly
 		public <T_Encoded> @NotNull Data encode(@NotNull EncodeContext<T_Encoded, Character> context) throws EncodeException {
-			return context.object == null ? context.empty() : (
-			context.isCompressed()
-				? context.createShort((short)(context.object.charValue()))
-				: context.createString(String.valueOf(context.object.charValue()))
+			Character c = context.object;
+			if (c == null) return EmptyData.INSTANCE;
+			return (
+				context.isCompressed()
+				? new NumberData((short)(c.charValue()))
+				: new StringData(String.valueOf(c.charValue()))
 			);
 		}
 	};
@@ -173,7 +173,7 @@ public class PrimitiveCoders {
 		@Override
 		@OverrideOnly
 		public <T_Encoded> @NotNull Data encode(@NotNull EncodeContext<T_Encoded, String> context) throws EncodeException {
-			return context.object == null ? context.empty() : context.createString(context.object);
+			return context.object == null ? EmptyData.INSTANCE : new StringData(context.object);
 		}
 	};
 
@@ -189,7 +189,7 @@ public class PrimitiveCoders {
 		@Override
 		@OverrideOnly
 		public <T_Encoded> @NotNull Data encode(@NotNull EncodeContext<T_Encoded, Boolean> context) throws EncodeException {
-			return context.object == null ? context.empty() : context.createBoolean(context.object.booleanValue());
+			return context.object == null ? EmptyData.INSTANCE : new BooleanData(context.object.booleanValue());
 		}
 	};
 
@@ -231,9 +231,9 @@ public class PrimitiveCoders {
 		public <T_Encoded> @NotNull Data encode(@NotNull EncodeContext<T_Encoded, OptionalInt> context) throws EncodeException {
 			OptionalInt optionalInt = context.object;
 			if (optionalInt == null || optionalInt.isEmpty()) {
-				return context.empty();
+				return EmptyData.INSTANCE;
 			}
-			return context.createInt(optionalInt.getAsInt());
+			return new NumberData(optionalInt.getAsInt());
 		}
 	};
 	public static final AutoCoder<OptionalLong> OPTIONAL_LONG = new NamedCoder<>("PrimitiveCoders.OPTIONAL_LONG") {
@@ -250,9 +250,9 @@ public class PrimitiveCoders {
 		public <T_Encoded> @NotNull Data encode(@NotNull EncodeContext<T_Encoded, OptionalLong> context) throws EncodeException {
 			OptionalLong optionalLong = context.object;
 			if (optionalLong == null || optionalLong.isEmpty()) {
-				return context.empty();
+				return EmptyData.INSTANCE;
 			}
-			return context.createLong(optionalLong.getAsLong());
+			return new NumberData(optionalLong.getAsLong());
 		}
 	};
 	public static final AutoCoder<OptionalDouble> OPTIONAL_DOUBLE = new NamedCoder<>("PrimitiveCoders.OPTIONAL_DOUBLE") {
@@ -269,9 +269,9 @@ public class PrimitiveCoders {
 		public <T_Encoded> @NotNull Data encode(@NotNull EncodeContext<T_Encoded, OptionalDouble> context) throws EncodeException {
 			OptionalDouble optionalDouble = context.object;
 			if (optionalDouble == null || optionalDouble.isEmpty()) {
-				return context.empty();
+				return EmptyData.INSTANCE;
 			}
-			return context.createDouble(optionalDouble.getAsDouble());
+			return new NumberData(optionalDouble.getAsDouble());
 		}
 	};
 
@@ -296,9 +296,9 @@ public class PrimitiveCoders {
 			@Override
 			@OverrideOnly
 			public <T_Encoded> @NotNull Data encode(@NotNull EncodeContext<T_Encoded, T_Decoded> context) throws EncodeException {
-				if (context.object == null) return context.empty();
+				if (context.object == null) return EmptyData.INSTANCE;
 				try {
-					return context.createString(destructor.apply(context.object));
+					return new StringData(destructor.apply(context.object));
 				}
 				catch (EncodeException exception) {
 					throw exception;

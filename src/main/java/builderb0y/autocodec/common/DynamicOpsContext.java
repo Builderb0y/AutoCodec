@@ -4,10 +4,9 @@ import com.mojang.serialization.DynamicOps;
 import org.jetbrains.annotations.NotNull;
 
 import builderb0y.autocodec.AutoCodec;
-import builderb0y.autocodec.data.DataFactory;
 import builderb0y.autocodec.util.ObjectArrayFactory;
 
-public abstract class DynamicOpsContext<T_Encoded> extends TaskContext implements DataFactory {
+public abstract class DynamicOpsContext<T_Encoded> extends TaskContext {
 
 	public static final @NotNull ObjectArrayFactory<DynamicOpsContext<?>> ARRAY_FACTORY = new ObjectArrayFactory<>(DynamicOpsContext.class).generic();
 

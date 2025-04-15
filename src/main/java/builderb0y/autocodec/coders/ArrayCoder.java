@@ -1,9 +1,9 @@
 package builderb0y.autocodec.coders;
 
 import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.List;
 
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.jetbrains.annotations.ApiStatus.OverrideOnly;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -13,6 +13,7 @@ import builderb0y.autocodec.coders.AutoCoder.NamedCoder;
 import builderb0y.autocodec.common.FactoryContext;
 import builderb0y.autocodec.common.FactoryException;
 import builderb0y.autocodec.data.Data;
+import builderb0y.autocodec.data.EmptyData;
 import builderb0y.autocodec.data.ListData;
 import builderb0y.autocodec.decoders.DecodeContext;
 import builderb0y.autocodec.decoders.DecodeException;
@@ -59,18 +60,18 @@ public class ArrayCoder<T_DecodedElement, T_DecodedArray> extends NamedCoder<T_D
 	@SuppressWarnings("unchecked")
 	public <T_Encoded> @NotNull Data encode(@NotNull EncodeContext<T_Encoded, T_DecodedArray> context) throws EncodeException {
 		T_DecodedArray from = context.object;
-		if (from == null) return context.empty();
+		if (from == null) return EmptyData.INSTANCE;
 		int length = Array.getLength(from);
 		if (this.singleton && length == 1) {
 			T_DecodedElement decodedElement = (T_DecodedElement)(Array.get(from, 0));
 			return context.object(decodedElement).encodeWith(this.elementCoder);
 		}
-		List<Data> to = new ArrayList<>(length);
+		List<Data> to = new ObjectArrayList<>(length);
 		for (int index = 0; index < length; index++) {
 			T_DecodedElement decodedElement = (T_DecodedElement)(Array.get(from, index));
 			to.add(context.object(decodedElement).encodeWith(this.elementCoder));
 		}
-		return context.createList(to);
+		return new ListData(to);
 	}
 
 	@Override

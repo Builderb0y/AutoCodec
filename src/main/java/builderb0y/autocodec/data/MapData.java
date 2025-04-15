@@ -1,6 +1,8 @@
 package builderb0y.autocodec.data;
 
+import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import com.mojang.datafixers.util.Pair;
@@ -12,9 +14,7 @@ import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.longs.LongList;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import it.unimi.dsi.fastutil.objects.ObjectList;
 import org.jetbrains.annotations.NotNull;
 
 import builderb0y.autocodec.util.AutoCodecUtil;
@@ -33,6 +33,24 @@ public class MapData extends Data {
 
 	public MapData(@NotNull Map<@NotNull Data, @NotNull Data> value) {
 		this.value = value;
+	}
+
+	public static @NotNull MapData singleton(@NotNull String key, @NotNull Data value) {
+		return singleton(new StringData(key), value);
+	}
+
+	public static @NotNull MapData singleton(@NotNull Data key, @NotNull Data value) {
+		MapData map = new MapData(4);
+		map.put(key, value);
+		return map;
+	}
+
+	public static <T> @NotNull MapData collect(
+		@NotNull Stream<? extends T> stream,
+		@NotNull Function<? super T, ? extends @NotNull Data> keyExtractor,
+		@NotNull Function<? super T, ? extends @NotNull Data> valueExtractor
+	) {
+		return new MapData(stream.collect(AutoCodecUtil.collectToMap(keyExtractor, valueExtractor, Object2ObjectLinkedOpenHashMap::new)));
 	}
 
 	public @NotNull Stream<Map.@NotNull Entry<@NotNull Data, @NotNull Data>> streamNonEmpty() {
@@ -116,11 +134,11 @@ public class MapData extends Data {
 		return this.put(key, new ListData(ObjectArrayList.wrap(value)));
 	}
 
-	public @NotNull Data putList(@NotNull String key, @NotNull ObjectList<@NotNull Data> value) {
+	public @NotNull Data putList(@NotNull String key, @NotNull List<@NotNull Data> value) {
 		return this.put(key, new ListData(value));
 	}
 
-	public @NotNull Data putMap(@NotNull String key, @NotNull Object2ObjectMap<@NotNull Data, @NotNull Data> value) {
+	public @NotNull Data putMap(@NotNull String key, @NotNull Map<@NotNull Data, @NotNull Data> value) {
 		return this.put(key, new MapData(value));
 	}
 

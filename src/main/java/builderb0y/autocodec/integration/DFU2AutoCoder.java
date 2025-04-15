@@ -10,6 +10,8 @@ import org.jetbrains.annotations.Nullable;
 
 import builderb0y.autocodec.coders.AutoCoder;
 import builderb0y.autocodec.data.Data;
+import builderb0y.autocodec.data.EmptyData;
+import builderb0y.autocodec.data.UnknownData;
 import builderb0y.autocodec.decoders.DecodeContext;
 import builderb0y.autocodec.decoders.DecodeException;
 import builderb0y.autocodec.encoders.EncodeContext;
@@ -87,8 +89,8 @@ implements AutoCoder<T_Decoded> {
 	@Override
 	@OverrideOnly
 	public <T_Encoded> @NotNull Data encode(@NotNull EncodeContext<T_Encoded, T_Decoded> context) throws EncodeException {
-		if (context.object == null && !this.nullSafe) return context.empty();
-		return context.createUnknown(
+		if (context.object == null && !this.nullSafe) return EmptyData.INSTANCE;
+		return new UnknownData<>(
 			context.ops,
 			context.logger().unwrapLazy(
 				this.codec.encodeStart(context.ops, context.object),

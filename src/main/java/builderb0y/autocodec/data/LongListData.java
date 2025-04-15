@@ -21,6 +21,10 @@ public class LongListData extends Data {
 		this.value = value;
 	}
 
+	public static @NotNull LongListData wrap(long @NotNull ... longs) {
+		return new LongListData(LongArrayList.wrap(longs));
+	}
+
 	@Override
 	public <T_NewEncoded> @NotNull T_NewEncoded convert(@NotNull DynamicOps<T_NewEncoded> ops) {
 		return ops.createLongList(this.value.longStream());

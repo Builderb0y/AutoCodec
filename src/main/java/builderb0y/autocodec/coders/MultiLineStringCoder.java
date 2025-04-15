@@ -12,7 +12,9 @@ import builderb0y.autocodec.coders.AutoCoder.NamedCoder;
 import builderb0y.autocodec.common.FactoryContext;
 import builderb0y.autocodec.common.FactoryException;
 import builderb0y.autocodec.data.Data;
+import builderb0y.autocodec.data.EmptyData;
 import builderb0y.autocodec.data.ListData;
+import builderb0y.autocodec.data.StringData;
 import builderb0y.autocodec.decoders.DecodeContext;
 import builderb0y.autocodec.decoders.DecodeException;
 import builderb0y.autocodec.encoders.EncodeContext;
@@ -49,9 +51,9 @@ public class MultiLineStringCoder extends NamedCoder<@MultiLine String> {
 	@Override
 	public <T_Encoded> @NotNull Data encode(@NotNull EncodeContext<T_Encoded, @MultiLine String> context) throws EncodeException {
 		String string = context.object;
-		if (string == null) return context.empty();
+		if (string == null) return EmptyData.INSTANCE;
 		int index = string.indexOf(this.lineSeparator);
-		if (index < 0) return context.createString(string);
+		if (index < 0) return new StringData(string);
 		Stream.Builder<String> lines = Stream.builder();
 		lines.accept(string.substring(0, index));
 		while (true) {
@@ -65,7 +67,7 @@ public class MultiLineStringCoder extends NamedCoder<@MultiLine String> {
 				break;
 			}
 		}
-		return context.createList(lines.build().map((String line) -> context.object(line).encodeWith(this.fallback)));
+		return ListData.collect(lines.build().map((String line) -> context.object(line).encodeWith(this.fallback)));
 	}
 
 	public static class Factory extends NamedCoderFactory {

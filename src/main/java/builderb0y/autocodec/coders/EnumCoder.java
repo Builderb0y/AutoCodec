@@ -11,9 +11,7 @@ import builderb0y.autocodec.coders.AutoCoder.NamedCoder;
 import builderb0y.autocodec.common.EnumName;
 import builderb0y.autocodec.common.FactoryContext;
 import builderb0y.autocodec.common.FactoryException;
-import builderb0y.autocodec.data.AbstractNumberData;
-import builderb0y.autocodec.data.Data;
-import builderb0y.autocodec.data.StringData;
+import builderb0y.autocodec.data.*;
 import builderb0y.autocodec.decoders.DecodeContext;
 import builderb0y.autocodec.decoders.DecodeException;
 import builderb0y.autocodec.encoders.EncodeContext;
@@ -65,11 +63,11 @@ public class EnumCoder<T_DecodedEnum extends Enum<T_DecodedEnum>> extends NamedC
 
 	@Override
 	public <T_Encoded> @NotNull Data encode(@NotNull EncodeContext<T_Encoded, T_DecodedEnum> context) throws EncodeException {
-		if (context.object == null) return context.empty();
+		if (context.object == null) return EmptyData.INSTANCE;
 		return (
 			context.isCompressed()
-			? context.createInt(context.object.ordinal())
-			: context.createString(this.enumName.getEnumName(context.object))
+			? new NumberData(context.object.ordinal())
+			: new StringData(this.enumName.getEnumName(context.object))
 		);
 	}
 

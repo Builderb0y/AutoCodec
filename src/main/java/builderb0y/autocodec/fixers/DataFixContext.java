@@ -10,6 +10,8 @@ import builderb0y.autocodec.AutoCodec;
 import builderb0y.autocodec.common.AbstractDecodeContext;
 import builderb0y.autocodec.data.Data;
 import builderb0y.autocodec.data.DataWriter;
+import builderb0y.autocodec.data.EmptyData;
+import builderb0y.autocodec.data.StringData;
 import builderb0y.autocodec.decoders.DecodeContext.DecodePath;
 import builderb0y.autocodec.util.ObjectArrayFactory;
 
@@ -59,7 +61,7 @@ implements DataWriter<DataFixException> {
 
 	@Override
 	public @NotNull DataFixContext<T_Encoded> getMember(@NotNull String key) throws DataFixException {
-		Data member = this.forceAsMap().value.get(this.createString(key));
-		return this.input(key, member != null ? member : this.empty());
+		Data member = this.forceAsMap().value.get(new StringData(key));
+		return this.input(key, member != null ? member : EmptyData.INSTANCE);
 	}
 }

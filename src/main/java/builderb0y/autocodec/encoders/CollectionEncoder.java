@@ -11,6 +11,8 @@ import builderb0y.autocodec.coders.AutoCoder;
 import builderb0y.autocodec.common.FactoryContext;
 import builderb0y.autocodec.common.FactoryException;
 import builderb0y.autocodec.data.Data;
+import builderb0y.autocodec.data.EmptyData;
+import builderb0y.autocodec.data.ListData;
 import builderb0y.autocodec.encoders.AutoEncoder.NamedEncoder;
 import builderb0y.autocodec.reflection.reification.ReifiedType;
 
@@ -32,9 +34,9 @@ public class CollectionEncoder<T_Element, T_Collection extends Collection<T_Elem
 	@Override
 	@OverrideOnly
 	public <T_Encoded> @NotNull Data encode(@NotNull EncodeContext<T_Encoded, T_Collection> context) throws EncodeException {
-		if (context.object == null) return context.empty();
+		if (context.object == null) return EmptyData.INSTANCE;
 		AutoCoder<T_Element> coder = this.elementCoder;
-		return context.createList(context.object.stream().map((T_Element element) -> context.object(element).encodeWith(coder)));
+		return ListData.collect(context.object.stream().map((T_Element element) -> context.object(element).encodeWith(coder)));
 	}
 
 	public static class Factory extends NamedEncoderFactory {

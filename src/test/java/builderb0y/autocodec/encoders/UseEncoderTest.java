@@ -11,6 +11,7 @@ import builderb0y.autocodec.common.FactoryContext;
 import builderb0y.autocodec.common.FactoryException;
 import builderb0y.autocodec.common.TestCommon;
 import builderb0y.autocodec.data.Data;
+import builderb0y.autocodec.data.EmptyData;
 import builderb0y.autocodec.encoders.AutoEncoder.EncoderFactory;
 import builderb0y.autocodec.reflection.reification.ReifiedType;
 
@@ -66,7 +67,7 @@ public class UseEncoderTest {
 			@OverrideOnly
 			public <T_Encoded> @NotNull Data encode(@NotNull EncodeContext<T_Encoded, Empty> context) throws EncodeException {
 				actualSuccesses++;
-				return context.empty();
+				return EmptyData.INSTANCE;
 			}
 		};
 
@@ -100,7 +101,7 @@ public class UseEncoderTest {
 			@OverrideOnly
 			public <T_Encoded> @NotNull Data encode(@NotNull EncodeContext<T_Encoded, Object> context) throws EncodeException {
 				actualSuccesses++;
-				return context.empty();
+				return EmptyData.INSTANCE;
 			}
 		};
 
