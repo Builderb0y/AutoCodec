@@ -4,14 +4,18 @@ import com.mojang.serialization.DynamicOps;
 import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.NotNull;
 
-public class NumberData extends AbstractNumberData{
+import builderb0y.autocodec.util.ObjectArrayFactory;
+
+public class NumberData extends AbstractNumberData {
+
+	public static final @NotNull ObjectArrayFactory<NumberData> ARRAY_FACTORY = new ObjectArrayFactory<>(NumberData.class);
 
 	public static final byte
-		BYTE = 0,
-		SHORT = 1,
-		INT = 2,
-		LONG = 3,
-		FLOAT = 4,
+		BYTE   = 0,
+		SHORT  = 1,
+		INT    = 2,
+		LONG   = 3,
+		FLOAT  = 4,
 		DOUBLE = 5;
 
 	public long bits; //basically a union.

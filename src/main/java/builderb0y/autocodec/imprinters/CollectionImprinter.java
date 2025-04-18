@@ -36,7 +36,7 @@ public class CollectionImprinter<T_Element, T_Collection extends Collection<T_El
 		try {
 			ListData array = context.forceAsListMaybeSingleton(this.singleton);
 			for (int index = 0, size = array.value.size(); index < size; index++) {
-				context.object.add(context.input(index, array.value.get(index)).decodeWith(this.elementDecoder));
+				context.object.add(context.fork(index, array.value.get(index)).decodeWith(this.elementDecoder));
 			}
 		}
 		catch (ImprintException exception) {

@@ -1,11 +1,17 @@
 package builderb0y.autocodec.data;
 
+import java.util.stream.LongStream;
+
 import com.mojang.serialization.DynamicOps;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.longs.LongList;
 import org.jetbrains.annotations.NotNull;
 
+import builderb0y.autocodec.util.ObjectArrayFactory;
+
 public class LongListData extends Data {
+
+	public static final @NotNull ObjectArrayFactory<LongListData> ARRAY_FACTORY = new ObjectArrayFactory<>(LongListData.class);
 
 	public @NotNull LongList value;
 
@@ -23,6 +29,10 @@ public class LongListData extends Data {
 
 	public static @NotNull LongListData wrap(long @NotNull ... longs) {
 		return new LongListData(LongArrayList.wrap(longs));
+	}
+
+	public static @NotNull LongListData collect(@NotNull LongStream stream) {
+		return wrap(stream.toArray());
 	}
 
 	@Override

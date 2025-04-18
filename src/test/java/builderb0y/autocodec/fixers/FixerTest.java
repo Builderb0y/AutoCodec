@@ -61,7 +61,7 @@ public class FixerTest {
 				for (String search : new String[] { "foo", "bar" }) {
 					Data removed = context.removeMember(search);
 					if (!removed.isEmpty()) {
-						int value = context.input(search, removed).forceAsInt();
+						int value = context.fork(search, removed).forceAsInt();
 						context.putString("type", search);
 						context.putInt("value", value);
 						return;

@@ -2,7 +2,11 @@ package builderb0y.autocodec.data;
 
 import org.jetbrains.annotations.NotNull;
 
+import builderb0y.autocodec.util.ObjectArrayFactory;
+
 public abstract class AbstractNumberData extends Data {
+
+	public static final @NotNull ObjectArrayFactory<AbstractNumberData> ARRAY_FACTORY = new ObjectArrayFactory<>(AbstractNumberData.class);
 
 	public abstract @NotNull Number numberValue();
 

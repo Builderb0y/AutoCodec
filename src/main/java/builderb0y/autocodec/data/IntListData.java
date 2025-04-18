@@ -1,11 +1,17 @@
 package builderb0y.autocodec.data;
 
+import java.util.stream.IntStream;
+
 import com.mojang.serialization.DynamicOps;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import org.jetbrains.annotations.NotNull;
 
+import builderb0y.autocodec.util.ObjectArrayFactory;
+
 public class IntListData extends Data {
+
+	public static final @NotNull ObjectArrayFactory<IntListData> ARRAY_FACTORY = new ObjectArrayFactory<>(IntListData.class);
 
 	public @NotNull IntList value;
 
@@ -21,8 +27,12 @@ public class IntListData extends Data {
 		this.value = value;
 	}
 
-	public static IntListData wrap(int @NotNull ... ints) {
+	public static @NotNull IntListData wrap(int @NotNull ... ints) {
 		return new IntListData(IntArrayList.wrap(ints));
+	}
+
+	public static @NotNull IntListData collect(@NotNull IntStream stream) {
+		return wrap(stream.toArray());
 	}
 
 	@Override

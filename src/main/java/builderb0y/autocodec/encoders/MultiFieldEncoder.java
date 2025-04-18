@@ -109,9 +109,9 @@ public class MultiFieldEncoder<T_Decoded> extends NamedEncoder<T_Decoded> {
 				MapData map = context.forceAsMap();
 				for (String alias : this.field.getAliases()) {
 					Data member = map.value.get(new StringData(alias));
-					if (member != null) return context.input(alias, member).decodeWith(this.coder);
+					if (member != null) return context.fork(alias, member).decodeWith(this.coder);
 				}
-				return context.input(EmptyData.INSTANCE).decodeWith(this.coder);
+				return context.withData(EmptyData.INSTANCE).decodeWith(this.coder);
 			}
 		}
 

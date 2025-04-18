@@ -46,7 +46,7 @@ public class PatternCoder extends NamedCoder<Pattern> {
 				ListData list = flags.tryAsList();
 				if (list != null) {
 					for (int index = 0, size = list.value.size(); index < size; index++) {
-						patternFlags |= context.input(index, list.value.get(index)).decodeWith(this.flagsCoder).flag;
+						patternFlags |= context.fork(index, list.value.get(index)).decodeWith(this.flagsCoder).flag;
 					}
 				}
 				else {

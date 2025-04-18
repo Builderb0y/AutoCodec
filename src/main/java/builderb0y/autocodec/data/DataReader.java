@@ -6,6 +6,8 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import builderb0y.autocodec.util.StreamableIterable;
+
 public interface DataReader<T_Exception extends Exception> {
 
 	public abstract @NotNull Data data();
@@ -139,7 +141,11 @@ public interface DataReader<T_Exception extends Exception> {
 
 	public abstract @NotNull DataReader<T_Exception> getMember(@NotNull String key) throws T_Exception;
 
-	public abstract @NotNull Iterable<? extends @NotNull DataReader<T_Exception>> listIterable() throws T_Exception;
+	public abstract @NotNull StreamableIterable<? extends @NotNull DataReader<T_Exception>> listIterable() throws T_Exception;
 
-	public abstract @NotNull Iterable<? extends Map.@NotNull Entry<? extends @NotNull DataReader<T_Exception>, ? extends @NotNull DataReader<T_Exception>>> mapIterable() throws T_Exception;
+	public abstract @NotNull StreamableIterable<? extends @NotNull DataReader<T_Exception>> listIterableOrSingleton() throws T_Exception;
+
+	public abstract @NotNull StreamableIterable<? extends @NotNull DataReader<T_Exception>> listIterableMaybeSingleton(boolean singleton) throws T_Exception;
+
+	public abstract @NotNull StreamableIterable<? extends Map.@NotNull Entry<? extends @NotNull DataReader<T_Exception>, ? extends @NotNull DataReader<T_Exception>>> mapIterable() throws T_Exception;
 }

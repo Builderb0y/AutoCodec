@@ -39,7 +39,7 @@ public class MultiLineStringCoder extends NamedCoder<@MultiLine String> {
 		if (list != null) {
 			StringJoiner joiner = new StringJoiner(this.lineSeparator);
 			for (int index = 0, size = list.value.size(); index < size; index++) {
-				joiner.add(context.input(index, list.value.get(index)).decodeWith(this.fallback));
+				joiner.add(context.fork(index, list.value.get(index)).decodeWith(this.fallback));
 			}
 			return joiner.toString();
 		}

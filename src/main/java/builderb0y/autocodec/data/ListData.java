@@ -19,7 +19,11 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import org.jetbrains.annotations.NotNull;
 
+import builderb0y.autocodec.util.ObjectArrayFactory;
+
 public class ListData extends Data implements Iterable<@NotNull Data> {
+
+	public static final @NotNull ObjectArrayFactory<ListData> ARRAY_FACTORY = new ObjectArrayFactory<>(ListData.class);
 
 	public @NotNull List<@NotNull Data> value;
 
@@ -33,6 +37,12 @@ public class ListData extends Data implements Iterable<@NotNull Data> {
 
 	public ListData(@NotNull List<@NotNull Data> value) {
 		this.value = value;
+	}
+
+	public static @NotNull ListData singleton(@NotNull Data contents) {
+		List<Data> list = new ObjectArrayList<>(4);
+		list.add(contents);
+		return new ListData(list);
 	}
 
 	public static @NotNull ListData wrap(@NotNull Data @NotNull ... elements) {

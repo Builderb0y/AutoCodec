@@ -3,7 +3,11 @@ package builderb0y.autocodec.data;
 import com.mojang.serialization.DynamicOps;
 import org.jetbrains.annotations.NotNull;
 
+import builderb0y.autocodec.util.ObjectArrayFactory;
+
 public class BooleanData extends Data {
+
+	public static final @NotNull ObjectArrayFactory<BooleanData> ARRAY_FACTORY = new ObjectArrayFactory<>(BooleanData.class);
 
 	public boolean value;
 

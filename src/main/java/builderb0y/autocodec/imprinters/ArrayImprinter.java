@@ -53,7 +53,7 @@ public abstract class ArrayImprinter<T_DecodedElement, T_DecodedArray> extends N
 					throw new ImprintException(() -> context.pathToStringBuilder().append(" should have a length of ").append(length).append(", but it was length ").append(size).toString());
 				}
 				for (int index = 0; index < length; index++) {
-					Array.set(to, index, context.input(index, from.value.get(index)).decodeWith(this.componentCoder));
+					Array.set(to, index, context.fork(index, from.value.get(index)).decodeWith(this.componentCoder));
 				}
 			}
 			catch (ImprintException exception) {
@@ -87,7 +87,7 @@ public abstract class ArrayImprinter<T_DecodedElement, T_DecodedArray> extends N
 					throw new ImprintException(() -> context.pathToStringBuilder().append(" should have a length of ").append(length).append(", but it was length ").append(from.value.size()).toString());
 				}
 				for (int index = 0; index < length; index++) {
-					to[index] = context.input(index, from.value.get(index)).decodeWith(this.componentCoder);
+					to[index] = context.fork(index, from.value.get(index)).decodeWith(this.componentCoder);
 				}
 			}
 			catch (ImprintException exception) {

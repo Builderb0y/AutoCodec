@@ -23,8 +23,11 @@ import org.jetbrains.annotations.Nullable;
 
 import builderb0y.autocodec.util.AutoCodecUtil;
 import builderb0y.autocodec.util.DFUVersions;
+import builderb0y.autocodec.util.ObjectArrayFactory;
 
 public class UnknownData<T_Encoded> extends Data {
+
+	public static final @NotNull ObjectArrayFactory<UnknownData<?>> ARRAY_FACTORY = new ObjectArrayFactory<>(UnknownData.class).generic();
 
 	public final DynamicOps<T_Encoded> ops;
 	public @NotNull T_Encoded payload;

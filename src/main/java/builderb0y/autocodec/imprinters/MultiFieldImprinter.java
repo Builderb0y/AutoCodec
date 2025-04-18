@@ -169,7 +169,7 @@ public class MultiFieldImprinter<T_Decoded> extends NamedImprinter<T_Decoded> {
 					for (String alias : this.field.getAliases()) {
 						Data member = map.value.get(new StringData(alias));
 						if (member != null) {
-							T_Member decodedMember = context.input(alias, member).decodeWith(this.coder);
+							T_Member decodedMember = context.fork(alias, member).decodeWith(this.coder);
 							if (decodedMember != null) {
 								this.writer.set(context.object, decodedMember);
 							}
@@ -180,7 +180,7 @@ public class MultiFieldImprinter<T_Decoded> extends NamedImprinter<T_Decoded> {
 				//if we didn't return from the loop, then no aliases were specified in the data.
 				//attempt to call the decoder on empty data, to see if it turns it into something useful.
 				//the @Default<type> annotations can do this.
-				T_Member decodedMember = context.input(this.field.getSerializedName(), EmptyData.INSTANCE).decodeWith(this.coder);
+				T_Member decodedMember = context.fork(this.field.getSerializedName(), EmptyData.INSTANCE).decodeWith(this.coder);
 				if (decodedMember != null) {
 					this.writer.set(context.object, decodedMember);
 				}
@@ -264,14 +264,14 @@ public class MultiFieldImprinter<T_Decoded> extends NamedImprinter<T_Decoded> {
 					for (String alias : this.field.getAliases()) {
 						Data member = map.value.get(new StringData(alias));
 						if (member != null) {
-							context.input(alias, member).imprintWith(this.imprinter, object);
+							context.fork(alias, member).imprintWith(this.imprinter, object);
 							return;
 						}
 					}
 				}
 				//if we didn't return from the loop, then no aliases were specified in the data.
 				//attempt to call the decoder on empty data, to see if it does anything useful with it.
-				context.input(this.field.getSerializedName(), EmptyData.INSTANCE).imprintWith(this.imprinter, object);
+				context.fork(this.field.getSerializedName(), EmptyData.INSTANCE).imprintWith(this.imprinter, object);
 			}
 		}
 

@@ -3,6 +3,7 @@ package builderb0y.autocodec.verifiers;
 import java.util.function.Supplier;
 
 import com.mojang.serialization.DynamicOps;
+import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -41,6 +42,7 @@ extends AbstractDecodeContext<
 	}
 
 	@Override
+	@Internal
 	public @NotNull VerifyContext<T_Encoded, T_Decoded> newContext(@Nullable AbstractDecodeContext<T_Encoded, ?, ?> parent, @NotNull DecodePath path, @NotNull Data input) {
 		return new VerifyContext<>(
 			this.autoCodec,

@@ -3,7 +3,11 @@ package builderb0y.autocodec.data;
 import com.mojang.serialization.DynamicOps;
 import org.jetbrains.annotations.NotNull;
 
+import builderb0y.autocodec.util.ObjectArrayFactory;
+
 public class UnknownNumberData extends AbstractNumberData {
+
+	public static final @NotNull ObjectArrayFactory<UnknownNumberData> ARRAY_FACTORY = new ObjectArrayFactory<>(UnknownNumberData.class);
 
 	public @NotNull Number value;
 

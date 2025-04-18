@@ -70,7 +70,7 @@ public abstract class KeyDispatchCoder<T_Key, T_Decoded> extends NamedCoder<T_De
 		if (context.data.isEmpty()) return null;
 		Data type = context.forceAsMap().value.remove(new StringData(this.keyName));
 		if (type == null) throw new DecodeException(() -> "Missing key " + this.keyName);
-		T_Key key = context.input(type).decodeWith(this.keyCoder);
+		T_Key key = context.withData(type).decodeWith(this.keyCoder);
 		if (key == null) throw new DecodeException(() -> "Key " + this.keyName + ' ' + type + " decoded into null");
 		AutoCoder<? extends T_Decoded> coder = this.getCoder(key);
 		if (coder == null) throw new DecodeException(() -> "No such coder for key " + this.keyName + ": " + key);

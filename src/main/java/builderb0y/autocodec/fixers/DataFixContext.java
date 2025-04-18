@@ -3,6 +3,7 @@ package builderb0y.autocodec.fixers;
 import java.util.function.Supplier;
 
 import com.mojang.serialization.DynamicOps;
+import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -40,6 +41,7 @@ implements DataWriter<DataFixException> {
 	}
 
 	@Override
+	@Internal
 	public @NotNull DataFixContext<T_Encoded> newContext(@Nullable AbstractDecodeContext<T_Encoded, ?, ?> parent, @NotNull DecodePath path, @NotNull Data input) {
 		return new DataFixContext<>(this.autoCodec, parent, path, input, this.ops);
 	}
@@ -56,12 +58,12 @@ implements DataWriter<DataFixException> {
 
 	@Override
 	public @NotNull DataFixContext<T_Encoded> getElement(int index) throws DataFixException {
-		return this.input(index, this.forceAsList().value.get(index));
+		return this.fork(index, this.forceAsList().value.get(index));
 	}
 
 	@Override
 	public @NotNull DataFixContext<T_Encoded> getMember(@NotNull String key) throws DataFixException {
 		Data member = this.forceAsMap().value.get(new StringData(key));
-		return this.input(key, member != null ? member : EmptyData.INSTANCE);
+		return this.fork(key, member != null ? member : EmptyData.INSTANCE);
 	}
 }

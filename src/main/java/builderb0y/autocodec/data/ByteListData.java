@@ -7,7 +7,11 @@ import it.unimi.dsi.fastutil.bytes.ByteArrayList;
 import it.unimi.dsi.fastutil.bytes.ByteList;
 import org.jetbrains.annotations.NotNull;
 
+import builderb0y.autocodec.util.ObjectArrayFactory;
+
 public class ByteListData extends Data {
+
+	public static final @NotNull ObjectArrayFactory<ByteListData> ARRAY_FACTORY = new ObjectArrayFactory<>(ByteListData.class);
 
 	public @NotNull ByteList value;
 

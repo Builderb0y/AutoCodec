@@ -1,18 +1,19 @@
 package builderb0y.autocodec.fixers;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 import com.mojang.serialization.DynamicOps;
+import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import builderb0y.autocodec.AutoCodec;
-import builderb0y.autocodec.data.Data;
-import builderb0y.autocodec.data.DataWriter;
-import builderb0y.autocodec.data.EmptyData;
-import builderb0y.autocodec.data.StringData;
+import builderb0y.autocodec.data.*;
 import builderb0y.autocodec.encoders.EncodeContext;
 import builderb0y.autocodec.encoders.EncodeException;
+import builderb0y.autocodec.util.StreamableIterable;
+import builderb0y.autocodec.util.StreamableIterable.SingletonStreamableIterable;
 
 public class DataAppendContext<T_Encoded, T_Decoded> extends EncodeContext<T_Encoded, T_Decoded> implements DataWriter<DataAppendException> {
 
@@ -45,24 +46,23 @@ public class DataAppendContext<T_Encoded, T_Decoded> extends EncodeContext<T_Enc
 		return new DataAppendException(() -> "Not a " + type + ": " + this.data);
 	}
 
-	public @NotNull DataAppendContext<T_Encoded, T_Decoded> input(@NotNull Data data) {
+	public @NotNull DataAppendContext<T_Encoded, T_Decoded> withData(@NotNull Data data) {
 		return new DataAppendContext<>(this, data);
 	}
 
 	@Override
 	public @NotNull DataAppendContext<T_Encoded, T_Decoded> getElement(int index) throws EncodeException {
-		return this.input(this.forceAsList().value.get(index));
+		return this.withData(this.forceAsList().value.get(index));
 	}
 
 	@Override
 	public @NotNull DataAppendContext<T_Encoded, T_Decoded> getMember(@NotNull String key) throws DataAppendException {
 		Data member = this.forceAsMap().value.get(new StringData(key));
-		return this.input(member != null ? member : EmptyData.INSTANCE);
+		return this.withData(member != null ? member : EmptyData.INSTANCE);
 	}
 
-	@Override
-	public @NotNull Iterable<@NotNull DataAppendContext<T_Encoded, T_Decoded>> listIterable() throws DataAppendException {
-		List<Data> list = this.forceAsList().value;
+	@Internal
+	public @NotNull StreamableIterable<@NotNull DataAppendContext<T_Encoded, T_Decoded>> createListIterable(List<Data> list) {
 		return () -> {
 			ListIterator<Data> iterator = list.listIterator();
 			return new Iterator<>() {
@@ -74,33 +74,66 @@ public class DataAppendContext<T_Encoded, T_Decoded> extends EncodeContext<T_Enc
 
 				@Override
 				public @NotNull DataAppendContext<T_Encoded, T_Decoded> next() {
-					return DataAppendContext.this.input(iterator.next());
+					return DataAppendContext.this.withData(iterator.next());
 				}
 			};
 		};
 	}
 
 	@Override
-	public @NotNull Iterable<? extends Map.Entry<@NotNull DataAppendContext<T_Encoded, T_Decoded>, @NotNull DataAppendContext<T_Encoded, T_Decoded>>> mapIterable() throws DataAppendException {
+	public @NotNull StreamableIterable<@NotNull DataAppendContext<T_Encoded, T_Decoded>> listIterable() throws DataAppendException {
+		return this.createListIterable(this.forceAsList().value);
+	}
+
+	@Override
+	public @NotNull StreamableIterable<@NotNull DataAppendContext<T_Encoded, T_Decoded>> listIterableOrSingleton() throws DataAppendException {
+		ListData list = this.tryAsList();
+		if (list != null) {
+			return this.createListIterable(list.value);
+		}
+		else {
+			return new SingletonStreamableIterable<>(this);
+		}
+	}
+
+	@Override
+	public @NotNull StreamableIterable<? extends @NotNull DataReader<DataAppendException>> listIterableMaybeSingleton(boolean singleton) throws DataAppendException {
+		return singleton ? this.listIterableOrSingleton() : this.listIterable();
+	}
+
+	@Override
+	public @NotNull StreamableIterable<? extends Map.Entry<@NotNull DataAppendContext<T_Encoded, T_Decoded>, @NotNull DataAppendContext<T_Encoded, T_Decoded>>> mapIterable() throws DataAppendException {
 		Set<Map.Entry<Data, Data>> entrySet = this.forceAsMap().value.entrySet();
-		return () -> {
-			Iterator<Map.Entry<Data, Data>> iterator = entrySet.iterator();
-			return new Iterator<>() {
+		return new StreamableIterable<>() {
 
-				@Override
-				public boolean hasNext() {
-					return iterator.hasNext();
-				}
+			@Override
+			public @NotNull Iterator<Map.Entry<DataAppendContext<T_Encoded, T_Decoded>, DataAppendContext<T_Encoded, T_Decoded>>> iterator() {
+				Iterator<Map.Entry<Data, Data>> iterator = entrySet.iterator();
+				return new Iterator<>() {
 
-				@Override
-				public Map.Entry<DataAppendContext<T_Encoded, T_Decoded>, DataAppendContext<T_Encoded, T_Decoded>> next() {
-					Map.Entry<Data, Data> next = iterator.next();
-					return Map.entry(
-						DataAppendContext.this.input(next.getKey()),
-						DataAppendContext.this.input(next.getValue())
-					);
-				}
-			};
+					@Override
+					public boolean hasNext() {
+						return iterator.hasNext();
+					}
+
+					@Override
+					public Map.Entry<DataAppendContext<T_Encoded, T_Decoded>, DataAppendContext<T_Encoded, T_Decoded>> next() {
+						Map.Entry<Data, Data> next = iterator.next();
+						return Map.entry(
+							DataAppendContext.this.withData(next.getKey()),
+							DataAppendContext.this.withData(next.getValue())
+						);
+					}
+				};
+			}
+
+			@Override
+			public @NotNull Stream<Map.Entry<@NotNull DataAppendContext<T_Encoded, T_Decoded>, @NotNull DataAppendContext<T_Encoded, T_Decoded>>> stream() {
+				return entrySet.stream().map((Map.Entry<Data, Data> entry) -> Map.entry(
+					DataAppendContext.this.withData(entry.getKey()),
+					DataAppendContext.this.withData(entry.getValue())
+				));
+			}
 		};
 	}
 

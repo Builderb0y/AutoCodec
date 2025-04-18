@@ -50,7 +50,7 @@ public class ArrayCoder<T_DecodedElement, T_DecodedArray> extends NamedCoder<T_D
 		int length = from.value.size();
 		T_DecodedArray to = this.arrayFactory.apply(length);
 		for (int index = 0; index < length; index++) {
-			Array.set(to, index, context.input(index, from.value.get(index)).decodeWith(this.elementCoder));
+			Array.set(to, index, context.fork(index, from.value.get(index)).decodeWith(this.elementCoder));
 		}
 		return to;
 	}

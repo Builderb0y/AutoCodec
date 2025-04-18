@@ -7,6 +7,7 @@ import org.jetbrains.annotations.ApiStatus.OverrideOnly;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import builderb0y.autocodec.annotations.ForceOrdinal;
 import builderb0y.autocodec.coders.AutoCoder.NamedCoder;
 import builderb0y.autocodec.common.EnumName;
 import builderb0y.autocodec.common.FactoryContext;
@@ -23,8 +24,9 @@ public class EnumCoder<T_DecodedEnum extends Enum<T_DecodedEnum>> extends NamedC
 	public final @NotNull EnumName enumName;
 	public final @NotNull T_DecodedEnum @NotNull [] valueArray;
 	public final @NotNull Map<@NotNull String, @NotNull T_DecodedEnum> valueMap;
+	public final @Nullable Boolean forceOrdinal;
 
-	public EnumCoder(@NotNull Class<T_DecodedEnum> enumClass, @NotNull EnumName enumName) {
+	public EnumCoder(@NotNull Class<T_DecodedEnum> enumClass, @NotNull EnumName enumName, @Nullable Boolean forceOrdinal) {
 		super(ReifiedType.from(enumClass));
 		this.enumName = enumName;
 		this.valueArray = enumClass.getEnumConstants();
@@ -35,6 +37,7 @@ public class EnumCoder<T_DecodedEnum extends Enum<T_DecodedEnum>> extends NamedC
 				throw new IllegalArgumentException("Duplicate enum: " + name);
 			}
 		}
+		this.forceOrdinal = forceOrdinal;
 	}
 
 	@Override
@@ -65,7 +68,7 @@ public class EnumCoder<T_DecodedEnum extends Enum<T_DecodedEnum>> extends NamedC
 	public <T_Encoded> @NotNull Data encode(@NotNull EncodeContext<T_Encoded, T_DecodedEnum> context) throws EncodeException {
 		if (context.object == null) return EmptyData.INSTANCE;
 		return (
-			context.isCompressed()
+			(this.forceOrdinal != null ? this.forceOrdinal.booleanValue() : context.isCompressed())
 			? new NumberData(context.object.ordinal())
 			: new StringData(this.enumName.getEnumName(context.object))
 		);
@@ -90,7 +93,8 @@ public class EnumCoder<T_DecodedEnum extends Enum<T_DecodedEnum>> extends NamedC
 		public <T_HandledType> @Nullable AutoCoder<?> tryCreate(@NotNull FactoryContext<T_HandledType> context) throws FactoryException {
 			Class<?> rawClass = context.type.getRawClass();
 			if (rawClass != null && rawClass.isEnum()) {
-				return new EnumCoder(rawClass, this.nameGetter);
+				ForceOrdinal annotation = context.type.getAnnotations().getFirst(ForceOrdinal.class);
+				return new EnumCoder(rawClass, this.nameGetter, annotation != null ? Boolean.valueOf(annotation.value()) : null);
 			}
 			return null;
 		}

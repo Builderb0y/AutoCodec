@@ -2,8 +2,10 @@ package builderb0y.autocodec.common;
 
 import java.util.*;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import com.mojang.serialization.DynamicOps;
+import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -11,7 +13,10 @@ import builderb0y.autocodec.AutoCodec;
 import builderb0y.autocodec.constructors.AutoConstructor;
 import builderb0y.autocodec.constructors.ConstructContext;
 import builderb0y.autocodec.constructors.ConstructException;
-import builderb0y.autocodec.data.*;
+import builderb0y.autocodec.data.Data;
+import builderb0y.autocodec.data.DataReader;
+import builderb0y.autocodec.data.EmptyData;
+import builderb0y.autocodec.data.ListData;
 import builderb0y.autocodec.decoders.AutoDecoder;
 import builderb0y.autocodec.decoders.DecodeContext;
 import builderb0y.autocodec.decoders.DecodeContext.ArrayDecodePath;
@@ -26,6 +31,8 @@ import builderb0y.autocodec.imprinters.ImprintContext;
 import builderb0y.autocodec.imprinters.ImprintException;
 import builderb0y.autocodec.logging.TaskLogger;
 import builderb0y.autocodec.util.ObjectArrayFactory;
+import builderb0y.autocodec.util.StreamableIterable;
+import builderb0y.autocodec.util.StreamableIterable.SingletonStreamableIterable;
 import builderb0y.autocodec.verifiers.AutoVerifier;
 import builderb0y.autocodec.verifiers.VerifyContext;
 import builderb0y.autocodec.verifiers.VerifyException;
@@ -71,6 +78,7 @@ implements DataReader<T_Exception> {
 		return this.data;
 	}
 
+	@Internal
 	public abstract @NotNull T_Context newContext(
 		@Nullable AbstractDecodeContext<T_Encoded, ?, ?> parent,
 		@NotNull DecodePath path,
@@ -78,20 +86,20 @@ implements DataReader<T_Exception> {
 	);
 
 	@SuppressWarnings("unchecked")
-	public @NotNull T_Context input(@NotNull Data input) {
-		return this.data == input ? (T_Context)(this) : this.newContext(this.parent, this.path, input);
+	public @NotNull T_Context withData(@NotNull Data data) {
+		return this.data == data ? (T_Context)(this) : this.newContext(this.parent, this.path, data);
 	}
 
-	public @NotNull T_Context input(@NotNull Data input, @NotNull DecodeContext.DecodePath nextPath) {
-		return this.newContext(this, nextPath, input);
+	public @NotNull T_Context fork(@NotNull DecodeContext.DecodePath nextPath, @NotNull Data data) {
+		return this.newContext(this, nextPath, data);
 	}
 
-	public @NotNull T_Context input(@NotNull String memberName, @NotNull Data member) {
-		return this.input(member, new ObjectDecodePath(memberName));
+	public @NotNull T_Context fork(@NotNull String memberName, @NotNull Data member) {
+		return this.fork(new ObjectDecodePath(memberName), member);
 	}
 
-	public @NotNull T_Context input(int index, @NotNull Data element) {
-		return this.input(element, new ArrayDecodePath(index));
+	public @NotNull T_Context fork(int index, @NotNull Data element) {
+		return this.fork(new ArrayDecodePath(index), element);
 	}
 
 	public abstract @NotNull T_Exception newException(@NotNull Supplier<@NotNull String> messageSupplier);
@@ -104,18 +112,17 @@ implements DataReader<T_Exception> {
 	@Override
 	public @NotNull T_Context getElement(int index) throws T_Exception {
 		ListData list = this.forceAsList();
-		return this.input(index, list.value.get(index));
+		return this.fork(index, list.value.get(index));
 	}
 
 	@Override
 	public @NotNull T_Context getMember(@NotNull String key) throws T_Exception {
 		Data member = this.forceAsMap().get(key);
-		return this.input(key, member != null ? member : EmptyData.INSTANCE);
+		return this.fork(key, member != null ? member : EmptyData.INSTANCE);
 	}
 
-	@Override
-	public @NotNull Iterable<@NotNull T_Context> listIterable() throws T_Exception {
-		List<Data> list = this.forceAsList().value;
+	@Internal
+	public @NotNull StreamableIterable<@NotNull T_Context> createListIterable(@NotNull List<@NotNull Data> list) {
 		return () -> {
 			ListIterator<Data> iterator = list.listIterator();
 			return new Iterator<>() {
@@ -127,33 +134,67 @@ implements DataReader<T_Exception> {
 
 				@Override
 				public T_Context next() {
-					return AbstractDecodeContext.this.input(iterator.nextIndex(), iterator.next());
+					return AbstractDecodeContext.this.fork(iterator.nextIndex(), iterator.next());
 				}
 			};
 		};
 	}
 
 	@Override
-	public @NotNull Iterable<Map.@NotNull Entry<@NotNull T_Context, @NotNull T_Context>> mapIterable() throws T_Exception {
+	public @NotNull StreamableIterable<@NotNull T_Context> listIterable() throws T_Exception {
+		return this.createListIterable(this.forceAsList().value);
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public @NotNull StreamableIterable<@NotNull T_Context> listIterableOrSingleton() throws T_Exception {
+		ListData list = this.tryAsList();
+		if (list != null) {
+			return this.createListIterable(list.value);
+		}
+		else {
+			return new SingletonStreamableIterable<>((T_Context)(this));
+		}
+	}
+
+	@Override
+	public @NotNull StreamableIterable<T_Context> listIterableMaybeSingleton(boolean singleton) throws T_Exception {
+		return singleton ? this.listIterableOrSingleton() : this.listIterable();
+	}
+
+	@Override
+	public @NotNull StreamableIterable<Map.@NotNull Entry<@NotNull T_Context, @NotNull T_Context>> mapIterable() throws T_Exception {
 		Set<Map.Entry<Data, Data>> entrySet = this.forceAsMap().value.entrySet();
-		return () -> {
-			Iterator<Map.Entry<Data, Data>> iterator = entrySet.iterator();
-			return new Iterator<>() {
+		return new StreamableIterable<>() {
 
-				@Override
-				public boolean hasNext() {
-					return iterator.hasNext();
-				}
+			@Override
+			public @NotNull Iterator<Map.Entry<T_Context, T_Context>> iterator() {
+				Iterator<Map.Entry<Data, Data>> iterator = entrySet.iterator();
+				return new Iterator<>() {
 
-				@Override
-				public Map.Entry<T_Context, T_Context> next() {
-					Map.Entry<Data, Data> next = iterator.next();
-					return Map.entry(
-						AbstractDecodeContext.this.input("<key>", next.getKey()),
-						AbstractDecodeContext.this.input(next.getKey().toString(), next.getValue())
-					);
-				}
-			};
+					@Override
+					public boolean hasNext() {
+						return iterator.hasNext();
+					}
+
+					@Override
+					public Map.Entry<T_Context, T_Context> next() {
+						Map.Entry<Data, Data> next = iterator.next();
+						return Map.entry(
+							AbstractDecodeContext.this.fork("<key>", next.getKey()),
+							AbstractDecodeContext.this.fork(next.getKey().toString(), next.getValue())
+						);
+					}
+				};
+			}
+
+			@Override
+			public @NotNull Stream<Map.Entry<T_Context, T_Context>> stream() {
+				return entrySet.stream().map((Map.Entry<Data, Data> entry) -> Map.entry(
+					AbstractDecodeContext.this.fork("<key>", entry.getKey()),
+					AbstractDecodeContext.this.fork(entry.getKey().toString(), entry.getValue())
+				));
+			}
 		};
 	}
 

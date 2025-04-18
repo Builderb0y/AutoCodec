@@ -34,8 +34,8 @@ public class MapImprinter<T_Key, T_Value, T_Map extends Map<T_Key, T_Value>> ext
 	public <T_Encoded> void imprint(@NotNull ImprintContext<T_Encoded, T_Map> context) throws ImprintException {
 		try {
 			for (Map.Entry<Data, Data> entry : context.forceAsMap().value.entrySet()) {
-				T_Key key = context.input("<key>", entry.getKey()).decodeWith(this.keyDecoder);
-				T_Value value = context.input(entry.getKey().toString(), entry.getValue()).decodeWith(this.valueDecoder);
+				T_Key key = context.fork("<key>", entry.getKey()).decodeWith(this.keyDecoder);
+				T_Value value = context.fork(entry.getKey().toString(), entry.getValue()).decodeWith(this.valueDecoder);
 				if (key != null && value != null) context.object.put(key, value);
 			}
 		}

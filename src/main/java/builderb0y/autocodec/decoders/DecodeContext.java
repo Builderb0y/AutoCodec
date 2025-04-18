@@ -3,6 +3,7 @@ package builderb0y.autocodec.decoders;
 import java.util.function.Supplier;
 
 import com.mojang.serialization.DynamicOps;
+import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,6 +36,7 @@ extends AbstractDecodeContext<
 	}
 
 	@Override
+	@Internal
 	public @NotNull DecodeContext<T_Encoded> newContext(
 		@Nullable AbstractDecodeContext<T_Encoded, ?, ?> parent,
 		@NotNull DecodePath path,

@@ -18,8 +18,11 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.jetbrains.annotations.NotNull;
 
 import builderb0y.autocodec.util.AutoCodecUtil;
+import builderb0y.autocodec.util.ObjectArrayFactory;
 
 public class MapData extends Data {
+
+	public static final @NotNull ObjectArrayFactory<MapData> ARRAY_FACTORY = new ObjectArrayFactory<>(MapData.class);
 
 	public @NotNull Map<@NotNull Data, @NotNull Data> value;
 
@@ -55,13 +58,17 @@ public class MapData extends Data {
 
 	public @NotNull Stream<Map.@NotNull Entry<@NotNull Data, @NotNull Data>> streamNonEmpty() {
 		return this.value.entrySet().stream().filter((Map.Entry<Data, Data> entry) -> {
-			return entry.getValue() != null && !entry.getValue().isEmpty();
+			return entry.getKey() != null && !entry.getKey().isEmpty() && entry.getValue() != null && !entry.getValue().isEmpty();
 		});
 	}
 
 	@Override
 	public <T_NewEncoded> @NotNull T_NewEncoded convert(@NotNull DynamicOps<T_NewEncoded> ops) {
 		return ops.createMap(this.streamNonEmpty().map((Map.Entry<Data, Data> entry) -> Pair.of(entry.getKey().convert(ops), entry.getValue().convert(ops))));
+	}
+
+	public int size() {
+		return this.value.size();
 	}
 
 	public @NotNull Data get(String key) {
