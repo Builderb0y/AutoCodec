@@ -198,7 +198,7 @@ public class NumberData extends AbstractNumberData {
 	}
 
 	@Override
-	public @NotNull AbstractNumberData deepCopy() {
+	public @NotNull NumberData deepCopy() {
 		return new NumberData(this.bits, this.precision);
 	}
 }

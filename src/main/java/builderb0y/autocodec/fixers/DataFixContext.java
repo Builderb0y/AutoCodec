@@ -57,12 +57,12 @@ implements DataWriter<DataFixException> {
 	}
 
 	@Override
-	public @NotNull DataFixContext<T_Encoded> getElement(int index) throws DataFixException {
+	public @NotNull DataFixContext<T_Encoded> forceGetElement(int index) throws DataFixException {
 		return this.fork(index, this.forceAsList().value.get(index));
 	}
 
 	@Override
-	public @NotNull DataFixContext<T_Encoded> getMember(@NotNull String key) throws DataFixException {
+	public @NotNull DataFixContext<T_Encoded> forceGetMember(@NotNull String key) throws DataFixException {
 		Data member = this.forceAsMap().value.get(new StringData(key));
 		return this.fork(key, member != null ? member : EmptyData.INSTANCE);
 	}

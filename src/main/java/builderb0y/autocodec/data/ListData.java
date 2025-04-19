@@ -250,7 +250,7 @@ public class ListData extends Data implements Iterable<@NotNull Data> {
 	}
 
 	@Override
-	public @NotNull Data deepCopy() {
+	public @NotNull ListData deepCopy() {
 		return new ListData(this.value.stream().map(Data::deepCopy).collect(Collectors.toCollection(ObjectArrayList::new)));
 	}
 }

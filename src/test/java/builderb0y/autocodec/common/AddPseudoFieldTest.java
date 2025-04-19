@@ -6,6 +6,8 @@ import org.junit.Test;
 
 import builderb0y.autocodec.annotations.AddPseudoField;
 import builderb0y.autocodec.reflection.PseudoField;
+import builderb0y.autocodec.reflection.memberViews.FieldLikeMemberView;
+import builderb0y.autocodec.reflection.memberViews.PseudoFieldView;
 
 import static org.junit.Assert.*;
 
@@ -23,6 +25,16 @@ public class AddPseudoFieldTest {
 		this.assertValid(MissingDefaultSetter.class);
 		this.assertInvalid(MismatchedValueTypes.class);
 		this.assertValid(RedHerringDefaultSetter.class);
+
+		FieldLikeMemberView<Sub, ?>[] fields = TestCommon.DEFAULT_CODEC.reflect(Sub.class).getFields(false);
+		assertEquals("Should only report one field", 1, fields.length);
+		FieldLikeMemberView<Sub, ?> value = fields[0];
+		assertEquals("value", value.getName());
+		if (!(value instanceof PseudoFieldView<Sub, ?>)) fail("Not pseudo: " + value);
+		assertEquals(String.class, value.getType().getRawClass());
+
+		//just check that getType() doesn't NPE.
+		TestCommon.DEFAULT_CODEC.reflect(NotSuper.class).getFields(false)[0].getType();
 	}
 
 	public void assertValid(Class<?> clazz) {
@@ -85,5 +97,25 @@ public class AddPseudoFieldTest {
 	public static class RedHerringDefaultSetter {
 		public Integer value() { return null; }
 		public void value(String value) {}
+	}
+
+	public static class Super<T> {
+
+		public T secret;
+
+		public T value() {
+			return this.secret;
+		}
+	}
+
+	@AddPseudoField("value")
+	public static class Sub extends Super<String> {}
+
+	@AddPseudoField("value")
+	public static class NotSuper {
+
+		public int value() {
+			return 1;
+		}
 	}
 }

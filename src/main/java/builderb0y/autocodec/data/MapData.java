@@ -186,7 +186,7 @@ public class MapData extends Data {
 	}
 
 	@Override
-	public @NotNull Data deepCopy() {
+	public @NotNull MapData deepCopy() {
 		return new MapData(this.value.entrySet().stream().collect(AutoCodecUtil.collectToMap((Map.Entry<Data, Data> entry) -> entry.getKey().deepCopy(), (Map.Entry<Data, Data> entry) -> entry.getValue().deepCopy(), Object2ObjectLinkedOpenHashMap::new)));
 	}
 }

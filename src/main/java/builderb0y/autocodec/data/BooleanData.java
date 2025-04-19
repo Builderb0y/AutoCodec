@@ -37,7 +37,7 @@ public class BooleanData extends Data {
 	}
 
 	@Override
-	public @NotNull Data deepCopy() {
+	public @NotNull BooleanData deepCopy() {
 		return new BooleanData(this.value);
 	}
 }

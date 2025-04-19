@@ -1,14 +1,12 @@
 package builderb0y.autocodec.reflection.memberViews;
 
 import java.lang.invoke.MethodHandle;
-import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.RecordComponent;
 
 import com.google.common.collect.ObjectArrays;
 import it.unimi.dsi.fastutil.Hash;
-import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -126,21 +124,7 @@ public abstract class FieldLikeMemberView<T_Owner, T_Member> extends MemberView<
 		return Modifier.isFinal(this.getModifiers());
 	}
 
-	/**
-	this method exists solely to avoid duplicated code when reifying the member type.
-	{@link #getType()} should always be used instead of this method.
-	*/
-	@Internal
-	public abstract @NotNull AnnotatedType getAnnotatedType();
-
-	@SuppressWarnings("unchecked")
-	public @NotNull ReifiedType<T_Member> getType() {
-		ReifiedType<T_Member> type = this.type;
-		if (type == null) {
-			this.type = type = (ReifiedType<T_Member>)(this.getDeclaringType().resolveDeclaration(this.getAnnotatedType()));
-		}
-		return type;
-	}
+	public abstract @NotNull ReifiedType<T_Member> getType();
 
 	@Override
 	public void appendTo(TypeFormatter formatter) {

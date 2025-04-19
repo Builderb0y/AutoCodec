@@ -148,7 +148,7 @@ public class PseudoField implements AnnotatedElement, Member {
 		AddPseudoField[] annotations = owner.getDeclaredAnnotationsByType(AddPseudoField.class);
 		int length = annotations.length;
 		if (length == 0) return ARRAY_FACTORY.empty();
-		Method[] methods = owner.getDeclaredMethods();
+		Method[] methods = owner.getMethods();
 		int methodCount = preprocessMethods(methods);
 		PseudoField[] fields = new PseudoField[length];
 		for (int index = 0; index < length; index++) {

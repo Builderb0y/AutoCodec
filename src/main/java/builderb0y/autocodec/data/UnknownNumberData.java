@@ -102,7 +102,7 @@ public class UnknownNumberData extends AbstractNumberData {
 	}
 
 	@Override
-	public @NotNull AbstractNumberData deepCopy() {
+	public @NotNull UnknownNumberData deepCopy() {
 		return new UnknownNumberData(this.value); //assume Number instances are immutable.
 	}
 }

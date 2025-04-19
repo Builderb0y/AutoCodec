@@ -77,7 +77,7 @@ public class IntListData extends Data {
 	}
 
 	@Override
-	public @NotNull Data deepCopy() {
+	public @NotNull IntListData deepCopy() {
 		return new IntListData(new IntArrayList(this.value));
 	}
 }

@@ -1,9 +1,7 @@
 package builderb0y.autocodec.reflection.memberViews;
 
 import java.lang.invoke.MethodHandle;
-import java.lang.reflect.AnnotatedType;
 
-import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
 
 import builderb0y.autocodec.common.ReflectContextProvider;
@@ -52,8 +50,17 @@ public class PseudoFieldView<T_Owner, T_Member> extends FieldLikeMemberView<T_Ow
 	}
 
 	@Override
-	@Internal
-	public @NotNull AnnotatedType getAnnotatedType() {
-		return this.field.annotatedType;
+	public @NotNull ReifiedType<T_Member> getType() {
+		ReifiedType<T_Member> type = this.type;
+		if (type == null) {
+			this.type = type = (
+				this
+				.getDeclaringType()
+				.resolveAncestor(this.field.getter.getDeclaringClass())
+				.resolveDeclaration(this.field.getter.getAnnotatedReturnType())
+				.uncheckedCast()
+			);
+		}
+		return type;
 	}
 }

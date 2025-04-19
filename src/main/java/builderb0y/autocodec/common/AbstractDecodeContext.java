@@ -13,10 +13,7 @@ import builderb0y.autocodec.AutoCodec;
 import builderb0y.autocodec.constructors.AutoConstructor;
 import builderb0y.autocodec.constructors.ConstructContext;
 import builderb0y.autocodec.constructors.ConstructException;
-import builderb0y.autocodec.data.Data;
-import builderb0y.autocodec.data.DataReader;
-import builderb0y.autocodec.data.EmptyData;
-import builderb0y.autocodec.data.ListData;
+import builderb0y.autocodec.data.*;
 import builderb0y.autocodec.decoders.AutoDecoder;
 import builderb0y.autocodec.decoders.DecodeContext;
 import builderb0y.autocodec.decoders.DecodeContext.ArrayDecodePath;
@@ -110,15 +107,25 @@ implements DataReader<T_Exception> {
 	}
 
 	@Override
-	public @NotNull T_Context getElement(int index) throws T_Exception {
-		ListData list = this.forceAsList();
-		return this.fork(index, list.value.get(index));
+	public @NotNull T_Context tryGetElement(int index) {
+		ListData list = this.tryAsList();
+		return this.fork(index, list != null ? list.get(index) : EmptyData.INSTANCE);
 	}
 
 	@Override
-	public @NotNull T_Context getMember(@NotNull String key) throws T_Exception {
-		Data member = this.forceAsMap().get(key);
-		return this.fork(key, member != null ? member : EmptyData.INSTANCE);
+	public @NotNull T_Context tryGetMember(@NotNull String key) {
+		MapData map = this.tryAsMap();
+		return this.fork(key, map != null ? map.get(key) : EmptyData.INSTANCE);
+	}
+
+	@Override
+	public @NotNull T_Context forceGetElement(int index) throws T_Exception {
+		return this.fork(index, this.forceAsList().value.get(index));
+	}
+
+	@Override
+	public @NotNull T_Context forceGetMember(@NotNull String key) throws T_Exception {
+		return this.fork(key, this.forceAsMap().get(key));
 	}
 
 	@Internal

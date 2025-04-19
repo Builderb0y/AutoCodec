@@ -1,11 +1,9 @@
 package builderb0y.autocodec.reflection.memberViews;
 
 import java.lang.invoke.MethodHandle;
-import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.RecordComponent;
 
-import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
 
 import builderb0y.autocodec.annotations.UseGetter;
@@ -71,29 +69,39 @@ public class RecordComponentView<T_Owner, T_Member> extends FieldLikeMemberView<
 	}
 
 	@Override
-	@Internal
-	public @NotNull AnnotatedType getAnnotatedType() {
-		/**
-		workaround for a bug in javac:
-		if the record component's type is an annotated *inner* class,
-		then the record component's annotated type reports no annotations.
-		example: {@code
-			public record Example(
-				@Foo Outer outer,
-				Outer.@Foo Inner inner
-			) {}
-		}
-		the outer record component's annotated type reports @Foo,
-		but the inner record component's annotated type doesn't.
+	public @NotNull ReifiedType<T_Member> getType() {
+		ReifiedType<T_Member> type = this.type;
+		if (type == null) {
+			this.type = type = (
+				this
+					.getDeclaringType()
+					.resolveDeclaration(
+						/**
+						workaround for a bug in javac:
+						if the record component's type is an annotated *inner* class,
+						then the record component's annotated type reports no annotations.
+						example: {@code
+							public record Example(
+								@Foo Outer outer,
+								Outer.@Foo Inner inner
+							) {}
+						}
+						the outer record component's annotated type reports @Foo,
+						but the inner record component's annotated type doesn't.
 
-		I know this is an issue with javac, not the reflection API,
-		because in the bytecode, @Foo for inner is present
-		for the backing field and the accessor method,
-		but not for the record component itself.
-		by contrast, @Foo for outer is present on the field,
-		the accessor method, and the record component itself.
-		*/
-		return this.recordComponent.getAccessor().getAnnotatedReturnType();
+						I know this is an issue with javac, not the reflection API,
+						because in the bytecode, @Foo for inner is present
+						for the backing field and the accessor method,
+						but not for the record component itself.
+						by contrast, @Foo for outer is present on the field,
+						the accessor method, and the record component itself.
+						*/
+						this.recordComponent.getAccessor().getAnnotatedReturnType()
+					)
+					.uncheckedCast()
+			);
+		}
+		return type;
 	}
 
 	@Override

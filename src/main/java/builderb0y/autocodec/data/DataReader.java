@@ -137,9 +137,13 @@ public interface DataReader<T_Exception extends Exception> {
 		return this.forceAsLongList().value.getLong(index);
 	}
 
-	public abstract @NotNull DataReader<T_Exception> getElement(int index) throws T_Exception;
+	public abstract @NotNull DataReader<T_Exception> tryGetElement(int index);
 
-	public abstract @NotNull DataReader<T_Exception> getMember(@NotNull String key) throws T_Exception;
+	public abstract @NotNull DataReader<T_Exception> tryGetMember(@NotNull String key);
+
+	public abstract @NotNull DataReader<T_Exception> forceGetElement(int index) throws T_Exception;
+
+	public abstract @NotNull DataReader<T_Exception> forceGetMember(@NotNull String key) throws T_Exception;
 
 	public abstract @NotNull StreamableIterable<? extends @NotNull DataReader<T_Exception>> listIterable() throws T_Exception;
 

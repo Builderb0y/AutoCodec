@@ -11,7 +11,6 @@ import org.jetbrains.annotations.Nullable;
 import builderb0y.autocodec.AutoCodec;
 import builderb0y.autocodec.data.*;
 import builderb0y.autocodec.encoders.EncodeContext;
-import builderb0y.autocodec.encoders.EncodeException;
 import builderb0y.autocodec.util.StreamableIterable;
 import builderb0y.autocodec.util.StreamableIterable.SingletonStreamableIterable;
 
@@ -51,12 +50,24 @@ public class DataAppendContext<T_Encoded, T_Decoded> extends EncodeContext<T_Enc
 	}
 
 	@Override
-	public @NotNull DataAppendContext<T_Encoded, T_Decoded> getElement(int index) throws EncodeException {
+	public @NotNull DataReader<DataAppendException> tryGetElement(int index) {
+		ListData list = this.tryAsList();
+		return this.withData(list != null ? list.get(index) : EmptyData.INSTANCE);
+	}
+
+	@Override
+	public @NotNull DataReader<DataAppendException> tryGetMember(@NotNull String key) {
+		MapData map = this.tryAsMap();
+		return this.withData(map != null ? map.get(key) : EmptyData.INSTANCE);
+	}
+
+	@Override
+	public @NotNull DataAppendContext<T_Encoded, T_Decoded> forceGetElement(int index) throws DataAppendException {
 		return this.withData(this.forceAsList().value.get(index));
 	}
 
 	@Override
-	public @NotNull DataAppendContext<T_Encoded, T_Decoded> getMember(@NotNull String key) throws DataAppendException {
+	public @NotNull DataAppendContext<T_Encoded, T_Decoded> forceGetMember(@NotNull String key) throws DataAppendException {
 		Data member = this.forceAsMap().value.get(new StringData(key));
 		return this.withData(member != null ? member : EmptyData.INSTANCE);
 	}

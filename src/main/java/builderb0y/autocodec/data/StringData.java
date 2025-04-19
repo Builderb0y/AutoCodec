@@ -41,7 +41,7 @@ public class StringData extends Data {
 	}
 
 	@Override
-	public @NotNull Data deepCopy() {
+	public @NotNull StringData deepCopy() {
 		return new StringData(this.value);
 	}
 }

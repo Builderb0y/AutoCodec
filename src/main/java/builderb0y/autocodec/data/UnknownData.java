@@ -325,7 +325,7 @@ public class UnknownData<T_Encoded> extends Data {
 	}
 
 	@Override
-	public @NotNull Data deepCopy() {
+	public @NotNull UnknownData<T_Encoded> deepCopy() {
 		UnknownData<T_Encoded> copy = new UnknownData<>(this.ops, this.payload);
 		if (this.resolution != null) {
 			copy.resolution = this.resolution.deepCopy();

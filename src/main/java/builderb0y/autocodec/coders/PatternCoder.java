@@ -35,9 +35,9 @@ public class PatternCoder extends NamedCoder<Pattern> {
 		if (patternString != null) {
 			return Pattern.compile(patternString.value);
 		}
-		patternString = context.getMember("pattern").forceAsString();
+		patternString = context.forceGetMember("pattern").forceAsString();
 		int patternFlags = 0;
-		DecodeContext<T_Encoded> flags = context.getMember("flags");
+		DecodeContext<T_Encoded> flags = context.forceGetMember("flags");
 		if (!flags.isEmpty()) {
 			if (context.isCompressed()) {
 				patternFlags = flags.forceAsInt();

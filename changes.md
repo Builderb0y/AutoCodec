@@ -13,3 +13,15 @@
 # Minor changes compared to V5:
 * FactoryList is now thread-safe, so handlers can now be requested from the AutoCodec from multiple threads at once.
 * Added a new ForceOrdinal annotation to tweak the ordinal vs. name policy for enum coding.
+* Pseudo-fields can now reference methods declared on super classes. For example:
+```java
+public class Super {
+	
+	public int value() {
+		return 1;
+	}
+}
+
+@AddPseudoField("value") //this is now valid.
+public class Sub extends Super {}
+```

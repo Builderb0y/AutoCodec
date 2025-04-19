@@ -77,7 +77,7 @@ public class LongListData extends Data {
 	}
 
 	@Override
-	public @NotNull Data deepCopy() {
+	public @NotNull LongListData deepCopy() {
 		return new LongListData(new LongArrayList(this.value));
 	}
 }

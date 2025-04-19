@@ -111,7 +111,7 @@ public class MultiFieldEncoder<T_Decoded> extends NamedEncoder<T_Decoded> {
 					Data member = map.value.get(new StringData(alias));
 					if (member != null) return context.fork(alias, member).decodeWith(this.coder);
 				}
-				return context.withData(EmptyData.INSTANCE).decodeWith(this.coder);
+				return context.fork(this.field.getSerializedName(), EmptyData.INSTANCE).decodeWith(this.coder);
 			}
 		}
 

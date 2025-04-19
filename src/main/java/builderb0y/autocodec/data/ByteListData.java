@@ -78,7 +78,7 @@ public class ByteListData extends Data {
 	}
 
 	@Override
-	public @NotNull Data deepCopy() {
+	public @NotNull ByteListData deepCopy() {
 		return new ByteListData(new ByteArrayList(this.value));
 	}
 }
