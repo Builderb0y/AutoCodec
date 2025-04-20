@@ -13,6 +13,7 @@ import builderb0y.autocodec.common.LookupFactory;
 import builderb0y.autocodec.constructors.AutoConstructor.ConstructorFactory;
 import builderb0y.autocodec.reflection.ReflectionManager;
 import builderb0y.autocodec.reflection.reification.ReifiedType;
+import builderb0y.autocodec.util.CollectionImpl;
 import builderb0y.autocodec.util.TypeFormatter;
 
 public class LookupConstructorFactory extends LookupFactory<AutoConstructor<?>> implements ConstructorFactory {
@@ -21,15 +22,16 @@ public class LookupConstructorFactory extends LookupFactory<AutoConstructor<?>> 
 	@OverrideOnly
 	public void setup() {
 		//java.util
-		this.addSimple(       Deque.class, ArrayDeque.class);
-		this.addSimple(        List.class,  ArrayList.class);
-		this.addSimple(         Map.class,    HashMap.class);
-		this.addSimple(NavigableMap.class,    TreeMap.class);
-		this.addSimple(NavigableSet.class,    TreeSet.class);
-		this.addSimple(       Queue.class, ArrayDeque.class);
-		this.addSimple(         Set.class,    HashSet.class);
-		this.addSimple(   SortedMap.class,    TreeMap.class);
-		this.addSimple(   SortedSet.class,    TreeSet.class);
+		this.addSimple(       Deque.class,     ArrayDeque.class);
+		this.addSimple(        List.class,      ArrayList.class);
+		this.addSimple(         Map.class,        HashMap.class);
+		this.addSimple(NavigableMap.class,        TreeMap.class);
+		this.addSimple(NavigableSet.class,        TreeSet.class);
+		this.addSimple(       Queue.class,     ArrayDeque.class);
+		this.addSimple(         Set.class,        HashSet.class);
+		this.addSimple(   SortedMap.class,        TreeMap.class);
+		this.addSimple(   SortedSet.class,        TreeSet.class);
+		this.addSimple(  Collection.class, CollectionImpl.class);
 		//java.util.concurrent
 		this.addSimple(         BlockingDeque.class,   LinkedBlockingDeque.class);
 		this.addSimple(         BlockingQueue.class,   LinkedBlockingQueue.class);
