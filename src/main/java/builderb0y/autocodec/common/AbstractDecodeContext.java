@@ -40,7 +40,7 @@ public abstract class AbstractDecodeContext<
 	T_Context extends AbstractDecodeContext<T_Encoded, T_Exception, T_Context>
 >
 extends DynamicOpsContext<T_Encoded>
-implements DataReader<T_Exception> {
+implements DataReader<T_Exception, T_Context> {
 
 	public static final @NotNull ObjectArrayFactory<AbstractDecodeContext<?, ?, ?>> ARRAY_FACTORY = new ObjectArrayFactory<>(AbstractDecodeContext.class).generic();
 

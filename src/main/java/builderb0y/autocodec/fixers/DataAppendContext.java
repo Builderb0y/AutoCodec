@@ -14,7 +14,13 @@ import builderb0y.autocodec.encoders.EncodeContext;
 import builderb0y.autocodec.util.StreamableIterable;
 import builderb0y.autocodec.util.StreamableIterable.SingletonStreamableIterable;
 
-public class DataAppendContext<T_Encoded, T_Decoded> extends EncodeContext<T_Encoded, T_Decoded> implements DataWriter<DataAppendException> {
+public class
+	DataAppendContext<T_Encoded, T_Decoded>
+extends
+	EncodeContext<T_Encoded, T_Decoded>
+implements
+	DataWriter<DataAppendException, DataAppendContext<T_Encoded, T_Decoded>>
+{
 
 	public /* non-final */ @NotNull Data data;
 
@@ -50,13 +56,13 @@ public class DataAppendContext<T_Encoded, T_Decoded> extends EncodeContext<T_Enc
 	}
 
 	@Override
-	public @NotNull DataReader<DataAppendException> tryGetElement(int index) {
+	public @NotNull DataAppendContext<T_Encoded, T_Decoded> tryGetElement(int index) {
 		ListData list = this.tryAsList();
 		return this.withData(list != null ? list.get(index) : EmptyData.INSTANCE);
 	}
 
 	@Override
-	public @NotNull DataReader<DataAppendException> tryGetMember(@NotNull String key) {
+	public @NotNull DataAppendContext<T_Encoded, T_Decoded> tryGetMember(@NotNull String key) {
 		MapData map = this.tryAsMap();
 		return this.withData(map != null ? map.get(key) : EmptyData.INSTANCE);
 	}
@@ -108,7 +114,7 @@ public class DataAppendContext<T_Encoded, T_Decoded> extends EncodeContext<T_Enc
 	}
 
 	@Override
-	public @NotNull StreamableIterable<? extends @NotNull DataReader<DataAppendException>> listIterableMaybeSingleton(boolean singleton) throws DataAppendException {
+	public @NotNull StreamableIterable<? extends @NotNull DataAppendContext<T_Encoded, T_Decoded>> listIterableMaybeSingleton(boolean singleton) throws DataAppendException {
 		return singleton ? this.listIterableOrSingleton() : this.listIterable();
 	}
 
@@ -146,6 +152,21 @@ public class DataAppendContext<T_Encoded, T_Decoded> extends EncodeContext<T_Enc
 				));
 			}
 		};
+	}
+
+	@Override
+	public @NotNull DataAppendContext<T_Encoded, T_Decoded> withMember(@NotNull String key, @NotNull Data value) throws DataAppendException {
+		return this.withData(this.forceAsMap().with(key, value));
+	}
+
+	@Override
+	public @NotNull DataAppendContext<T_Encoded, T_Decoded> withoutMember(@NotNull String key) throws DataAppendException {
+		return this.withData(this.forceAsMap().without(key));
+	}
+
+	@Override
+	public DataAppendContext<T_Encoded, T_Decoded> deepCopy() {
+		return this.withData(this.data.deepCopy());
 	}
 
 	public @NotNull DataAppendContext<T_Encoded, T_Decoded> appendDataWith(@NotNull AutoFixer<T_Decoded> fixer) throws DataAppendException {

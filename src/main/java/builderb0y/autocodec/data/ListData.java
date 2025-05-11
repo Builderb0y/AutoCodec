@@ -249,6 +249,10 @@ public class ListData extends Data implements Iterable<@NotNull Data> {
 		return this.value.toString();
 	}
 
+	public @NotNull ListData shallowCopy() {
+		return new ListData(new ObjectArrayList<>(this.value));
+	}
+
 	@Override
 	public @NotNull ListData deepCopy() {
 		return new ListData(this.value.stream().map(Data::deepCopy).collect(Collectors.toCollection(ObjectArrayList::new)));

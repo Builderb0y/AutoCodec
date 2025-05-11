@@ -3,9 +3,6 @@ package builderb0y.autocodec.fixers;
 import org.jetbrains.annotations.ApiStatus.OverrideOnly;
 import org.jetbrains.annotations.NotNull;
 
-import builderb0y.autocodec.data.Data;
-import builderb0y.autocodec.data.MapData;
-import builderb0y.autocodec.data.StringData;
 import builderb0y.autocodec.fixers.AutoFixer.NamedFixer;
 import builderb0y.autocodec.reflection.reification.ReifiedType;
 
@@ -43,10 +40,10 @@ public abstract class VersionedFixer<T_Decoded> extends NamedFixer<T_Decoded> {
 	@Override
 	@OverrideOnly
 	public <T_Encoded> @NotNull DataFixContext<T_Encoded> fixData(@NotNull DataFixContext<T_Encoded> context) throws DataFixException {
-		MapData map = context.forceAsMap();
-		Data versionData = map.value.remove(new StringData(this.versionKey));
-		if (versionData == null) throw new DataFixException(() -> "Missing version!");
-		return this.fixData(context, context.fork(this.versionKey, versionData).forceAsInt());
+		int version = context.forceGetMember(this.versionKey).forceAsInt();
+		context = context.deepCopy();
+		context.removeMember(this.versionKey);
+		return this.fixData(context, version);
 	}
 
 	@Override

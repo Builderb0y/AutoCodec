@@ -22,7 +22,7 @@ extends AbstractDecodeContext<
 	DataFixException,
 	DataFixContext<T_Encoded>
 >
-implements DataWriter<DataFixException> {
+implements DataWriter<DataFixException, DataFixContext<T_Encoded>> {
 
 	public static final @NotNull ObjectArrayFactory<DataFixContext<?>> ARRAY_FACTORY = new ObjectArrayFactory<>(DataFixContext.class).generic();
 
@@ -65,5 +65,20 @@ implements DataWriter<DataFixException> {
 	public @NotNull DataFixContext<T_Encoded> forceGetMember(@NotNull String key) throws DataFixException {
 		Data member = this.forceAsMap().value.get(new StringData(key));
 		return this.fork(key, member != null ? member : EmptyData.INSTANCE);
+	}
+
+	@Override
+	public @NotNull DataFixContext<T_Encoded> withMember(@NotNull String key, @NotNull Data value) throws DataFixException {
+		return this.withData(this.forceAsMap().with(key, value));
+	}
+
+	@Override
+	public @NotNull DataFixContext<T_Encoded> withoutMember(@NotNull String key) throws DataFixException {
+		return this.withData(this.forceAsMap().without(key));
+	}
+
+	@Override
+	public DataFixContext<T_Encoded> deepCopy() {
+		return this.withData(this.data.deepCopy());
 	}
 }

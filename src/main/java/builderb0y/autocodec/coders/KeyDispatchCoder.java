@@ -68,13 +68,14 @@ public abstract class KeyDispatchCoder<T_Key, T_Decoded> extends NamedCoder<T_De
 	@Override
 	public <T_Encoded> @Nullable T_Decoded decode(@NotNull DecodeContext<T_Encoded> context) throws DecodeException {
 		if (context.isEmpty()) return null;
-		Data type = context.forceAsMap().value.remove(new StringData(this.keyName));
-		if (type == null) throw new DecodeException(() -> "Missing key " + this.keyName);
+		MapData map = context.forceAsMap();
+		Data type = map.get(this.keyName);
+		if (type.isEmpty()) throw new DecodeException(() -> "Missing key " + this.keyName);
 		T_Key key = context.fork(this.keyName, type).decodeWith(this.keyCoder);
 		if (key == null) throw new DecodeException(() -> "Key " + this.keyName + ' ' + type + " decoded into null");
 		AutoCoder<? extends T_Decoded> coder = this.getCoder(key);
 		if (coder == null) throw new DecodeException(() -> "No such coder for key " + this.keyName + ": " + key);
-		return context.decodeWith(coder);
+		return context.withData(map.without(this.keyName)).decodeWith(coder);
 	}
 
 	@Override

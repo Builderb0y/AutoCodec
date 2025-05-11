@@ -10,7 +10,7 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import org.jetbrains.annotations.NotNull;
 
-public interface DataWriter<T_Exception extends Exception> extends DataReader<T_Exception> {
+public interface DataWriter<T_Exception extends Exception, T_Writer extends DataWriter<T_Exception, T_Writer>> extends DataReader<T_Exception, T_Writer> {
 
 	public default void setBooleanValue(boolean value) throws T_Exception {
 		this.forceAsBoolean().value = value;
@@ -229,78 +229,152 @@ public interface DataWriter<T_Exception extends Exception> extends DataReader<T_
 	}
 
 	public default @NotNull Data putBoolean(@NotNull String key, boolean value) throws T_Exception {
-		return this.putData(key, new BooleanData(value));
+		return this.putMember(key, new BooleanData(value));
 	}
 
 	public default @NotNull Data putByte(@NotNull String key, byte value) throws T_Exception {
-		return this.putData(key, new NumberData(value));
+		return this.putMember(key, new NumberData(value));
 	}
 
 	public default @NotNull Data putShort(@NotNull String key, short value) throws T_Exception {
-		return this.putData(key, new NumberData(value));
+		return this.putMember(key, new NumberData(value));
 	}
 
 	public default @NotNull Data putInt(@NotNull String key, int value) throws T_Exception {
-		return this.putData(key, new NumberData(value));
+		return this.putMember(key, new NumberData(value));
 	}
 
 	public default @NotNull Data putLong(@NotNull String key, long value) throws T_Exception {
-		return this.putData(key, new NumberData(value));
+		return this.putMember(key, new NumberData(value));
 	}
 
 	public default @NotNull Data putFloat(@NotNull String key, float value) throws T_Exception {
-		return this.putData(key, new NumberData(value));
+		return this.putMember(key, new NumberData(value));
 	}
 
 	public default @NotNull Data putDouble(@NotNull String key, double value) throws T_Exception {
-		return this.putData(key, new NumberData(value));
+		return this.putMember(key, new NumberData(value));
 	}
 
 	public default @NotNull Data putString(@NotNull String key, @NotNull String value) throws T_Exception {
-		return this.putData(key, new StringData(value));
+		return this.putMember(key, new StringData(value));
 	}
 
 	public default @NotNull Data putByteList(@NotNull String key, byte @NotNull ... value) throws T_Exception {
-		return this.putData(key, ByteListData.wrap(value));
+		return this.putMember(key, ByteListData.wrap(value));
 	}
 
 	public default @NotNull Data putByteList(@NotNull String key, @NotNull ByteList value) throws T_Exception {
-		return this.putData(key, new ByteListData(value));
+		return this.putMember(key, new ByteListData(value));
 	}
 
 	public default @NotNull Data putIntList(@NotNull String key, int @NotNull ... value) throws T_Exception {
-		return this.putData(key, IntListData.wrap(value));
+		return this.putMember(key, IntListData.wrap(value));
 	}
 
 	public default @NotNull Data putIntList(@NotNull String key, @NotNull IntList value) throws T_Exception {
-		return this.putData(key, new IntListData(value));
+		return this.putMember(key, new IntListData(value));
 	}
 
 	public default @NotNull Data putLongList(@NotNull String key, long @NotNull ... value) throws T_Exception {
-		return this.putData(key, LongListData.wrap(value));
+		return this.putMember(key, LongListData.wrap(value));
 	}
 
 	public default @NotNull Data putLongList(@NotNull String key, @NotNull LongList value) throws T_Exception {
-		return this.putData(key, new LongListData(value));
+		return this.putMember(key, new LongListData(value));
 	}
 
 	public default @NotNull Data putList(@NotNull String key, @NotNull Data @NotNull ... value) throws T_Exception {
-		return this.putData(key, ListData.wrap(value));
+		return this.putMember(key, ListData.wrap(value));
 	}
 
 	public default @NotNull Data putList(@NotNull String key, @NotNull List<@NotNull Data> value) throws T_Exception {
-		return this.putData(key, new ListData(value));
+		return this.putMember(key, new ListData(value));
 	}
 
 	public default @NotNull Data putMap(@NotNull String key, @NotNull Map<@NotNull Data, @NotNull Data> value) throws T_Exception {
-		return this.putData(key, new MapData(value));
+		return this.putMember(key, new MapData(value));
 	}
 
-	public default @NotNull Data putData(@NotNull String key, @NotNull Data value) throws T_Exception {
-		return this.forceAsMap().put(new StringData(key), value);
+	public default @NotNull Data putMember(@NotNull String key, @NotNull Data value) throws T_Exception {
+		return this.forceAsMap().put(key, value);
 	}
 
 	public default @NotNull Data removeMember(@NotNull String key) throws T_Exception {
-		return this.forceAsMap().remove(new StringData(key));
+		return this.forceAsMap().remove(key);
 	}
+
+	public default @NotNull T_Writer withBoolean(@NotNull String key, boolean value) throws T_Exception {
+		return this.withMember(key, new BooleanData(value));
+	}
+
+	public default @NotNull T_Writer withByte(@NotNull String key, byte value) throws T_Exception {
+		return this.withMember(key, new NumberData(value));
+	}
+
+	public default @NotNull T_Writer withShort(@NotNull String key, short value) throws T_Exception {
+		return this.withMember(key, new NumberData(value));
+	}
+
+	public default @NotNull T_Writer withInt(@NotNull String key, int value) throws T_Exception {
+		return this.withMember(key, new NumberData(value));
+	}
+
+	public default @NotNull T_Writer withLong(@NotNull String key, long value) throws T_Exception {
+		return this.withMember(key, new NumberData(value));
+	}
+
+	public default @NotNull T_Writer withFloat(@NotNull String key, float value) throws T_Exception {
+		return this.withMember(key, new NumberData(value));
+	}
+
+	public default @NotNull T_Writer withDouble(@NotNull String key, double value) throws T_Exception {
+		return this.withMember(key, new NumberData(value));
+	}
+
+	public default @NotNull T_Writer withString(@NotNull String key, @NotNull String value) throws T_Exception {
+		return this.withMember(key, new StringData(value));
+	}
+
+	public default @NotNull T_Writer withByteList(@NotNull String key, byte @NotNull ... value) throws T_Exception {
+		return this.withMember(key, ByteListData.wrap(value));
+	}
+
+	public default @NotNull T_Writer withByteList(@NotNull String key, @NotNull ByteList value) throws T_Exception {
+		return this.withMember(key, new ByteListData(value));
+	}
+
+	public default @NotNull T_Writer withIntList(@NotNull String key, int @NotNull ... value) throws T_Exception {
+		return this.withMember(key, IntListData.wrap(value));
+	}
+
+	public default @NotNull T_Writer withIntList(@NotNull String key, @NotNull IntList value) throws T_Exception {
+		return this.withMember(key, new IntListData(value));
+	}
+
+	public default @NotNull T_Writer withLongList(@NotNull String key, long @NotNull ... value) throws T_Exception {
+		return this.withMember(key, LongListData.wrap(value));
+	}
+
+	public default @NotNull T_Writer withLongList(@NotNull String key, @NotNull LongList value) throws T_Exception {
+		return this.withMember(key, new LongListData(value));
+	}
+
+	public default @NotNull T_Writer withList(@NotNull String key, @NotNull Data @NotNull ... value) throws T_Exception {
+		return this.withMember(key, ListData.wrap(value));
+	}
+
+	public default @NotNull T_Writer withList(@NotNull String key, @NotNull List<@NotNull Data> value) throws T_Exception {
+		return this.withMember(key, new ListData(value));
+	}
+
+	public default @NotNull T_Writer withMap(@NotNull String key, @NotNull Map<@NotNull Data, @NotNull Data> value) throws T_Exception {
+		return this.withMember(key, new MapData(value));
+	}
+
+	public abstract @NotNull T_Writer withMember(@NotNull String key, @NotNull Data value) throws T_Exception;
+
+	public abstract @NotNull T_Writer withoutMember(@NotNull String key) throws T_Exception;
+
+	public abstract T_Writer deepCopy();
 }

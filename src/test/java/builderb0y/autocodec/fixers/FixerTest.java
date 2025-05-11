@@ -71,7 +71,7 @@ public class FixerTest {
 			}
 
 			public <T_Encoded> void fixV1(DataFixContext<T_Encoded> context) throws DataFixException {
-				context.putData("name", context.removeMember("type"));
+				context.putMember("name", context.removeMember("type"));
 			}
 		};
 	}

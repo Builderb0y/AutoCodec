@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Nullable;
 
 import builderb0y.autocodec.util.StreamableIterable;
 
-public interface DataReader<T_Exception extends Exception> {
+public interface DataReader<T_Exception extends Exception, T_Reader extends DataReader<T_Exception, T_Reader>> extends DataFactory {
 
 	public abstract @NotNull Data data();
 
@@ -137,19 +137,19 @@ public interface DataReader<T_Exception extends Exception> {
 		return this.forceAsLongList().value.getLong(index);
 	}
 
-	public abstract @NotNull DataReader<T_Exception> tryGetElement(int index);
+	public abstract @NotNull T_Reader tryGetElement(int index);
 
-	public abstract @NotNull DataReader<T_Exception> tryGetMember(@NotNull String key);
+	public abstract @NotNull T_Reader tryGetMember(@NotNull String key);
 
-	public abstract @NotNull DataReader<T_Exception> forceGetElement(int index) throws T_Exception;
+	public abstract @NotNull T_Reader forceGetElement(int index) throws T_Exception;
 
-	public abstract @NotNull DataReader<T_Exception> forceGetMember(@NotNull String key) throws T_Exception;
+	public abstract @NotNull T_Reader forceGetMember(@NotNull String key) throws T_Exception;
 
-	public abstract @NotNull StreamableIterable<? extends @NotNull DataReader<T_Exception>> listIterable() throws T_Exception;
+	public abstract @NotNull StreamableIterable<? extends @NotNull T_Reader> listIterable() throws T_Exception;
 
-	public abstract @NotNull StreamableIterable<? extends @NotNull DataReader<T_Exception>> listIterableOrSingleton() throws T_Exception;
+	public abstract @NotNull StreamableIterable<? extends @NotNull T_Reader> listIterableOrSingleton() throws T_Exception;
 
-	public abstract @NotNull StreamableIterable<? extends @NotNull DataReader<T_Exception>> listIterableMaybeSingleton(boolean singleton) throws T_Exception;
+	public abstract @NotNull StreamableIterable<? extends @NotNull T_Reader> listIterableMaybeSingleton(boolean singleton) throws T_Exception;
 
-	public abstract @NotNull StreamableIterable<? extends Map.@NotNull Entry<? extends @NotNull DataReader<T_Exception>, ? extends @NotNull DataReader<T_Exception>>> mapIterable() throws T_Exception;
+	public abstract @NotNull StreamableIterable<? extends Map.@NotNull Entry<? extends @NotNull T_Reader, ? extends @NotNull T_Reader>> mapIterable() throws T_Exception;
 }

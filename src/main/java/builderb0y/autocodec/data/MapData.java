@@ -159,6 +159,84 @@ public class MapData extends Data {
 		return old;
 	}
 
+	public @NotNull Data withBoolean(@NotNull String key, boolean value) {
+		return this.with(key, new BooleanData(value));
+	}
+
+	public @NotNull Data withByte(@NotNull String key, byte value) {
+		return this.with(key, new NumberData(value));
+	}
+
+	public @NotNull Data withShort(@NotNull String key, short value) {
+		return this.with(key, new NumberData(value));
+	}
+
+	public @NotNull Data withInt(@NotNull String key, int value) {
+		return this.with(key, new NumberData(value));
+	}
+
+	public @NotNull Data withLong(@NotNull String key, long value) {
+		return this.with(key, new NumberData(value));
+	}
+
+	public @NotNull Data withFloat(@NotNull String key, float value) {
+		return this.with(key, new NumberData(value));
+	}
+
+	public @NotNull Data withDouble(@NotNull String key, double value) {
+		return this.with(key, new NumberData(value));
+	}
+
+	public @NotNull Data withString(@NotNull String key, @NotNull String value) {
+		return this.with(key, new StringData(value));
+	}
+
+	public @NotNull Data withByteList(@NotNull String key, byte @NotNull ... value) {
+		return this.with(key, new ByteListData(ByteArrayList.wrap(value)));
+	}
+
+	public @NotNull Data withByteList(@NotNull String key, @NotNull ByteList value) {
+		return this.with(key, new ByteListData(value));
+	}
+
+	public @NotNull Data withIntList(@NotNull String key, int @NotNull ... value) {
+		return this.with(key, new IntListData(IntArrayList.wrap(value)));
+	}
+
+	public @NotNull Data withIntList(@NotNull String key, @NotNull IntList value) {
+		return this.with(key, new IntListData(value));
+	}
+
+	public @NotNull Data withLongList(@NotNull String key, long @NotNull ... value) {
+		return this.with(key, new LongListData(LongArrayList.wrap(value)));
+	}
+
+	public @NotNull Data withLongList(@NotNull String key, @NotNull LongList value) {
+		return this.with(key, new LongListData(value));
+	}
+
+	public @NotNull Data withList(@NotNull String key, @NotNull Data @NotNull ... value) {
+		return this.with(key, new ListData(ObjectArrayList.wrap(value)));
+	}
+
+	public @NotNull Data withList(@NotNull String key, @NotNull List<@NotNull Data> value) {
+		return this.with(key, new ListData(value));
+	}
+
+	public @NotNull Data withMap(@NotNull String key, @NotNull Map<@NotNull Data, @NotNull Data> value) {
+		return this.with(key, new MapData(value));
+	}
+
+	public @NotNull MapData with(@NotNull String key, @NotNull Data value) {
+		return this.with(new StringData(key), value);
+	}
+
+	public @NotNull MapData with(@NotNull Data key, @NotNull Data value) {
+		MapData result = this.shallowCopy();
+		result.put(key, value);
+		return result;
+	}
+
 	public @NotNull Data remove(@NotNull String key) {
 		return this.remove(new StringData(key));
 	}
@@ -167,6 +245,16 @@ public class MapData extends Data {
 		Data removed = this.value.remove(key);
 		if (removed == null) removed = EmptyData.INSTANCE;
 		return removed;
+	}
+
+	public @NotNull MapData without(@NotNull String key) {
+		return this.without(new StringData(key));
+	}
+
+	public @NotNull MapData without(@NotNull Data key) {
+		MapData result = this.shallowCopy();
+		result.remove(key);
+		return result;
 	}
 
 	@Override
@@ -183,6 +271,10 @@ public class MapData extends Data {
 	@Override
 	public String toString() {
 		return this.value.toString();
+	}
+
+	public MapData shallowCopy() {
+		return new MapData(new Object2ObjectLinkedOpenHashMap<>(this.value));
 	}
 
 	@Override
