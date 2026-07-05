@@ -33,9 +33,11 @@ public class UnknownData<T_Encoded> extends Data {
 	public @NotNull T_Encoded payload;
 	public @Nullable Data resolution;
 
-	public UnknownData(@NotNull DynamicOps<T_Encoded> ops, @NotNull T_Encoded payload) {
+	public UnknownData(@NotNull DynamicOps<T_Encoded> ops, @Nullable T_Encoded payload) {
 		this.ops = ops;
-		this.payload = payload;
+		//note: some ops can return null in some places.
+		//most of them will be caught here.
+		this.payload = payload != null ? payload : ops.empty();
 	}
 
 	@Override
