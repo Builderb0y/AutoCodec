@@ -68,7 +68,7 @@ public class StackContextLogger extends AbstractTaskLogger {
 				this.logError(throwable);
 			}
 			else {
-				this.logMessage(String.valueOf(result));
+				this.logMessage(result != null ? result : "null");
 			}
 		}
 		finally {
