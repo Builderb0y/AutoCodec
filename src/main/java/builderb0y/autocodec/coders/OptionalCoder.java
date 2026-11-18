@@ -6,6 +6,7 @@ import org.jetbrains.annotations.ApiStatus.OverrideOnly;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import builderb0y.autocodec.annotations.VerifyNullable;
 import builderb0y.autocodec.coders.AutoCoder.NamedCoder;
 import builderb0y.autocodec.common.FactoryContext;
 import builderb0y.autocodec.common.FactoryException;
@@ -29,6 +30,7 @@ public class OptionalCoder<T> extends NamedCoder<Optional<T>> {
 	@Override
 	@OverrideOnly
 	public <T_Encoded> @Nullable Optional<T> decode(@NotNull DecodeContext<T_Encoded> context) throws DecodeException {
+		if (context.isEmpty()) return Optional.empty();
 		return Optional.ofNullable(context.decodeWith(this.coder));
 	}
 
@@ -50,7 +52,7 @@ public class OptionalCoder<T> extends NamedCoder<Optional<T>> {
 		public <T_HandledType> @Nullable AutoCoder<?> tryCreate(@NotNull FactoryContext<T_HandledType> context) throws FactoryException {
 			ReifiedType<?> type = context.type.resolveParameter(Optional.class);
 			if (type != null) {
-				return new OptionalCoder(context.type, context.type(type).forceCreateCoder());
+				return new OptionalCoder(context.type, context.type(type.addAnnotation(VerifyNullable.INSTANCE)).forceCreateCoder());
 			}
 			return null;
 		}
